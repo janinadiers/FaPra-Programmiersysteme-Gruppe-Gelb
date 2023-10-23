@@ -10,12 +10,12 @@ export class SvgExportService {
     }
 
     exportToSvg(elements: Array<Element>): string {
-        let svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600">`;
+        let svgElement = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600">`;
 
         elements.forEach(element => {
-            if (element.id) {
+            if (element) {
                 const circleRadius = 25;
-                svgString += `<circle id="${element.id}" cx="${element.x}" cy="${element.y}" r="${circleRadius}" fill="black" />`;
+                svgElement += `<circle id="${element.id}" cx="${element.x}" cy="${element.y}" r="${circleRadius}" fill="black" />`;
 
                 // TODO: Je nach Elementtyp unterscheiden (Rechteck, Kreis, etc.)
                 // oder für ein Rechteck:
@@ -23,8 +23,8 @@ export class SvgExportService {
             }
         });
 
-        svgString += `</svg>`;
+        svgElement += `</svg>`;
 
-        return svgString;
+        return svgElement;
     }
 }
