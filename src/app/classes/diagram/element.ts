@@ -53,19 +53,4 @@ export class Element {
         }
         this._svgElement.setAttribute('fill', 'black');
     }
-
-    get svgElement(): {
-        id: string
-        x: number,
-        y: number
-    } | undefined {
-        if (this._svgElement) {
-            return {
-                id: this._id,
-                x: this._x,
-                y: this._y
-            }
-        }
-        return undefined;
-    }
 }
