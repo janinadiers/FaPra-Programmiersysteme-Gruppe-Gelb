@@ -27,7 +27,6 @@ export class AppComponent {
 
         if (newSource.includes('pnml')) {
             result = this._pnmlImportService.import(newSource);
-            console.log('Result', result);
         } else {
             result = this._parserService.parse(newSource);
         }

@@ -5,13 +5,12 @@ import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 
 
 @Injectable({
-    providedIn: 'root',
+    providedIn: 'root'
 })
 export class ParserService {
     parse(text: string): Diagram | undefined {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
-            console.log('Parsed JSON', rawData);
 
             const elements = this.parseElements(rawData['places']);
             this.setPosition(elements, rawData['layout']);
@@ -24,7 +23,6 @@ export class ParserService {
     }
 
     private parseElements(placeIds: Array<string> | undefined): Array<Element> {
-        console.log(placeIds);
 
         if (placeIds === undefined || !Array.isArray(placeIds)) {
             return [];
@@ -33,10 +31,10 @@ export class ParserService {
         return placeIds.map((pid) => new Element(pid));
     }
 
-    private setPosition(
-        elements: Array<Element>,
-        layout: JsonPetriNet['layout']
-    ): void {
+    private setPosition(elements: Array<Element>,layout: 
+    JsonPetriNet['layout']): void {
+
+        
         if (layout === undefined) {
             return;
         }
