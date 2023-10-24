@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {ParserService} from './services/parser.service';
-import {DisplayService} from './services/display.service';
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { ParserService } from './services/parser.service';
+import { PnmlImportService } from './services/pnml-import.service';
+import { DisplayService } from './services/display.service';
 
 @Component({
     selector: 'app-root',
@@ -9,20 +10,30 @@ import {DisplayService} from './services/display.service';
     styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-
     public textareaFc: FormControl;
 
-    constructor(private _parserService: ParserService,
-                private _displayService: DisplayService) {
+    constructor(
+        private _parserService: ParserService,
+        private _displayService: DisplayService,
+        private _pnmlImportService: PnmlImportService
+    ) {
         this.textareaFc = new FormControl();
         this.textareaFc.disable();
     }
 
     public processSourceChange(newSource: string) {
         this.textareaFc.setValue(newSource);
+        let result = undefined;
 
-        const result = this._parserService.parse(newSource);
+        if (newSource.includes('pnml')) {
+            result = this._pnmlImportService.import(newSource);
+            console.log('Result', result);
+        } else {
+            result = this._parserService.parse(newSource);
+        }
+
         if (result !== undefined) {
+
             this._displayService.display(result);
         }
     }
