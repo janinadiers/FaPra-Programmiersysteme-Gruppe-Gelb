@@ -1,0 +1,42 @@
+<mat-toolbar class ="toolbar">
+
+    <button mat-icon-button 
+        class="hover-class"
+        [class.active]="rectActiveColor"
+        (click)="toggleRectangleButton($event)">
+        <mat-icon>crop_portrait</mat-icon>
+    </button>
+        
+    <button  mat-icon-button 
+        class="hover-class" 
+        [class.active]="circleActiveColor"
+        (click)="toggleCircleButton($event)"> 
+        <mat-icon>panorama_fish_eye</mat-icon> 
+     </button>
+      
+    <button  mat-icon-button 
+        class="hover-class"
+        [class.active]="arrowActiveColor"
+        (click)="toggleArrowButton($event)"> 
+        <mat-icon>north_east</mat-icon> 
+    </button>
+
+    <button  mat-icon-button 
+        class="hover-class"
+        [class.active]="boltActiveColor"
+        (click)="toggleBoltButton($event)"> 
+        <mat-icon>bolt</mat-icon> 
+    </button>
+     
+    <button  mat-icon-button 
+        class="hover-class"> 
+        <mat-icon>delete</mat-icon> 
+    </button>
+    
+    <button  mat-icon-button 
+        class="hover-class"> 
+        <mat-icon>clear</mat-icon> 
+    </button>
+      
+</mat-toolbar>
+

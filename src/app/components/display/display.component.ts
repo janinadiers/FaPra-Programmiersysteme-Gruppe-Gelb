@@ -6,6 +6,7 @@ import {Diagram} from '../../classes/diagram/diagram';
 import {ExampleFileComponent} from "../example-file/example-file.component";
 import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
+import { ActivebuttonService } from 'src/app/services/activebutton.service';
 
 @Component({
     selector: 'app-display',
@@ -24,7 +25,8 @@ export class DisplayComponent implements OnDestroy {
     constructor(private _svgService: SvgService,
                 private _displayService: DisplayService,
                 private _fileReaderService: FileReaderService,
-                private _http: HttpClient) {
+                private _http: HttpClient,
+                private activeButtonService: ActivebuttonService) {
 
         this.fileContent = new EventEmitter<string>();
 
@@ -111,4 +113,81 @@ export class DisplayComponent implements OnDestroy {
             drawingArea.removeChild(drawingArea.lastChild as ChildNode);
         }
     }
+
+
+    onCanvasClick(event: MouseEvent) {
+
+        // Check ob linker Mouse Button geklickt und Button aktiviert
+        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
+          
+            // Koordinaten des Klick Events relativ zum SVG Element 
+          const svgElement = document.getElementById('canvas');
+          if (!svgElement) {
+              return;
+          }
+  
+          // Position des SVG Elements relativ zum Viewport
+          const svgRect = svgElement.getBoundingClientRect();
+  
+          // Berechnung der Maus Koordinanten relativ zum SVG Element 
+          const x = event.clientX - svgRect.left;
+          const y = event.clientY - svgRect.top;
+  
+          // SVG Kreis Element
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  
+          // Attribute
+          circle.setAttribute('cx', x.toString()); // x-Koordinate
+          circle.setAttribute('cy', y.toString()); // y-Koordinate
+          circle.setAttribute('r', '30'); // Radius 
+          circle.setAttribute('fill', 'white'); // Farbe 
+          circle.setAttribute('stroke', 'black'); // Border Farbe
+          circle.setAttribute('stroke-width', '2'); 
+  
+          svgElement.appendChild(circle);
+        }  
+    
+     else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
+
+
+        // Koordinaten des Klick Events relativ zum SVG Element  
+        const svgElement = document.getElementById('canvas');
+        if (!svgElement) {
+        return;
+        }
+
+        // Position des SVG Elements relativ zum Viewport
+        const svgRect = svgElement.getBoundingClientRect();
+
+        // Berechnung der Maus Koordinanten relativ zum SVG Element
+        const mouseX = event.clientX - svgRect.left;
+        const mouseY = event.clientY - svgRect.top;
+
+        const width = 30; 
+        const height = 50; 
+
+        // Berechne Koordinaten der linken oberen Ecke des Rechtecks von der Mitte aus
+        const x = mouseX - width / 2;
+        const y = mouseY - height / 2;
+
+        // SVG Rechteck erschaffen
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+        // Attribute
+        rect.setAttribute('x', x.toString()); 
+        rect.setAttribute('y', y.toString()); 
+        rect.setAttribute('width', width.toString()); 
+        rect.setAttribute('height', height.toString()); 
+        rect.setAttribute('fill', 'black'); 
+    
+
+        svgElement.appendChild(rect);
+
+        }
+
+
+    }
+
+
+
 }

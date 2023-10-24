@@ -14,6 +14,8 @@ import {ExampleFileComponent} from './components/example-file/example-file.compo
 import {APP_BASE_HREF, PlatformLocation} from "@angular/common";
 import {HttpClientModule} from "@angular/common/http";
 import {ExampleButtonComponent} from "./components/example-button/example-button.component";
+import { ToolbarComponent } from './components/toolbar/toolbar.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
     declarations: [
@@ -22,6 +24,7 @@ import {ExampleButtonComponent} from "./components/example-button/example-button
         FooterComponent,
         ExampleFileComponent,
         ExampleButtonComponent,
+        ToolbarComponent,
     ],
     imports: [
         BrowserModule,
@@ -33,6 +36,7 @@ import {ExampleButtonComponent} from "./components/example-button/example-button
         MatIconModule,
         ReactiveFormsModule,
         HttpClientModule,
+        MatToolbarModule,
     ],
     providers: [
         {
