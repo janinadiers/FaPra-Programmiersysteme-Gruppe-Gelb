@@ -43,8 +43,9 @@ import { ExportButtonComponent } from './components/export-button/export-button.
             provide: APP_BASE_HREF,
             useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
             deps: [PlatformLocation]
-        },
+        }
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+}

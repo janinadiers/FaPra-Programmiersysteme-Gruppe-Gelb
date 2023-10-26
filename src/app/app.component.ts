@@ -4,12 +4,14 @@ import { ParserService } from './services/parser.service';
 import { PnmlImportService } from './services/pnml-import.service';
 import { DisplayService } from './services/display.service';
 
+
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+    
     public textareaFc: FormControl;
 
     constructor(
