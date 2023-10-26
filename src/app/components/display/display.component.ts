@@ -7,6 +7,8 @@ import {ExampleFileComponent} from "../example-file/example-file.component";
 import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
+import { Element } from 'src/app/classes/diagram/element';
+import { SvgElementService } from 'src/app/services/svg-element.service';
 
 @Component({
     selector: 'app-display',
@@ -26,7 +28,8 @@ export class DisplayComponent implements OnDestroy {
                 private _displayService: DisplayService,
                 private _fileReaderService: FileReaderService,
                 private _http: HttpClient,
-                private activeButtonService: ActivebuttonService) {
+                private activeButtonService: ActivebuttonService,
+                private svgElementService: SvgElementService ) {
 
         this.fileContent = new EventEmitter<string>();
 
@@ -114,6 +117,50 @@ export class DisplayComponent implements OnDestroy {
         }
     }
 
+    private drawCircle (x:number, y: number){
+       
+        const svgElement = document.getElementById('canvas');
+        
+        if (!svgElement) {
+            return;
+        }
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  
+        // Attribute
+        circle.setAttribute('cx', x.toString()); // x-Koordinate
+        circle.setAttribute('cy', y.toString()); // y-Koordinate
+        circle.setAttribute('r', '30'); // Radius 
+        circle.setAttribute('fill', 'white'); // Farbe 
+        circle.setAttribute('stroke', 'black'); // Border Farbe
+        circle.setAttribute('stroke-width', '2'); 
+        
+        svgElement.appendChild(circle);
+    }
+
+
+    private drawRectangle(x:number, y: number, width: number, height: number){
+        
+        const svgElement = document.getElementById('canvas');
+        
+        if (!svgElement) {
+            return;
+        }
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+        // Attribute
+        rect.setAttribute('x', x.toString()); 
+        rect.setAttribute('y', y.toString()); 
+        rect.setAttribute('width', width.toString()); 
+        rect.setAttribute('height', height.toString()); 
+        rect.setAttribute('fill', 'black'); 
+        
+        svgElement.appendChild(rect);
+    }
+
+
+
+
+
 
     onCanvasClick(event: MouseEvent) {
 
@@ -132,19 +179,16 @@ export class DisplayComponent implements OnDestroy {
           // Berechnung der Maus Koordinanten relativ zum SVG Element 
           const x = event.clientX - svgRect.left;
           const y = event.clientY - svgRect.top;
-  
-          // SVG Kreis Element
-          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  
-          // Attribute
-          circle.setAttribute('cx', x.toString()); // x-Koordinate
-          circle.setAttribute('cy', y.toString()); // y-Koordinate
-          circle.setAttribute('r', '30'); // Radius 
-          circle.setAttribute('fill', 'white'); // Farbe 
-          circle.setAttribute('stroke', 'black'); // Border Farbe
-          circle.setAttribute('stroke-width', '2'); 
-  
-          svgElement.appendChild(circle);
+
+           //Kreis-Objekt erzeugen
+           let circleObject = new Element("circle");
+           circleObject.x=x;
+           circleObject.y=y;
+ 
+           this.svgElementService.addCircle(circleObject);
+
+            //SVG Kreis Element malen
+          this.drawCircle(x,y);
         }  
     
      else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
@@ -170,19 +214,17 @@ export class DisplayComponent implements OnDestroy {
         const x = mouseX - width / 2;
         const y = mouseY - height / 2;
 
-        // SVG Rechteck erschaffen
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        //Rechteck-Objekt erzeugen
+        let rectObject = new Element("rectangle");
+        rectObject.x=x;
+        rectObject.y=y;
 
-        // Attribute
-        rect.setAttribute('x', x.toString()); 
-        rect.setAttribute('y', y.toString()); 
-        rect.setAttribute('width', width.toString()); 
-        rect.setAttribute('height', height.toString()); 
-        rect.setAttribute('fill', 'black'); 
-    
+        //Objekt im Array speichern
 
-        svgElement.appendChild(rect);
+        this.svgElementService.addRectangle(rectObject);
 
+        //SVG Kreis Element malen
+        this.drawRectangle(x,y,width,height);
         }
 
 
