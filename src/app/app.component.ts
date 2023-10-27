@@ -23,15 +23,15 @@ export class AppComponent {
         this.textareaFc.disable();
     }
 
-    public processSourceChange(newSource: string) {
+    public processSourceChange(newSource: {fileContent: string, fileExtension: string}) {
         this.textareaFc.setValue(newSource);
         let result = undefined;
         console.log('new Source: ', newSource);
         
-        if (newSource.includes('pnml')) {
-            result = this._pnmlImportService.import(newSource);
+        if (newSource.fileExtension === 'pnml') {
+            result = this._pnmlImportService.import(newSource.fileContent);
         } else {
-            result = this._parserService.parse(newSource);
+            result = this._parserService.parse(newSource.fileContent);
         }
 
         if (result !== undefined) {

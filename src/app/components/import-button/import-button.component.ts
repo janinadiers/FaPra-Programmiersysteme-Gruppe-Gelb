@@ -18,12 +18,12 @@ export class ImportButtonComponent {
 
     @Input() title: string | undefined;
     @ViewChild('hiddenInput') input: ElementRef = new ElementRef(null);
-    @Output('fileContent') fileContent: EventEmitter<string>;
+    @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
 
     constructor(
         private _fileReaderService: FileReaderService
     ) {
-        this.fileContent = new EventEmitter<string>();
+        this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
     }
 
     prevent(e: Event) {
@@ -53,15 +53,11 @@ export class ImportButtonComponent {
     importFromPnmlFile(e: Event) {
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
-            // console.log('selectedFile: ', selectedFile.files[0].name.match(/\.pnml$/));
-            // if(selectedFile.files[0].name.match(/\.pnml$/)) {
-            //     console.log('PNML file selected');
-                
-            // }
+            const fileExtension = selectedFile.files[0].name.match(/\.pnml$/) ? 'pnml' : '';
             this._fileReaderService
                 .readFile(selectedFile.files[0])
                 .subscribe((content) => {
-                    this.fileContent.emit(content);
+                    this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
                 });
         }
     }
