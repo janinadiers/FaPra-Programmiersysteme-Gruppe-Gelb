@@ -43,7 +43,7 @@ export class ImportButtonComponent {
         target.classList.remove('mouse-hover');
     }
 
-    processMouseClick(e: MouseEvent) {
+    prepareImportFromPnmlFile(e: MouseEvent) {
         
       this.prevent(e);
       this.input?.nativeElement.click();
