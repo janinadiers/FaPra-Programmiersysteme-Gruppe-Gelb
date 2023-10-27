@@ -26,7 +26,8 @@ export class AppComponent {
     public processSourceChange(newSource: string) {
         this.textareaFc.setValue(newSource);
         let result = undefined;
-
+        console.log('new Source: ', newSource);
+        
         if (newSource.includes('pnml')) {
             result = this._pnmlImportService.import(newSource);
         } else {

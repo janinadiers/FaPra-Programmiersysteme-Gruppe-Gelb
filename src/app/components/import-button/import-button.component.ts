@@ -16,8 +16,6 @@ import { FileReaderService } from '../../services/file-reader.service';
 })
 export class ImportButtonComponent {
 
-    public static readonly META_DATA_CODE = 'drag-file-location';
-
     @Input() title: string | undefined;
     @ViewChild('hiddenInput') input: ElementRef = new ElementRef(null);
     @Output('fileContent') fileContent: EventEmitter<string>;
@@ -52,9 +50,14 @@ export class ImportButtonComponent {
         
     }
 
-    processFileChange(e: Event) {
+    importFromPnmlFile(e: Event) {
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
+            // console.log('selectedFile: ', selectedFile.files[0].name.match(/\.pnml$/));
+            // if(selectedFile.files[0].name.match(/\.pnml$/)) {
+            //     console.log('PNML file selected');
+                
+            // }
             this._fileReaderService
                 .readFile(selectedFile.files[0])
                 .subscribe((content) => {

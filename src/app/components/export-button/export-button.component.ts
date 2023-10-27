@@ -8,8 +8,6 @@ import {Component, Input} from '@angular/core';
 })
 export class ExportButtonComponent {
 
-    public static readonly META_DATA_CODE = 'drag-file-location';
-
     @Input() title: string | undefined;
     
     constructor(
@@ -33,7 +31,7 @@ export class ExportButtonComponent {
         target.classList.remove('mouse-hover');
     }
 
-    processMouseClick(e: MouseEvent) {
+    exportToPnmlFile(e: MouseEvent) {
         
       this.prevent(e);
       this._pnmlExport.export();
