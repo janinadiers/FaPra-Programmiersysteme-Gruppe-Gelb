@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {DisplayService} from "../../services/display.service";
-import {SvgExportService} from "../../services/svg-export.service";
 import {take} from "rxjs";
+import {SvgService} from "../../services/svg.service";
 
 @Component({
     selector: 'app-export-svg-button',
@@ -13,7 +13,7 @@ export class ExportSvgButtonComponent {
     @Input() title: string | undefined;
 
     constructor(private displayService: DisplayService,
-                private svgExportService: SvgExportService) {
+                private svgService: SvgService) {
     }
 
     prevent(e: Event) {
@@ -38,9 +38,9 @@ export class ExportSvgButtonComponent {
         // Mit take(1) wird sichergestellt, dass nur das erste Element abgerufen wird, und mit toPromise() wird es zu einem Promise.
         const diagram = await this.displayService.diagram$.pipe(take(1)).toPromise();
 
-        if (diagram) {
+        if (diagram && diagram.elements.length > 0) {
             // Elemente des Diagramms in ein SVG-Format exportieren.
-            const svgWithElements = this.svgExportService.exportToSvg(diagram.elements);
+            const svgWithElements = this.svgService.exportToSvg(diagram.elements);
 
             // Erstellen einer Blob-Datei mit dem SVG-Inhalt und dem entsprechenden Typ.
             const blob = new Blob([svgWithElements], {type: 'image/svg+xml'});
