@@ -54,4 +54,7 @@ export class Element {
         this._svgElement.setAttribute('fill', 'black');
     }
 
+    get svgElement(): SVGElement | undefined {
+        return this._svgElement;
+    }
 }
