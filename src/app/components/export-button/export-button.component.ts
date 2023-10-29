@@ -8,7 +8,6 @@ import { PngExportService } from "../../services/png-export.service";
   styleUrls: ['./export-button.component.css']
 })
 export class ExportButtonComponent {
-    public static readonly META_DATA_CODE = 'drag-file-location';
 
     @Input() title: string | undefined;
 

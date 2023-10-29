@@ -2,7 +2,7 @@ export class Element {
     private readonly _id: string;
     private _x: number;
     private _y: number;
-    _svgElement: SVGElement | undefined;
+    private _svgElement: SVGElement | undefined;
 
     constructor(id: string) {
         this._id = id;
