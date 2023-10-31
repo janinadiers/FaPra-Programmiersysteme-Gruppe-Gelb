@@ -43,17 +43,19 @@ export class ImportButtonComponent {
         target.classList.remove('mouse-hover');
     }
 
-    prepareImportFromPnmlFile(e: MouseEvent) {
+    prepareImportFromFile(e: MouseEvent) {
         
       this.prevent(e);
       this.input?.nativeElement.click();
         
     }
 
-    importFromPnmlFile(e: Event) {
+    importFromFile(e: Event) {
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
-            const fileExtension = selectedFile.files[0].name.match(/\.pnml$/) ? 'pnml' : '';
+            var fileExtension = selectedFile.files[0].name.match(/\.pnml$/) ? 'pnml' : '';
+            if (fileExtension.length == 0)
+                fileExtension = selectedFile.files[0].name.match(/\.json$/) ? 'json' : '';
             this._fileReaderService
                 .readFile(selectedFile.files[0])
                 .subscribe((content) => {

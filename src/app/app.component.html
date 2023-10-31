@@ -12,11 +12,11 @@
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <app-example-button title="Button"></app-example-button>
-        <app-export-button title="Export PNML"></app-export-button>
+        <app-export-button title="Export"></app-export-button>
 
         <app-import-button
             (fileContent)="processSourceChange($event)"
-            title="Import PNML"
+            title="Import"
         ></app-import-button>
 
         <app-example-file title="File" link="assets/example.json" description="An example .json Petri net"></app-example-file>

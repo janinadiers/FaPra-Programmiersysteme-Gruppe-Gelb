@@ -4,7 +4,7 @@
         class="interactive-square"
         fxLayout="row"
         fxLayoutAlign="center center"
-        (click)="prepareImportFromPnmlFile($event)"
+        (click)="prepareImportFromFile($event)"
         (mouseenter)="hoverStart($event)"
         (mouseleave)="hoverEnd($event)"
     >
@@ -12,7 +12,7 @@
     </div>
     <input
         #hiddenInput
-        (change)="importFromPnmlFile($event)"
+        (change)="importFromFile($event)"
         type="file"
         id="fileInput"
         style="display: none"
