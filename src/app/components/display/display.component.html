@@ -1,5 +1,6 @@
 <svg id= "canvas" #drawingArea class="canvas"
      (drop)="processDropEvent($event)"
      (dragover)="prevent($event)"
-     (click)="onCanvasClick($event)">
+     (click)="onCanvasClick($event)"
+     (contextmenu)="handleRightClick($event)">
 </svg>

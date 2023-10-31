@@ -9,21 +9,24 @@ export class SvgElementService {
   circles: Element[] = [];
   rectangles: Element[] = [];
   arrows: Element[] = [];
+ 
+  idCircleCount: number = 0;
+  idRectCount: number = 0;
+  idArrowCount: number = 0;
+  lightningCount: number =0;
 
-  
+  selectedCircle: SVGElement | undefined = undefined;
+  selectedRect: SVGElement | undefined = undefined;
+ 
+
   addCircle(circle: Element): void {
     this.circles.push(circle);
     console.log(this.circles);
   }
 
-  getCircleByIndex(index: number): Element | undefined {
-    return this.circles[index];
-  }
-  
   addRectangle(rectangle: Element): void {
     this.rectangles.push(rectangle);
     console.log(this.rectangles);
   }
-
-
+  
 }

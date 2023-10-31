@@ -18,13 +18,11 @@ export class ActivebuttonService {
     this.isRectangleButtonActive = !this.isRectangleButtonActive;
   }
   
-  
   circleButtonActive() {
     this.isRectangleButtonActive = false;
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = false;
-    this.isCircleButtonActive = !this.isCircleButtonActive;
-    
+    this.isCircleButtonActive = !this.isCircleButtonActive;  
   }
 
   arrowButtonActive() {
@@ -33,7 +31,6 @@ export class ActivebuttonService {
     this.isBoltButtonActive = false;
     this.isArrowButtonActive = !this.isArrowButtonActive;
   }
-
 
   boltButtonActive() {
     this.isCircleButtonActive = false;
