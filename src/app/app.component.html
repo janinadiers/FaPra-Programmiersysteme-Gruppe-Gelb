@@ -12,7 +12,8 @@
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <app-example-button title="Button"></app-example-button>
-        <app-export-button title="Export"></app-export-button>
+        <app-export-button title="Export PNML"></app-export-button>
+        <app-export-button-json title="Export JSON"></app-export-button-json>
 
         <app-import-button
             (fileContent)="processSourceChange($event)"

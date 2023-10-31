@@ -16,6 +16,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ExampleButtonComponent } from './components/example-button/example-button.component';
 import { ImportButtonComponent } from './components/import-button/import-button.component';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
+import { ExportJsonButtonComponent } from './components/export-button-json/export-button-json.component';
 
 @NgModule({
     declarations: [
@@ -26,6 +27,7 @@ import { ExportButtonComponent } from './components/export-button/export-button.
         ExampleButtonComponent,
         ImportButtonComponent,
         ExportButtonComponent,
+        ExportJsonButtonComponent,
     ],
     imports: [
         BrowserModule,
