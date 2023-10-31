@@ -19,7 +19,7 @@ export class DisplayComponent implements OnDestroy {
 
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
-    @Output('fileContent') fileContent: EventEmitter<string>;
+    @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
 
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
@@ -31,7 +31,7 @@ export class DisplayComponent implements OnDestroy {
                 private activeButtonService: ActivebuttonService,
                 private svgElementService: SvgElementService ) {
 
-        this.fileContent = new EventEmitter<string>();
+        this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
             console.log('new diagram');
@@ -64,6 +64,7 @@ export class DisplayComponent implements OnDestroy {
     }
 
     private fetchFile(link: string) {
+        
         this._http.get(link,{
             responseType: 'text'
         }).pipe(
@@ -73,7 +74,11 @@ export class DisplayComponent implements OnDestroy {
             }),
             take(1)
         ).subscribe(content => {
-            this.emitFileContent(content);
+            if (content === undefined) {
+                return;
+            }
+            const fileExtension = link.split('.').pop() || '';
+            this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
         })
     }
 
@@ -82,16 +87,13 @@ export class DisplayComponent implements OnDestroy {
             return;
         }
         this._fileReaderService.readFile(files[0]).pipe(take(1)).subscribe(content => {
-            this.emitFileContent(content);
+            
+            const fileExtension = files[0].name.split('.').pop() || '';
+            this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
         });
     }
 
-    private emitFileContent(content: string | undefined) {
-        if (content === undefined) {
-            return;
-        }
-        this.fileContent.emit(content);
-    }
+    
 
     private draw() {
         if (this.drawingArea === undefined) {
