@@ -1,21 +1,18 @@
-import { Component, Input } from '@angular/core';
-import { DisplayService } from "../../services/display.service";
-import { PngExportService } from "../../services/png-export.service";
+import { PnmlExport } from 'src/app/services/pnml-export.service';
+import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-export-button',
-  templateUrl: './export-button.component.html',
-  styleUrls: ['./export-button.component.css']
+    selector: 'app-export-button',
+    templateUrl: './export-button.component.html',
+    styleUrls: ['./export-button.component.css']
 })
 export class ExportButtonComponent {
 
     @Input() title: string | undefined;
-
+    
     constructor(
-        private _displayService: DisplayService,
-        private _pngExport: PngExportService,
-        ) {
-    }
+        private _pnmlExport: PnmlExport,
+    ) {}
 
     prevent(e: Event) {
         e.preventDefault();
@@ -34,9 +31,11 @@ export class ExportButtonComponent {
         target.classList.remove('mouse-hover');
     }
 
-    processMouseClick(e: MouseEvent) {
-        console.log(`Template button "${this.title}" clicked`, e);
-        this._pngExport.createPngFile();
-        // this._pngExport.createPng2();
+    exportToPnmlFile(e: MouseEvent) {
+        
+      this.prevent(e);
+      this._pnmlExport.export();
+        
     }
+
 }

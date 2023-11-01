@@ -4,12 +4,18 @@
         class="interactive-square"
         fxLayout="row"
         fxLayoutAlign="center center"
-        (click)="exportToPnmlFile($event)"
+        (click)="prepareImportFromPnmlFile($event)"
         (mouseenter)="hoverStart($event)"
         (mouseleave)="hoverEnd($event)"
     >
         ♥
     </div>
-    
+    <input
+        #hiddenInput
+        (change)="importFromPnmlFile($event)"
+        type="file"
+        id="fileInput"
+        style="display: none"
+    />
 </div>
 
