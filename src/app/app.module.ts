@@ -20,6 +20,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { PngExportButtonComponent } from './components/png-export-button/png-export-button.component';
 import { ExportButtonComponent} from "./components/export-button/export-button.component";
 import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
+import { ExportJsonButtonComponent } from './components/export-button-json/export-button-json.component';
+
 
 @NgModule({
     declarations: [
@@ -33,6 +35,7 @@ import { ExportSvgButtonComponent } from './components/export-svg-button/export-
         ImportButtonComponent,
         PngExportButtonComponent,
         ExportButtonComponent,
+        ExportJsonButtonComponent,
     ],
     imports: [
         BrowserModule,

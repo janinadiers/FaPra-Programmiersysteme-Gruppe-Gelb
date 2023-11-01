@@ -4,18 +4,12 @@
         class="interactive-square"
         fxLayout="row"
         fxLayoutAlign="center center"
-        (click)="prepareImportFromFile($event)"
+        (click)="exportToJsonFile($event)"
         (mouseenter)="hoverStart($event)"
         (mouseleave)="hoverEnd($event)"
     >
         ♥
     </div>
-    <input
-        #hiddenInput
-        (change)="importFromFile($event)"
-        type="file"
-        id="fileInput"
-        style="display: none"
-    />
+    
 </div>
 
