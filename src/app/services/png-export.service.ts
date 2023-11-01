@@ -1,26 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Element } from "../classes/diagram/element";
-import { DisplayService } from "./display.service";
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class PngExportService {
-  constructor(
-      private _displayService: DisplayService
-  ) {}
+  constructor() {}
 
-  private getElements(): Array<Element> {
-      const result = [];
-      const elements = this._displayService.diagram.elements;
-      for (const element of elements) {
-          result.push(element);
-      }
-      return result;
-  }
-
-  // Variante 1: lädt schwarzes Bild runter ...
   createPngFile() {
       // SVG-String erstellen -- eventuell später als Methodenaufruf?
       // (<svg> zu Blob, Blob zu Image,
@@ -70,6 +56,7 @@ export class PngExportService {
               ctx.drawImage(img,0,0);
               const pngUrl = canvas.toDataURL("image/png");
 
+
               //Link erstellen und zuweisen
               const a = document.createElement('a');
               a.href = pngUrl;
@@ -78,26 +65,10 @@ export class PngExportService {
               //Download starten
               a.click();
               window.URL.revokeObjectURL(pngUrl);
+
           }
       };
       img.src = url;
-
-      return;
-  }
-
-
-  // vielleicht für später:
-  download(url: string, filename: string) {
-      //URL für den Download zuweisen:
-      const blob = new Blob([url], {type:'image/png'});
-      const pngUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-
-      a.href = pngUrl;
-      a.download = filename+'.png';
-
-      a.click();
-      window.URL.revokeObjectURL(pngUrl);
 
       return;
   }
