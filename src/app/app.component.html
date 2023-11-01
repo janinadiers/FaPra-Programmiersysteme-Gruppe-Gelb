@@ -13,7 +13,7 @@
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <app-png-export-button title="Png-Export"></app-png-export-button>
         <app-export-button title="Pnml-Export"></app-export-button>
-        <app-import-button title="Import"></app-import-button>
+        <app-import-button title="Pnml-Import" (fileContent)="processSourceChange($event)"></app-import-button>
 
         <app-example-file title="File" link="assets/example.json" description="An example .json Petri net"></app-example-file>
 
