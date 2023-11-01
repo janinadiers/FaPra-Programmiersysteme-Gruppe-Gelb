@@ -17,6 +17,7 @@ import { ExampleButtonComponent } from './components/example-button/example-butt
 import { ImportButtonComponent } from './components/import-button/import-button.component';
 import { PngExportButtonComponent } from './components/png-export-button/png-export-button.component';
 import { ExportButtonComponent} from "./components/export-button/export-button.component";
+import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
 
 @NgModule({
     declarations: [
@@ -25,6 +26,7 @@ import { ExportButtonComponent} from "./components/export-button/export-button.c
         FooterComponent,
         ExampleFileComponent,
         ExampleButtonComponent,
+        ExportSvgButtonComponent,
         ImportButtonComponent,
         PngExportButtonComponent,
         ExportButtonComponent,
