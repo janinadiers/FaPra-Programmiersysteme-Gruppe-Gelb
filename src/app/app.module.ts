@@ -15,7 +15,8 @@ import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ExampleButtonComponent } from './components/example-button/example-button.component';
 import { ImportButtonComponent } from './components/import-button/import-button.component';
-import { ExportButtonComponent } from './components/export-button/export-button.component';
+import { PngExportButtonComponent } from './components/png-export-button/png-export-button.component';
+import { ExportButtonComponent} from "./components/export-button/export-button.component";
 import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
 
 @NgModule({
@@ -27,6 +28,7 @@ import { ExportSvgButtonComponent } from './components/export-svg-button/export-
         ExampleButtonComponent,
         ExportSvgButtonComponent,
         ImportButtonComponent,
+        PngExportButtonComponent,
         ExportButtonComponent,
     ],
     imports: [
