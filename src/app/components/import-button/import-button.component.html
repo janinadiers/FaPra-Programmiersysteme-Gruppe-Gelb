@@ -1,0 +1,21 @@
+<div fxLayout="column" fxLayoutAlign="start center">
+    {{ title }}
+    <div
+        class="interactive-square"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        (click)="prepareImportFromPnmlFile($event)"
+        (mouseenter)="hoverStart($event)"
+        (mouseleave)="hoverEnd($event)"
+    >
+        ♥
+    </div>
+    <input
+        #hiddenInput
+        (change)="importFromPnmlFile($event)"
+        type="file"
+        id="fileInput"
+        style="display: none"
+    />
+</div>
+
