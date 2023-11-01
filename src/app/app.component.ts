@@ -32,7 +32,9 @@ export class AppComponent {
             result = this._pnmlImportService.import(newSource.fileContent);
         } else if (newSource.fileExtension === 'json') {
             result = this._parserService.parse(newSource.fileContent);
-        } 
+        } else {
+            alert("Please choose either .pnml or .json");
+        }
 
         if (result !== undefined) {
 
