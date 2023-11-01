@@ -1,0 +1,15 @@
+.toolbar {
+
+    background-color: white;
+}
+
+.hover-class:hover {
+
+    background-color: red;
+ }
+
+ .active {
+    background-color: red; 
+    color: white; 
+
+ }

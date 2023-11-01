@@ -29,7 +29,7 @@ export class Element {
     set y(value: number) {
         this._y = value;
     }
-
+    
     public registerSvg(svg: SVGElement) {
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
@@ -56,5 +56,9 @@ export class Element {
 
     get svgElement(): SVGElement | undefined {
         return this._svgElement;
+    }
+
+    set svgElement(svgElement: SVGElement) {
+        this._svgElement = svgElement;
     }
 }
