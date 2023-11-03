@@ -44,19 +44,5 @@ export class JsonExport implements ExportService{
         var jsonString = JSON.stringify(petriNet);
 
         this.downloadService.downloadFile(jsonString, 'petriNetz.json', 'application/json');
-
-        /*const blob = new Blob([jsonString], { type: 'application/json' });
-
-        // Erstellen einer URL für den Blob, um sie als Link zu verwenden.
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-
-        // Zuweisen der URL zum Link und Festlegen des Dateinamens für den Download.
-        a.href = url;
-        a.download = 'petriNetz.json';
-
-        // Download starten
-        a.click();
-        window.URL.revokeObjectURL(url);*/
     }
 }
