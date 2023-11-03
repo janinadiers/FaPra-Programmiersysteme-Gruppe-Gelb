@@ -28,6 +28,20 @@ export class SvgService {
         return svg;
     }
 
+    private createSvgRectangleForElement(element: Element): SVGElement {
+        const svg = this.createSvgElement('rect');
+
+        svg.setAttribute('x', `${element.x}`);
+        svg.setAttribute('y', `${element.y}`);
+        svg.setAttribute('width', `25`);
+        svg.setAttribute('height', `50`);
+        svg.setAttribute('fill', 'black');
+
+        element.registerSvg(svg);
+
+        return svg;
+    }
+
     private createSvgElement(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
@@ -60,11 +74,11 @@ export class SvgService {
 
         elements.forEach(element => {
             if (element) {
-                svgElement += this.createSvgCircleForElement(element).outerHTML;
-
-                // TODO: Je nach Elementtyp unterscheiden (Rechteck, Kreis, etc.)
-                // oder für ein Rechteck:
-                // svgString += `<rect id="${element.id}" x="${element.x}" y="${element.y}" width="100" height="100" fill="blue" />`;
+                if(element.svgElement instanceof SVGCircleElement) {
+                    svgElement += this.createSvgCircleForElement(element).outerHTML;
+                } else if (element.svgElement instanceof SVGRectElement) {
+                    svgElement += this.createSvgRectangleForElement(element).outerHTML;
+                }
             }
         });
 
