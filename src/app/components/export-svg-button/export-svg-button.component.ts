@@ -38,7 +38,7 @@ export class ExportSvgButtonComponent {
 
         // Das Diagramm wird über den displayService abgerufen und als Observable behandelt.
         // Mit take(1) wird sichergestellt, dass nur das erste Element abgerufen wird, und mit toPromise() wird es zu einem Promise.
-        let diagram = await this.displayService.diagram$.pipe(take(1)).toPromise();
+        const diagram = await this.displayService.diagram$.pipe(take(1)).toPromise();
 
         if (diagram && diagram.elements.length > 0) {
             // Elemente des Diagramms in ein SVG-Format exportieren.

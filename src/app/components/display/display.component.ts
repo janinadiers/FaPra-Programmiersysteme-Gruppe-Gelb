@@ -219,7 +219,6 @@ export class DisplayComponent implements OnDestroy {
         circleObject.y=y;
         circleObject.svgElement=circle; // mit SVG Element verknüpfen
 
-
         this._diagram?.elements.push(circleObject);
 
         // Objekt im Array speichern
@@ -287,9 +286,10 @@ export class DisplayComponent implements OnDestroy {
                 }
             }
 
-            let idString: string = "t" + this.svgElementService.idArrowCount;
+            // ToDo: circle und rect verlieren ihre ID-Info
+            let idString: string = "p" + circle.id + ', t' + rect.id;
             this.svgElementService.idArrowCount++;
-
+            console.log(idString)
             let lineObject = new Element(idString);
             lineObject.x=circleX;
             lineObject.y=circleY;
