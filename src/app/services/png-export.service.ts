@@ -40,7 +40,7 @@ export class PngExportService {
 
                 canvas.toBlob((blob) => {
                     if (blob) {
-                        this.downloadService.downloadPng(URL.createObjectURL(blob), 'petriNetz.png');
+                        this.downloadService.downloadFile(URL.createObjectURL(blob), 'petriNetz.png', 'image/png');
                     }
                 });
             }

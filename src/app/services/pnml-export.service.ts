@@ -37,6 +37,6 @@ export class PnmlExport implements ExportService{
         }
         pnmlString += '</page>\n</net>\n</pnml>';
 
-        this.downloadService.downloadSvgOrPnml(pnmlString, 'text/xml', 'petriNetz.pnml');
+        this.downloadService.downloadFile(pnmlString, 'petriNetz.pnml', 'text/xml');
     }
 }

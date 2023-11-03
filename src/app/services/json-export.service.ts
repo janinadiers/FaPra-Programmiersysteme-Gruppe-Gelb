@@ -2,13 +2,15 @@ import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
 import { Element } from '../classes/diagram/element';
 import { Injectable } from '@angular/core';
-import { JsonPetriNet, Coords } from '../classes/json-petri-net';
+import { JsonPetriNet } from '../classes/json-petri-net';
+import {DownloadService} from "./helper/download-service";
 
 @Injectable({
     providedIn: 'root',
 })
 export class JsonExport implements ExportService{
-    constructor(private _displayService: DisplayService) {}
+    constructor(private _displayService: DisplayService,
+                private downloadService: DownloadService) {}
 
     private getElements(): Array<Element> {
         const result: Array<Element> = [];
@@ -31,7 +33,7 @@ export class JsonExport implements ExportService{
             marking: {},
             layout: {}
           };
-        
+
         const elements = this.getElements();
 
         elements.forEach(element => {
@@ -40,7 +42,10 @@ export class JsonExport implements ExportService{
         });
 
         var jsonString = JSON.stringify(petriNet);
-        const blob = new Blob([jsonString], { type: 'application/json' });
+
+        this.downloadService.downloadFile(jsonString, 'petriNetz.json', 'application/json');
+
+        /*const blob = new Blob([jsonString], { type: 'application/json' });
 
         // Erstellen einer URL für den Blob, um sie als Link zu verwenden.
         const url = window.URL.createObjectURL(blob);
@@ -52,6 +57,6 @@ export class JsonExport implements ExportService{
 
         // Download starten
         a.click();
-        window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url);*/
     }
 }
