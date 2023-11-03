@@ -42,6 +42,21 @@ export class SvgService {
         return svg;
     }
 
+    private createSvgLineForElement(element: Element): SVGElement {
+        const svg = this.createSvgElement('line');
+
+        svg.setAttribute('x1', `${element.x}`);
+        svg.setAttribute('y1', `${element.y}`);
+        svg.setAttribute('x2', `${element.x2}`);
+        svg.setAttribute('y2', `${element.y2}`);
+        svg.setAttribute('stroke', 'black');
+        svg.setAttribute('stroke-width', '1');
+
+        element.registerSvg(svg);
+
+        return svg;
+    }
+
     private createSvgElement(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
@@ -78,6 +93,8 @@ export class SvgService {
                     svgElement += this.createSvgCircleForElement(element).outerHTML;
                 } else if (element.svgElement instanceof SVGRectElement) {
                     svgElement += this.createSvgRectangleForElement(element).outerHTML;
+                } else if(element.svgElement instanceof SVGLineElement) {
+                    svgElement += this.createSvgLineForElement(element).outerHTML;
                 }
             }
         });

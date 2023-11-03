@@ -287,6 +287,18 @@ export class DisplayComponent implements OnDestroy {
                 }
             }
 
+            let idString: string = "t" + this.svgElementService.idArrowCount;
+            this.svgElementService.idArrowCount++;
+
+            let lineObject = new Element(idString);
+            lineObject.x=circleX;
+            lineObject.y=circleY;
+            lineObject.x2=rectX;
+            lineObject.y2=rectY;
+            lineObject.svgElement=line; // mit SVG Element verknüpfen
+
+            this._diagram?.elements.push(lineObject);
+
             if(this.activeButtonService.isArrowButtonActive){
                 this.svgElementService.selectedCircle = undefined;
                 this.svgElementService.selectedRect = undefined;
