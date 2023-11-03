@@ -8,9 +8,9 @@ export class DownloadService {
     constructor() {
     }
 
-    public download(inhalt: string, type: string, downloadFileName: string): void {
+    public downloadSvgOrPnml(content: string, type: string, downloadFileName: string): void {
         // Erstellen einer Blob-Datei mit dem SVG-Inhalt und dem entsprechenden Typ.
-        const blob = new Blob([inhalt], {type: type});
+        const blob = new Blob([content], {type: type});
 
         // Erstellen einer URL für den Blob, um sie als Link zu verwenden.
         const url = window.URL.createObjectURL(blob);
@@ -23,5 +23,12 @@ export class DownloadService {
         // Download starten
         a.click();
         window.URL.revokeObjectURL(url);
+    }
+
+    public downloadPng(content: string, downloadFileName: string): void {
+        const a = document.createElement('a');
+        a.href = content;
+        a.download = downloadFileName;
+        a.click();
     }
 }

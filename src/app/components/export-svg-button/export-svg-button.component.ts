@@ -45,7 +45,7 @@ export class ExportSvgButtonComponent {
             const svgWithElements = this.svgService.exportToSvg(diagram.elements);
 
             // Download der SVG-Datei
-            this.downloadService.download(svgWithElements, 'image/svg+xml', 'petriNetz.svg');
+            this.downloadService.downloadSvgOrPnml(svgWithElements, 'image/svg+xml', 'petriNetz.svg');
         }
     }
 }
