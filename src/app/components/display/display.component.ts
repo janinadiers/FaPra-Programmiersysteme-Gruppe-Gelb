@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnInit, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -15,12 +15,13 @@ import { SvgElementService } from 'src/app/services/svg-element.service';
     templateUrl: './display.component.html',
     styleUrls: ['./display.component.css']
 })
-export class DisplayComponent implements OnDestroy {
+export class DisplayComponent implements OnInit, OnDestroy {
 
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
-
+   
+    private subscriptionOfToolbar: Subscription = new Subscription;
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
 
@@ -41,8 +42,20 @@ export class DisplayComponent implements OnDestroy {
         });
     }
 
+    ngOnInit() {
+        this.subscriptionOfToolbar = 
+        this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
+        if (buttonId === "clear"){
+            this.clearDrawingArea();
+        }
+        else
+        this.deleteLastElement();
+        });
+    }
+
     ngOnDestroy(): void {
         this._sub.unsubscribe();
+        this.subscriptionOfToolbar.unsubscribe();
         this.fileContent.complete();
     }
 
@@ -117,6 +130,33 @@ export class DisplayComponent implements OnDestroy {
         while (drawingArea.childElementCount > 0) {
             drawingArea.removeChild(drawingArea.lastChild as ChildNode);
         }
+        //Array leeren, selektierte Elemente und Counter Variablen zurücksetzen
+        this.svgElementService.clearElements();
+        this.svgElementService.resetSelectedElements();
+        this.svgElementService.resetCounterVar();
+    }
+
+   
+    
+    private deleteLastElement(){
+        const drawingArea = this.drawingArea?.nativeElement;
+        if (drawingArea?.childElementCount === undefined) {
+            return;
+        }
+
+        if (drawingArea.childElementCount > 0) {
+            if (this.svgElementService.elements.length > 0) {
+              let lastShape = this.svgElementService.elements.pop();
+              let lastSvg = lastShape?.svgElement;
+              
+              if (lastSvg) {
+                drawingArea.removeChild(lastSvg);
+              }
+             this.svgElementService.resetSelectedElements();
+                this.svgElementService.resetCounterVar();
+            }
+
+        }   
     }
 
     onCanvasClick(event: MouseEvent) {
@@ -160,8 +200,8 @@ export class DisplayComponent implements OnDestroy {
                 const y = event.clientY - svgContainer.top;
                 this.drawCircle(x,y);
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this.svgElementService.circles[this.svgElementService.circles.length - 1];
-                this.svgElementService.selectedCircle = lastCircleObject.svgElement;
+                const lastCircleObject = this.svgElementService.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
+                this.svgElementService.selectedCircle = lastCircleObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
                 }
@@ -178,8 +218,8 @@ export class DisplayComponent implements OnDestroy {
                 const y = mouseY - height / 2;
                 this.drawRectangle(x,y,width,height);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this.svgElementService.rectangles[this.svgElementService.rectangles.length - 1];
-                this.svgElementService.selectedRect = lastRectObject.svgElement;
+                const lastRectObject = this.svgElementService.elements.find(element=> element.id === "t" + (this.svgElementService.idCircleCount-1));
+                this.svgElementService.selectedRect = lastRectObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
                 }
@@ -219,7 +259,7 @@ export class DisplayComponent implements OnDestroy {
         circleObject.y=y;
         circleObject.svgElement=circle; // mit SVG Element verknüpfen
         // Objekt im Array speichern
-        this.svgElementService.addCircle(circleObject);
+        this.svgElementService.addElements(circleObject);
     }
 
     private drawRectangle(x:number, y: number, width: number, height: number){
@@ -253,7 +293,7 @@ export class DisplayComponent implements OnDestroy {
         rectObject.y=y;
         rectObject.svgElement=rect; // mit SVG Element verknüpfen
         // Objekt im Array speichern
-        this.svgElementService.addRectangle(rectObject);
+        this.svgElementService.addElements(rectObject);
     }
 
 
@@ -272,17 +312,16 @@ export class DisplayComponent implements OnDestroy {
             line.setAttribute('x2', rectX.toString());
             line.setAttribute('y2', rectY.toString());
             line.setAttribute('stroke', 'black');
-            line.setAttribute('stroke-width', '1');
+            line.setAttribute('stroke-width', '1');       
             
             if (svgElement) {
-                if (svgElement.firstChild) {
+                if (svgElement.firstChild){
                     svgElement.insertBefore(line,svgElement.firstChild);
-                }
+                }              
             }
             
             if(this.activeButtonService.isArrowButtonActive){
-                this.svgElementService.selectedCircle = undefined;
-                this.svgElementService.selectedRect = undefined;
+                this.svgElementService.resetSelectedElements();
             }      
         }
     }
@@ -310,8 +349,7 @@ export class DisplayComponent implements OnDestroy {
       
         if(this.activeButtonService.isBoltButtonActive){
             
-            this.svgElementService.selectedCircle = undefined;
-            this.svgElementService.selectedRect = undefined;
+            this.svgElementService.resetSelectedElements();
             this.svgElementService.lightningCount = 0;
             console.log("Right-click event works");
         }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -38,4 +39,18 @@ export class ActivebuttonService {
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = !this.isBoltButtonActive;
   }
+
+  //Observable für Delete-Button
+
+  private buttonClickSubject = new Subject<string>();
+
+  sendButtonClick(buttonId: string) {
+    this.buttonClickSubject.next(buttonId);
+  }
+
+  getButtonClickObservable() {
+    return this.buttonClickSubject.asObservable();
+  }
+
+
 }

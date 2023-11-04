@@ -6,10 +6,7 @@ import { Element } from '../classes/diagram/element';
 })
 export class SvgElementService {
 
-  circles: Element[] = [];
-  rectangles: Element[] = [];
-  arrows: Element[] = [];
- 
+  elements: Element[] = [];  
   idCircleCount: number = 0;
   idRectCount: number = 0;
   idArrowCount: number = 0;
@@ -18,15 +15,24 @@ export class SvgElementService {
   selectedCircle: SVGElement | undefined = undefined;
   selectedRect: SVGElement | undefined = undefined;
  
-
-  addCircle(circle: Element): void {
-    this.circles.push(circle);
-    console.log(this.circles);
+  addElements(element: Element): void {
+    this.elements.push(element);
+    console.log(this.elements);
   }
 
-  addRectangle(rectangle: Element): void {
-    this.rectangles.push(rectangle);
-    console.log(this.rectangles);
+  clearElements(){
+    this.elements = [];
   }
-  
+
+  resetSelectedElements() {
+    this.selectedCircle = undefined;
+    this.selectedRect = undefined;
+  }
+
+  resetCounterVar() {
+    this.idCircleCount = 0;
+    this.idRectCount = 0;
+    this.idArrowCount = 0;
+    this.lightningCount = 0;
+  }
 }

@@ -3,38 +3,40 @@
     <button  mat-icon-button 
         class="hover-class" 
         [class.active]="circleActiveColor"
-        (click)="toggleCircleButton($event)"> 
+        (click)="toggleCircleButton()"> 
         <mat-icon>panorama_fish_eye</mat-icon> 
     </button>
     
     <button mat-icon-button 
         class="hover-class"
         [class.active]="rectActiveColor"
-        (click)="toggleRectangleButton($event)">
+        (click)="toggleRectangleButton()">
         <mat-icon>crop_portrait</mat-icon>
     </button>
       
     <button  mat-icon-button 
         class="hover-class"
         [class.active]="arrowActiveColor"
-        (click)="toggleArrowButton($event)"> 
+        (click)="toggleArrowButton()"> 
         <mat-icon>north_east</mat-icon> 
     </button>
 
     <button  mat-icon-button 
         class="hover-class"
         [class.active]="boltActiveColor"
-        (click)="toggleBoltButton($event)"> 
+        (click)="toggleBoltButton()"> 
         <mat-icon>bolt</mat-icon> 
     </button>
      
     <button  mat-icon-button 
-        class="hover-class"> 
+        class="hover-class"
+        (click)="onButtonClick('deleteLast')"> 
         <mat-icon>delete</mat-icon> 
     </button>
     
     <button  mat-icon-button 
-        class="hover-class"> 
+        class="hover-class"
+        (click)="onButtonClick('clear')"> 
         <mat-icon>clear</mat-icon> 
     </button>
       
