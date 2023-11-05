@@ -7,6 +7,7 @@ import { Element } from '../classes/diagram/element';
 export class SvgElementService {
 
   elements: Element[] = [];  
+  
   idCircleCount: number = 0;
   idRectCount: number = 0;
   idArrowCount: number = 0;

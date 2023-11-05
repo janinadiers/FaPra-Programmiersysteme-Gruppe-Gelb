@@ -9,6 +9,7 @@ import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import { Element } from 'src/app/classes/diagram/element';
 import { SvgElementService } from 'src/app/services/svg-element.service';
+import { Line } from 'src/app/classes/diagram/line';
 
 @Component({
     selector: 'app-display',
@@ -48,8 +49,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
         if (buttonId === "clear"){
             this.clearDrawingArea();
         }
-        else
+        else if (buttonId === "deleteLast") {
         this.deleteLastElement();
+        }
         });
     }
 
@@ -148,14 +150,25 @@ export class DisplayComponent implements OnInit, OnDestroy {
             if (this.svgElementService.elements.length > 0) {
               let lastShape = this.svgElementService.elements.pop();
               let lastSvg = lastShape?.svgElement;
-              
-              if (lastSvg) {
-                drawingArea.removeChild(lastSvg);
-              }
-             this.svgElementService.resetSelectedElements();
-                this.svgElementService.resetCounterVar();
-            }
 
+              if (lastSvg) {
+                    drawingArea.removeChild(lastSvg);
+              
+                    if (lastShape?.id === "p" + (this.svgElementService.idCircleCount -1)){
+                    this.svgElementService.idCircleCount--;
+                    }
+                    else if (lastShape?.id === "t" + (this.svgElementService.idRectCount -1)){
+                    this.svgElementService.idRectCount--;
+                    }
+                    else if (lastShape?.id === "a" + (this.svgElementService.idArrowCount -1)){
+                    this.svgElementService.idArrowCount--;
+                    }
+              
+                    this.svgElementService.resetSelectedElements();
+                    this.svgElementService.lightningCount = 0;
+                }
+                
+            }
         }   
     }
 
@@ -218,7 +231,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 const y = mouseY - height / 2;
                 this.drawRectangle(x,y,width,height);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this.svgElementService.elements.find(element=> element.id === "t" + (this.svgElementService.idCircleCount-1));
+                const lastRectObject = this.svgElementService.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
                 this.svgElementService.selectedRect = lastRectObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
@@ -255,9 +268,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Kreis-Objekt erzeugen
         let circleObject = new Element(idString);
-        circleObject.x=x;
-        circleObject.y=y;
-        circleObject.svgElement=circle; // mit SVG Element verknüpfen
+        circleObject.x = x;
+        circleObject.y = y;
+        circleObject.svgElement = circle; // mit SVG Element verknüpfen
         // Objekt im Array speichern
         this.svgElementService.addElements(circleObject);
     }
@@ -289,9 +302,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Rechteck-Objekt erzeugen
         let rectObject = new Element(idString);
-        rectObject.x=x;
-        rectObject.y=y;
-        rectObject.svgElement=rect; // mit SVG Element verknüpfen
+        rectObject.x = x;
+        rectObject.y = y;
+        rectObject.svgElement = rect; // mit SVG Element verknüpfen
         // Objekt im Array speichern
         this.svgElementService.addElements(rectObject);
     }
@@ -320,6 +333,21 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }              
             }
             
+            // ID String für jeden Pfeil/Linie um 1 erhöhen (a0, a1,..)
+            let idString: string = "a" + this.svgElementService.idArrowCount;
+            this.svgElementService.idArrowCount++;
+
+            // Line-Objekt erzeugen
+            let lineObject = new Line (idString);
+            lineObject.x = circleX;
+            lineObject.y = circleY;
+            lineObject.x2 = rectX;
+            lineObject.y2 = rectY;
+            lineObject.svgElement = line; // mit SVG Element verknüpfen
+            
+            // Objekt im Array speichern
+            this.svgElementService.addElements(lineObject);    
+
             if(this.activeButtonService.isArrowButtonActive){
                 this.svgElementService.resetSelectedElements();
             }      
