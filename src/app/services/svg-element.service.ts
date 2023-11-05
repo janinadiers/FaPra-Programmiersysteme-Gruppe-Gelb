@@ -9,7 +9,7 @@ export class SvgElementService {
   circles: Element[] = [];
   rectangles: Element[] = [];
   arrows: Element[] = [];
- 
+
   idCircleCount: number = 0;
   idRectCount: number = 0;
   idArrowCount: number = 0;
@@ -17,7 +17,7 @@ export class SvgElementService {
 
   selectedCircle: SVGElement | undefined = undefined;
   selectedRect: SVGElement | undefined = undefined;
- 
+
 
   addCircle(circle: Element): void {
     this.circles.push(circle);
@@ -28,5 +28,4 @@ export class SvgElementService {
     this.rectangles.push(rectangle);
     console.log(this.rectangles);
   }
-  
 }

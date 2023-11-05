@@ -29,4 +29,8 @@ export class DisplayService implements OnDestroy {
         this._diagram$.next(net);
     }
 
+    public getValues() {
+
+    }
+
 }
