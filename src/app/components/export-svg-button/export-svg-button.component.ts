@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {DisplayService} from "../../services/display.service";
 import {take} from "rxjs";
 import {SvgService} from "../../services/svg.service";
+import {DownloadService} from "../../services/helper/download-service";
 
 @Component({
     selector: 'app-export-svg-button',
@@ -13,7 +14,8 @@ export class ExportSvgButtonComponent {
     @Input() title: string | undefined;
 
     constructor(private displayService: DisplayService,
-                private svgService: SvgService) {
+                private svgService: SvgService,
+                private downloadService: DownloadService) {
     }
 
     prevent(e: Event) {
@@ -44,20 +46,8 @@ export class ExportSvgButtonComponent {
             // Elemente des Diagramms in ein SVG-Format exportieren.
             const svgWithElements = this.svgService.exportToSvg(diagram.elements);
 
-            // Erstellen einer Blob-Datei mit dem SVG-Inhalt und dem entsprechenden Typ.
-            const blob = new Blob([svgWithElements], {type: 'image/svg+xml'});
-
-            // Erstellen einer URL für den Blob, um sie als Link zu verwenden.
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-
-            // Zuweisen der URL zum Link und Festlegen des Dateinamens für den Download.
-            a.href = url;
-            a.download = 'petriNetz.svg';
-
-            // Download starten
-            a.click();
-            window.URL.revokeObjectURL(url);
+            // Download der SVG-Datei
+            this.downloadService.downloadFile(svgWithElements,'petriNetz.svg', 'image/svg+xml');
         }
     }
 }
