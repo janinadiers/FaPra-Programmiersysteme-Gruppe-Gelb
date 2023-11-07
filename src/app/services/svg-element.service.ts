@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Element } from '../classes/diagram/element';
+import { Diagram } from '../classes/diagram/diagram';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SvgElementService {
 
-  elements: Element[] = [];  
-  
+  private elements: Array<Element> = [];
+  objects = new Diagram (this.elements);
+
   idCircleCount: number = 0;
   idRectCount: number = 0;
   idArrowCount: number = 0;
@@ -16,15 +18,6 @@ export class SvgElementService {
   selectedCircle: SVGElement | undefined = undefined;
   selectedRect: SVGElement | undefined = undefined;
  
-  addElements(element: Element): void {
-    this.elements.push(element);
-    console.log(this.elements);
-  }
-
-  clearElements(){
-    this.elements = [];
-  }
-
   resetSelectedElements() {
     this.selectedCircle = undefined;
     this.selectedRect = undefined;

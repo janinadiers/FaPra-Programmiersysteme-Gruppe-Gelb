@@ -10,4 +10,14 @@ export class Diagram {
     get elements(): Array<Element> {
         return this._elements;
     }
+
+    pushElement(element: Element): void {
+       
+        this._elements.push(element);
+    }
+
+    clearElements(): void {
+        this._elements.splice(0, this._elements.length);
+    }
 }
+

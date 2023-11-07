@@ -133,7 +133,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
             drawingArea.removeChild(drawingArea.lastChild as ChildNode);
         }
         //Array leeren, selektierte Elemente und Counter Variablen zurücksetzen
-        this.svgElementService.clearElements();
+        this.svgElementService.objects.clearElements();
         this.svgElementService.resetSelectedElements();
         this.svgElementService.resetCounterVar();
     }
@@ -147,27 +147,27 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
 
         if (drawingArea.childElementCount > 0) {
-            if (this.svgElementService.elements.length > 0) {
-              let lastShape = this.svgElementService.elements.pop();
-              let lastSvg = lastShape?.svgElement;
-
-              if (lastSvg) {
+            if (this.svgElementService.objects.elements.length > 0) {
+              let lastObject = this.svgElementService.objects.elements.pop();
+              
+              let lastSvg = lastObject?.svgElement;
+              
+              if (lastObject && lastSvg) {
                     drawingArea.removeChild(lastSvg);
               
-                    if (lastShape?.id === "p" + (this.svgElementService.idCircleCount -1)){
+                    if (lastObject.id === "p" + (this.svgElementService.idCircleCount -1)){
                     this.svgElementService.idCircleCount--;
                     }
-                    else if (lastShape?.id === "t" + (this.svgElementService.idRectCount -1)){
+                    else if (lastObject.id === "t" + (this.svgElementService.idRectCount -1)){
                     this.svgElementService.idRectCount--;
                     }
-                    else if (lastShape?.id === "a" + (this.svgElementService.idArrowCount -1)){
+                    else if (lastObject.id === "a" + (this.svgElementService.idArrowCount -1)){
                     this.svgElementService.idArrowCount--;
                     }
               
                     this.svgElementService.resetSelectedElements();
                     this.svgElementService.lightningCount = 0;
-                }
-                
+                }  
             }
         }   
     }
@@ -213,7 +213,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 const y = event.clientY - svgContainer.top;
                 this.drawCircle(x,y);
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this.svgElementService.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
+                const lastCircleObject = this.svgElementService.objects.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
                 this.svgElementService.selectedCircle = lastCircleObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
@@ -231,7 +231,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 const y = mouseY - height / 2;
                 this.drawRectangle(x,y,width,height);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this.svgElementService.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
+                const lastRectObject = this.svgElementService.objects.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
                 this.svgElementService.selectedRect = lastRectObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
@@ -272,7 +272,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
         circleObject.y = y;
         circleObject.svgElement = circle; // mit SVG Element verknüpfen
         // Objekt im Array speichern
-        this.svgElementService.addElements(circleObject);
+       
+        this.svgElementService.objects.pushElement(circleObject);
+        console.log(this.svgElementService.objects.elements);
+        this._diagram?.elements.push(circleObject);
     }
 
     private drawRectangle(x:number, y: number, width: number, height: number){
@@ -306,7 +309,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
         rectObject.y = y;
         rectObject.svgElement = rect; // mit SVG Element verknüpfen
         // Objekt im Array speichern
-        this.svgElementService.addElements(rectObject);
+        this.svgElementService.objects.pushElement(rectObject);
+        console.log(this.svgElementService.objects.elements);
+        this._diagram?.elements.push(rectObject);
     }
 
 
@@ -346,7 +351,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
             lineObject.svgElement = line; // mit SVG Element verknüpfen
             
             // Objekt im Array speichern
-            this.svgElementService.addElements(lineObject);    
+            this.svgElementService.objects.pushElement(lineObject);  
+            console.log(this.svgElementService.objects.elements);
+            this._diagram?.elements.push(lineObject);
 
             if(this.activeButtonService.isArrowButtonActive){
                 this.svgElementService.resetSelectedElements();
