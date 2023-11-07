@@ -9,20 +9,16 @@ export class DownloadService {
     }
 
     public downloadFile(content: string, downloadFileName: string, type: string): void {
+        const a = document.createElement('a');
         if (type === 'image/png') {
-            const a = document.createElement('a');
             a.href = content;
-            a.download = downloadFileName;
-            a.click();
         } else {
-            const blob = new Blob([content], { type: type });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-
-            a.href = url;
-            a.download = downloadFileName;
-            a.click();
-            window.URL.revokeObjectURL(url);
+            const blob = new Blob([content], {type: type});
+            a.href = window.URL.createObjectURL(blob);
         }
+
+        a.download = downloadFileName;
+        a.click();
+        window.URL.revokeObjectURL(a.href);
     }
 }
