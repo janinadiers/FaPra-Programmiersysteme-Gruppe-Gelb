@@ -21,6 +21,7 @@ import { PngExportButtonComponent } from './components/png-export-button/png-exp
 import { ExportButtonComponent} from "./components/export-button/export-button.component";
 import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
 import { ExportJsonButtonComponent } from './components/export-button-json/export-button-json.component';
+import {MatMenuModule} from "@angular/material/menu";
 
 
 @NgModule({
@@ -48,6 +49,7 @@ import { ExportJsonButtonComponent } from './components/export-button-json/expor
         ReactiveFormsModule,
         HttpClientModule,
         MatToolbarModule,
+        MatMenuModule
     ],
     providers: [
         {

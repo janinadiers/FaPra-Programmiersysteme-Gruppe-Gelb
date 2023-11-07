@@ -1,42 +1,71 @@
 <mat-toolbar class ="toolbar">
-    
-    <button  mat-icon-button 
-        class="hover-class" 
+
+    <button  mat-icon-button
+        class="hover-class"
         [class.active]="circleActiveColor"
-        (click)="toggleCircleButton($event)"> 
-        <mat-icon>panorama_fish_eye</mat-icon> 
+        (click)="toggleCircleButton($event)">
+        <mat-icon>panorama_fish_eye</mat-icon>
     </button>
-    
-    <button mat-icon-button 
+
+    <button mat-icon-button
         class="hover-class"
         [class.active]="rectActiveColor"
         (click)="toggleRectangleButton($event)">
         <mat-icon>crop_portrait</mat-icon>
     </button>
-      
-    <button  mat-icon-button 
+
+    <button  mat-icon-button
         class="hover-class"
         [class.active]="arrowActiveColor"
-        (click)="toggleArrowButton($event)"> 
-        <mat-icon>north_east</mat-icon> 
+        (click)="toggleArrowButton($event)">
+        <mat-icon>north_east</mat-icon>
     </button>
 
-    <button  mat-icon-button 
+    <button  mat-icon-button
         class="hover-class"
         [class.active]="boltActiveColor"
-        (click)="toggleBoltButton($event)"> 
-        <mat-icon>bolt</mat-icon> 
+        (click)="toggleBoltButton($event)">
+        <mat-icon>bolt</mat-icon>
     </button>
-     
-    <button  mat-icon-button 
-        class="hover-class"> 
-        <mat-icon>delete</mat-icon> 
+
+    <button  mat-icon-button
+        class="hover-class">
+        <mat-icon>delete</mat-icon>
     </button>
-    
-    <button  mat-icon-button 
-        class="hover-class"> 
-        <mat-icon>clear</mat-icon> 
+
+    <button  mat-icon-button
+        class="hover-class">
+        <mat-icon>clear</mat-icon>
     </button>
-      
+
+    <!--<button mat-button [matMenuTriggerFor]="menu">
+        <mat-icon>import_export</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item>Item 1</button>
+        <button mat-menu-item>Item 2</button>
+    </mat-menu>-->
+
+    <button mat-button [matMenuTriggerFor]="import_export">
+        <mat-icon>import_export</mat-icon>
+    </button>
+    <mat-menu #import_export="matMenu">
+        <button mat-menu-item [matMenuTriggerFor]="import">Import</button>
+        <button mat-menu-item [matMenuTriggerFor]="export">Export</button>
+    </mat-menu>
+
+    <mat-menu #import="matMenu">
+        <button mat-menu-item>PNML</button>
+        <button mat-menu-item>JSON</button>
+    </mat-menu>
+
+    <mat-menu #export="matMenu">
+        <button mat-menu-item (click)="exportPnml()">PNML</button>
+        <button mat-menu-item (click)="exportJson()">JSON</button>
+        <button mat-menu-item (click)="exportPng()">PNG</button>
+        <button mat-menu-item (click)="exportSvg()">SVG</button>
+    </mat-menu>
+
 </mat-toolbar>
 
