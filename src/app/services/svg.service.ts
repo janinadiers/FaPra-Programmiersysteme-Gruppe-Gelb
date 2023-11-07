@@ -21,7 +21,9 @@ export class SvgService {
         svg.setAttribute('cx', `${element.x}`);
         svg.setAttribute('cy', `${element.y}`);
         svg.setAttribute('r', '25');
-        svg.setAttribute('fill', 'black');
+        svg.setAttribute('fill', 'white'); // Farbe
+        svg.setAttribute('stroke', 'black'); // Border Farbe
+        svg.setAttribute('stroke-width', '2');
 
         element.registerSvg(svg);
 
@@ -33,9 +35,11 @@ export class SvgService {
 
         svg.setAttribute('x', `${element.x}`);
         svg.setAttribute('y', `${element.y}`);
-        svg.setAttribute('width', `25`);
-        svg.setAttribute('height', `50`);
+        svg.setAttribute('width', `20`);
+        svg.setAttribute('height', `40`);
         svg.setAttribute('fill', 'black');
+        svg.setAttribute('stroke', 'black');
+        svg.setAttribute('stroke-width', '2');
 
         element.registerSvg(svg);
 
