@@ -1,75 +1,51 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import {DownloadService} from "./helper/download-service";
+import {DisplayService} from "./display.service";
+import {SvgService} from "./svg.service";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 
 export class PngExportService {
-  constructor() {}
+    constructor(private downloadService: DownloadService,
+                private displayService: DisplayService,
+                private svgService: SvgService) {
+    }
 
-  createPngFile() {
-      // SVG-String erstellen -- eventuell später als Methodenaufruf?
-      // (<svg> zu Blob, Blob zu Image,
-      // Image zu Canvas, dann Download
+    createPngFile() {
+        const diagram = this.displayService.diagram;
+        const svgString = this.svgService.exportToSvg(diagram.elements);
 
-      // Aufruf des SVG-Elements über den Selector "svg", Erhalt eines Objekts:
-      const svgObject = document.querySelector("svg");
-      if (!svgObject){
-          return;
-      }
+        const image = new Image();
+        const svg = new Blob([svgString], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(svg);
 
-      // Objekt in String umwandeln
-      let svgString = svgObject.outerHTML;
+        // Zuweisen der URL und Browserfehler abfangen
+        const domUrl = window.URL || window.webkitURL || window;
+        if (!domUrl) {
+            throw new Error("(browser doesnt support this)")
+        }
 
-      // Namespace für die SVG-Datei anlegen
-      if (!svgString.match(/xmlns=\"/mi)){
-          svgString = svgString.replace ('<svg ','<svg xmlns="http://www.w3.org/2000/svg" ') ;
-      }
+        image.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = image.width;
+            canvas.height = image.height;
 
-      //Blob erstellen
-      const svgBlob = new Blob([svgString], {type: "image/svg+xml; base64; charset=utf-8"});
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.fillStyle = 'white';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(image, 0, 0);
 
-      // Zuweisen der URL und Browserfehler abfangen
-      const domUrl = window.URL || window.webkitURL || window;
-      if (!domUrl) {
-          throw new Error("(browser doesnt support this)")
-      }
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        this.downloadService.downloadFile(URL.createObjectURL(blob), 'petriNetz.png', 'image/png');
+                    }
+                });
+            }
+        };
 
-      // Variablen für URL und Image erstellen
-      const url = domUrl.createObjectURL(svgBlob);
-      const img = new Image();
-
-      // Bild in die Variable img laden
-      img.onload = function() {
-          //Canvas erstellen
-          const canvas = document.createElement("canvas");
-          canvas.width = svgObject.width.animVal.value;
-          canvas.height = svgObject.height.animVal.value;
-
-          // Ctx erstellen
-          const ctx = canvas.getContext("2d");
-
-          if(ctx){
-              // Bild erstellen
-              ctx.fillStyle = "white";
-              ctx.fillRect(0,0, canvas.width, canvas.height);
-              ctx.drawImage(img,0,0);
-              const pngUrl = canvas.toDataURL("image/png");
-
-
-              //Link erstellen und zuweisen
-              const a = document.createElement('a');
-              a.href = pngUrl;
-              a.download = 'petrinetz.png';
-
-              //Download starten
-              a.click();
-              window.URL.revokeObjectURL(pngUrl);
-
-          }
-      };
-      img.src = url;
-
-      return;
-  }
+        image.src = url;
+    }
 }
