@@ -2,117 +2,78 @@
 import { Injectable } from '@angular/core';
 import { Element } from '../classes/diagram/element';
 import { ImportService } from '../classes/import-service';
-import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 import { Diagram } from '../classes/diagram/diagram';
+import { SvgService } from './svg.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PnmlImportService implements ImportService {
-
+   
+    constructor(private _svgService: SvgService) {}
     import(content: string): Diagram | undefined {
         
+        // convert pnml string to DOM object
         let rawData = new DOMParser().parseFromString(content, 'text/xml');
+        // get all places as an Element instance from DOM object
         let places = this.importPlaces(rawData);
+        // get all transitions as an Element instance from DOM object
         let transitions = this.importTransitions(rawData);
+        // get all arcs as an Element instance from DOM object
         let arcs = this.importArcs(rawData);
-        for (const arc of arcs) {
-            this.setArcPositions([...places, ...transitions], arc);
-        }
-        
-        
-
+       
         return new Diagram([...places, ...transitions, ...arcs]);
+      
     }
 
     importPlaces(rawData: Document): Array<Element> {
-        const places = rawData.querySelectorAll('place');
-        const placeIds: Array<string> = Array.from(places)
-            .map((place) => {
-                return place.getAttribute('id');
-            })
-            .filter((id): id is string => id !== null);
 
-        let layout: JsonPetriNet['layout'] = {};
-        this.setLayout(places, layout);
-        const elements = this.parseElements(placeIds);
-        this.setPosition(elements, layout);
-        return elements;
+        const places:NodeListOf<globalThis.Element> = rawData.querySelectorAll('place');
+        const result:Array<Element> = []
+        places.forEach((place) => {
+            const placePosition = this.getPlacePosition(place);
+            const placeId = place.getAttribute('id');
+            if(!placeId) throw new Error('Place element misses id: ' + place);
+            const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y);
+            result.push(placeElement);
+        });
+       
+        
+        return result;
     }
 
     importTransitions(rawData: Document): Array<Element> {
         const transitions = rawData.querySelectorAll('transition');
-        const transitionIds: Array<string> = Array.from(transitions)
-            .map((transition) => {
-                return transition.getAttribute('id');
-            })
-            .filter((id): id is string => id !== null);
-
-        let layout: JsonPetriNet['layout'] = {};
-        this.setLayout(transitions, layout);
-        const elements = this.parseElements(transitionIds);
-        this.setPosition(elements, layout);
-        return elements;
+        const result:Array<Element> = []
+        transitions.forEach((transition) => {
+            const transitionId = transition.getAttribute('id');
+            const transitionPosition = this.getTransitionPosition(transition);
+            if(!transitionId) throw new Error('Transition element misses id: ' + transition);
+            const transitionElement = this.createTransition(transitionId, transitionPosition.x, transitionPosition.y);
+            result.push(transitionElement);
+        });
+        
+        return result;
+            
     }
 
     importArcs(rawData: Document): Array<Element> {
         const arcs = rawData.querySelectorAll('arc');
-        const arcIds: Array<string> = Array.from(arcs)
-            .map((arc) => {
-                return arc.getAttribute('id');
-            })
-            .filter((id): id is string => id !== null);
-        
-        let layout: JsonPetriNet['arcs'] = {};
-        this.setArcs(arcs, layout);
-        const elements = this.parseElements(arcIds);
-        
-        return elements;
+        const result:Array<Element> = []
+        arcs.forEach((arc) => {
+            const arcId = arc.getAttribute('id');
+            const arcPosition = this.getEdgePosition(arc);
+            if(!arcId) throw new Error('Arc element misses id: ' + arc);
+            const arcElement = this.createEdge(arcId, arcPosition.x, arcPosition.y, arcPosition.x2, arcPosition.y2);
+            result.push(arcElement);
+        });
+       return result;
     }
 
-  
-    private setArcPositions(elements: Array<Element>, arcElement: Element){
-           
-            const id = arcElement.id;
-            const source = id.split(",")[0].trim();
-            const target = id.split(",")[1].trim();
-            const sourceElement = elements.filter((el) => el.id == source)[0];
-            const targetElement = elements.filter((el) => el.id == target)[0];
+
+    private getPlacePosition(element: globalThis.Element):{x:number, y:number}{
+        
             
-            if(sourceElement && targetElement){
-                arcElement.x = sourceElement.x;
-                arcElement.y = sourceElement.y;
-                arcElement.x2 = targetElement.x;
-                arcElement.y2 = targetElement.y;
-            }    
-        
-    }
-    private setArcs(arcs: NodeListOf<globalThis.Element>, layout: JsonPetriNet['arcs']){
-            arcs.forEach((arc) => {
-                const graphics = Array.from(arc.children).filter(
-                    (child) => child.tagName == 'graphics'
-                );
-
-                const inscription = Array.from(graphics[0].children).filter(
-                    (child) => child.tagName == 'inscription'
-                );
-                let weight = Array.from(inscription[0].children).filter(
-                    (child) => child.tagName == 'text'
-                );
-                const weightContent = weight[0].innerHTML;
-                const source = arc.getAttribute('source');
-                const target = arc.getAttribute('target');
-                
-                
-                if (!layout) layout = {};
-
-                layout[`${source}, ${target}`] =  parseInt(weightContent);
-            });
-    }
-
-    private setLayout(elements: NodeListOf<globalThis.Element>, layout: JsonPetriNet['layout']){
-        elements.forEach((element) => {
-            const id = element.getAttribute('id');
             const graphics = Array.from(element.children).filter(
                 (child) => child.tagName == 'graphics'
             );
@@ -122,43 +83,80 @@ export class PnmlImportService implements ImportService {
             const x = positions[0].getAttribute('x');
             const y = positions[0].getAttribute('y');
 
-            if (!id || !x || !y) return;
-            if (!layout) layout = {};
+            if (!x || !y) throw new Error('Place element misses id or positional attribute: ' + element );
+            
 
-            layout[id] = { x: parseInt(x), y: parseInt(y) };
-        });
+           return { x: parseInt(x), y: parseInt(y) };
+        
     }
 
-    
+    private getTransitionPosition(element:globalThis.Element):{x:number, y:number}{
+        const graphics = Array.from(element.children).filter(
+            (child) => child.tagName == 'graphics'
+        );
+        const positions = Array.from(graphics[0].children).filter(
+            (child) => child.tagName == 'position'
+        );
+        const x = positions[0].getAttribute('x');
+        const y = positions[0].getAttribute('y');
 
-    private parseElements(elementIds: Array<string> | undefined): Array<Element> {
-        if (elementIds === undefined || !Array.isArray(elementIds)) {
-            return [];
-        }
-        return elementIds.map((pid) => new Element(pid));
+        if (!x || !y) throw new Error('Transition element misses id or positional attribute: ' + element );
+        
+
+       return { x: parseInt(x), y: parseInt(y) };
+    }
+    private getEdgePosition(element:globalThis.Element):{x:number, y:number, x2:number, y2:number}{
+        
+        const graphics = Array.from(element.children).filter(
+            (child) => child.tagName == 'graphics'
+        );
+            
+        const positions = Array.from(graphics[0].children).filter(
+            (child) => child.tagName == 'position'
+        );
+        const x = positions[0].getAttribute('x');
+        const y = positions[0].getAttribute('y');
+        const x2 = positions[1].getAttribute('x');
+        const y2 = positions[1].getAttribute('y');
+       
+       
+        if(!x || !y || !x2 || !y2) throw new Error('Arc element misses positional attribute: ' + element );
+        return { x: parseInt(x), y: parseInt(y), x2: parseInt(x2), y2: parseInt(y2) };
+       
     }
 
-    private setPosition(
-        elements: Array<Element>,
-        layout: JsonPetriNet['layout']
-    ): void {
-        if (layout === undefined) {
-            return;
-        }
 
-        for (const el of elements) {
-            const pos = layout[el.id] as Coords | undefined;
-            if (pos !== undefined) {
-                el.x = pos.x;
-                el.y = pos.y;
-            }
-        }
+    private createPlace(id:string, x:number, y:number): Element {
+        const element = new Element(id);
+        element.x = x;
+        element.y = y;
+        element.svgElement = this._svgService.createSvgCircleForElement(element);
+        return element;
+       
+
     }
 
-   
-    
+    private createTransition(id:string, x:number, y:number): Element {
+        const element = new Element(id);
+        element.x = x;
+        element.y = y;
+        element.svgElement = this._svgService.createSvgRectangleForElement(element);
+        return element;
+       
 
-   
+    }
 
-   
+    private createEdge(id:string, x:number, y:number, x2:number, y2:number): Element {
+        const element = new Element(id);
+        element.x = x;
+        element.y = y;
+        element.x2 = x2;
+        element.y2 = y2;
+        element.svgElement = this._svgService.createSvgLineForElement(element);
+        return element;
+      
+
+    }
+
+
 }

@@ -10,25 +10,25 @@ export class SvgService {
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
         const result: Array<SVGElement> = [];
         diagram.elements.forEach(el => {
-            console.log('el', el);
-            if(el.id.includes('p') && el.id.includes('t')){
-                result.push(this.createSvgLineForElement(el))
-            }
-            else if(el.id.includes('p')){
-                result.push(this.createSvgCircleForElement(el))
-            }
-            else if(el.id.includes('t')){
-                result.push(this.createSvgRectangleForElement(el))
+            console.log(el);
+            
+            if(el.svgElement instanceof SVGCircleElement) {
+               result.push(this.createSvgCircleForElement(el));
+            } else if (el.svgElement instanceof SVGRectElement) {
+                result.push(this.createSvgRectangleForElement(el));
+            } else if(el.svgElement instanceof SVGLineElement) {
+                result.push(this.createSvgLineForElement(el));
             }
            
             
         });
-        console.log('000', result);
+        console.log(result);
+        
         
         return result;
     }
 
-    private createSvgCircleForElement(element: Element): SVGElement {
+    public createSvgCircleForElement(element: Element): SVGElement {
         const svg = this.createSvgElement('circle');
 
         svg.setAttribute('cx', `${element.x}`);
@@ -43,7 +43,7 @@ export class SvgService {
         return svg;
     }
 
-    private createSvgRectangleForElement(element: Element): SVGElement {
+    public createSvgRectangleForElement(element: Element): SVGElement {
         const svg = this.createSvgElement('rect');
 
         svg.setAttribute('x', `${element.x}`);
@@ -57,7 +57,7 @@ export class SvgService {
         return svg;
     }
 
-    private createSvgLineForElement(element: Element): SVGElement {
+    public createSvgLineForElement(element: Element): SVGElement {
         const svg = this.createSvgElement('line');
 
         svg.setAttribute('x1', `${element.x}`);
