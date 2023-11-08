@@ -34,7 +34,6 @@ export class DisplayComponent implements OnDestroy {
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
-            console.log('new diagram');
 
             this._diagram = diagram;
             this.draw();
@@ -290,12 +289,10 @@ export class DisplayComponent implements OnDestroy {
                 }
             }
 
-                       
+                       // TODO: Unterscheidung von source und target, es können sowohl circles als auch rects source und target sein
                         let idString: string = `${circle.id},${rect.id}`;
                         const source:Element | undefined = this.svgElementService.circles.filter((elem) => { return elem.id == circle.id})[0];
                         const target:Element | undefined = this.svgElementService.rectangles.filter((elem) => { return elem.id == rect.id})[0]; 
-                        console.log(source, target);
-                        
                         
                         this.svgElementService.idArrowCount++;
                         

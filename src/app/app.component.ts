@@ -29,7 +29,7 @@ export class AppComponent {
         
         if (newSource.fileExtension === 'pnml') {
             result = this._pnmlImportService.import(newSource.fileContent);
-            console.log('result: ', result);
+            
             
         } else if (newSource.fileExtension === 'json') {
             result = this._parserService.parse(newSource.fileContent);

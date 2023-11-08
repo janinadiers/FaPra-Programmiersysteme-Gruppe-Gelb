@@ -21,12 +21,12 @@ export class SvgElementService {
 
   addCircle(circle: Element): void {
     this.circles.push(circle);
-    console.log(this.circles);
+    
   }
 
   addRectangle(rectangle: Element): void {
     this.rectangles.push(rectangle);
-    console.log(this.rectangles);
+    
   }
   
 }
