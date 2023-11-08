@@ -34,8 +34,8 @@ export class PnmlExport implements ExportService{
             } else if (element.svgElement?.tagName === 'rect') {
                 pnmlString += `<transition id="${element.id}"><name><text>"${element.id}"</text></name><graphics><position x="${element.x}" y="${element.y}"/></graphics></transition>`;
             } else if (element.svgElement?.tagName === 'line') {
-                if(element.source && element.target){
-                    pnmlString += `\n<arc id="${element.id}" source="${element.source.id}" target="${element.target.id}">\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n<position x="${element.x2}" y="${element.y2}"/>\n<inscription><text>0</text></inscription></graphics>\n</arc>`;
+                if(element.sourceID && element.targetID){
+                    pnmlString += `\n<arc id="${element.id}" source="${element.sourceID}" target="${element.targetID}">\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n<position x="${element.x2}" y="${element.y2}"/>\n<inscription><text>0</text></inscription></graphics>\n</arc>`;
 
                 }
                 else{

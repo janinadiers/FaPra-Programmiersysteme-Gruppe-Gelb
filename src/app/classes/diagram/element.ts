@@ -5,8 +5,8 @@ export class Element {
     private _svgElement: SVGElement | undefined;
     private _x2: number;
     private _y2: number;
-    private _source: Element | undefined;
-    private _target: Element | undefined;
+    private _sourceID: string | undefined;
+    private _targetID: string | undefined;
 
     constructor(id: string) {
         this._id = id;
@@ -14,8 +14,8 @@ export class Element {
         this._y = 0;
         this._x2 = 0;
         this._y2 = 0;
-        this._source = undefined;
-        this._target = undefined;
+        this._sourceID = undefined;
+        this._targetID = undefined;
     }
 
     get id(): string {
@@ -55,20 +55,20 @@ export class Element {
         this._y2 = value;
     }
 
-    get source(): Element | undefined {
-        return this._source;
+    get sourceID(): string | undefined {
+        return this._sourceID;
     }
 
-    set source(value: Element) {
-        this._source = value;
+    set sourceID(value: string) {
+        this._sourceID = value;
     }
 
-    get target(): Element | undefined {
-        return this._target;
+    get targetID(): string | undefined {
+        return this._targetID;
     }
 
-    set target(value: Element) {
-        this._target = value;
+    set targetID(value: string) {
+        this._targetID = value;
     }
     
     public registerSvg(svg: SVGElement) {

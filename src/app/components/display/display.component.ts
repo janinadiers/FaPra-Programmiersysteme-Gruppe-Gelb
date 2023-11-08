@@ -291,8 +291,8 @@ export class DisplayComponent implements OnDestroy {
 
                        // TODO: Unterscheidung von source und target, es können sowohl circles als auch rects source und target sein
                         let idString: string = `${circle.id},${rect.id}`;
-                        const source:Element | undefined = this.svgElementService.circles.filter((elem) => { return elem.id == circle.id})[0];
-                        const target:Element | undefined = this.svgElementService.rectangles.filter((elem) => { return elem.id == rect.id})[0]; 
+                        const sourceID:string | undefined = circle.id;
+                        const targetID:string | undefined = rect.id;
                         
                         this.svgElementService.idArrowCount++;
                         
@@ -302,8 +302,8 @@ export class DisplayComponent implements OnDestroy {
                         lineObject.x2=rectX;
                         lineObject.y2=rectY;
                         lineObject.svgElement=line;
-                        lineObject.source = source
-                        lineObject.target = target
+                        lineObject.sourceID = sourceID
+                        lineObject.targetID = targetID
                         
             
                         this._diagram?.elements.push(lineObject);
