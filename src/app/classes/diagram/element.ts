@@ -3,11 +3,19 @@ export class Element {
     private _x: number;
     private _y: number;
     private _svgElement: SVGElement | undefined;
+    private _x2: number;
+    private _y2: number;
+    private _source: Element | undefined;
+    private _target: Element | undefined;
 
     constructor(id: string) {
         this._id = id;
         this._x = 0;
         this._y = 0;
+        this._x2 = 0;
+        this._y2 = 0;
+        this._source = undefined;
+        this._target = undefined;
     }
 
     get id(): string {
@@ -28,6 +36,39 @@ export class Element {
 
     set y(value: number) {
         this._y = value;
+    }
+
+
+    get x2(): number {
+        return this._x2;
+    }
+
+    set x2(value: number) {
+        this._x2 = value;
+    }
+
+    get y2(): number {
+        return this._y2;
+    }
+
+    set y2(value: number) {
+        this._y2 = value;
+    }
+
+    get source(): Element | undefined {
+        return this._source;
+    }
+
+    set source(value: Element) {
+        this._source = value;
+    }
+
+    get target(): Element | undefined {
+        return this._target;
+    }
+
+    set target(value: Element) {
+        this._target = value;
     }
     
     public registerSvg(svg: SVGElement) {

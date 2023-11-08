@@ -104,6 +104,8 @@ export class DisplayComponent implements OnDestroy {
         this.clearDrawingArea();
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
         for (const element of elements) {
+            
+            
             this.drawingArea.nativeElement.appendChild(element);
         }
     }
@@ -201,6 +203,7 @@ export class DisplayComponent implements OnDestroy {
 
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         // Attribute
+        circle.setAttribute('id', idString); // ID
         circle.setAttribute('cx', x.toString()); // x-Koordinate
         circle.setAttribute('cy', y.toString()); // y-Koordinate
         circle.setAttribute('r', '25'); // Radius 
@@ -218,8 +221,11 @@ export class DisplayComponent implements OnDestroy {
         circleObject.x=x;
         circleObject.y=y;
         circleObject.svgElement=circle; // mit SVG Element verknüpfen
+
+        this._diagram?.elements.push(circleObject);
         // Objekt im Array speichern
         this.svgElementService.addCircle(circleObject);
+        
     }
 
     private drawRectangle(x:number, y: number, width: number, height: number){
@@ -234,6 +240,7 @@ export class DisplayComponent implements OnDestroy {
 
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         // Attribute
+        rect.setAttribute('id', idString);
         rect.setAttribute('x', x.toString()); 
         rect.setAttribute('y', y.toString()); 
         rect.setAttribute('width', width.toString()); 
@@ -252,6 +259,9 @@ export class DisplayComponent implements OnDestroy {
         rectObject.x=x;
         rectObject.y=y;
         rectObject.svgElement=rect; // mit SVG Element verknüpfen
+
+        this._diagram?.elements.push(rectObject);
+
         // Objekt im Array speichern
         this.svgElementService.addRectangle(rectObject);
     }
@@ -279,11 +289,34 @@ export class DisplayComponent implements OnDestroy {
                     svgElement.insertBefore(line,svgElement.firstChild);
                 }
             }
+
+                       
+                        let idString: string = `${circle.id},${rect.id}`;
+                        const source:Element | undefined = this.svgElementService.circles.filter((elem) => { return elem.id == circle.id})[0];
+                        const target:Element | undefined = this.svgElementService.rectangles.filter((elem) => { return elem.id == rect.id})[0]; 
+                        console.log(source, target);
+                        
+                        
+                        this.svgElementService.idArrowCount++;
+                        
+                        let lineObject = new Element(idString);
+                        lineObject.x=circleX;
+                        lineObject.y=circleY;
+                        lineObject.x2=rectX;
+                        lineObject.y2=rectY;
+                        lineObject.svgElement=line;
+                        lineObject.source = source
+                        lineObject.target = target
+                        
+            
+                        this._diagram?.elements.push(lineObject);
             
             if(this.activeButtonService.isArrowButtonActive){
                 this.svgElementService.selectedCircle = undefined;
                 this.svgElementService.selectedRect = undefined;
-            }      
+            }   
+            
+           
         }
     }
     

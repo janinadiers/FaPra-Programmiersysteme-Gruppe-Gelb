@@ -10,8 +10,21 @@ export class SvgService {
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
         const result: Array<SVGElement> = [];
         diagram.elements.forEach(el => {
-            result.push(this.createSvgCircleForElement(el))
+            console.log('el', el);
+            if(el.id.includes('p') && el.id.includes('t')){
+                result.push(this.createSvgLineForElement(el))
+            }
+            else if(el.id.includes('p')){
+                result.push(this.createSvgCircleForElement(el))
+            }
+            else if(el.id.includes('t')){
+                result.push(this.createSvgRectangleForElement(el))
+            }
+           
+            
         });
+        console.log('000', result);
+        
         return result;
     }
 
@@ -21,7 +34,38 @@ export class SvgService {
         svg.setAttribute('cx', `${element.x}`);
         svg.setAttribute('cy', `${element.y}`);
         svg.setAttribute('r', '25');
+        svg.setAttribute('fill', 'white');
+        svg.setAttribute('stroke', 'black');
+        svg.setAttribute('stroke-width', '1');
+
+        element.registerSvg(svg);
+
+        return svg;
+    }
+
+    private createSvgRectangleForElement(element: Element): SVGElement {
+        const svg = this.createSvgElement('rect');
+
+        svg.setAttribute('x', `${element.x}`);
+        svg.setAttribute('y', `${element.y}`);
+        svg.setAttribute('width', `25`);
+        svg.setAttribute('height', `50`);
         svg.setAttribute('fill', 'black');
+
+        element.registerSvg(svg);
+
+        return svg;
+    }
+
+    private createSvgLineForElement(element: Element): SVGElement {
+        const svg = this.createSvgElement('line');
+
+        svg.setAttribute('x1', `${element.x}`);
+        svg.setAttribute('y1', `${element.y}`);
+        svg.setAttribute('x2', `${element.x2}`);
+        svg.setAttribute('y2', `${element.y2}`);
+        svg.setAttribute('stroke', 'black');
+        svg.setAttribute('stroke-width', '1');
 
         element.registerSvg(svg);
 
