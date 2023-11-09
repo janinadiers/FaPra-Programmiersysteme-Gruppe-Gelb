@@ -20,7 +20,7 @@ export class PnmlImportService implements ImportService {
         // get all transitions as an Element instance from DOM object
         let transitions = this.importTransitions(rawData);
         // get all arcs as an Element instance from DOM object
-        let arcs = this.importArcs(rawData);
+        let arcs = this.importArcs(rawData, [...places, ...transitions]);
        
         return new Diagram([...places, ...transitions, ...arcs]);
       
@@ -57,12 +57,12 @@ export class PnmlImportService implements ImportService {
             
     }
 
-    importArcs(rawData: Document): Array<Element> {
+    importArcs(rawData: Document, elements: Element[]): Array<Element> {
         const arcs = rawData.querySelectorAll('arc');
         const result:Array<Element> = []
         arcs.forEach((arc) => {
             const arcId = arc.getAttribute('id');
-            const arcPosition = this.getEdgePosition(arc);
+            const arcPosition = this.getEdgePosition(arc, elements);
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
             const arcElement = this.createEdge(arcId, arcPosition.x, arcPosition.y, arcPosition.x2, arcPosition.y2);
             result.push(arcElement);
@@ -86,7 +86,7 @@ export class PnmlImportService implements ImportService {
             if (!x || !y) throw new Error('Place element misses id or positional attribute: ' + element );
             
 
-           return { x: parseInt(x), y: parseInt(y) };
+           return { x: parseFloat(x), y: parseFloat(y) };
         
     }
 
@@ -103,25 +103,25 @@ export class PnmlImportService implements ImportService {
         if (!x || !y) throw new Error('Transition element misses id or positional attribute: ' + element );
         
 
-       return { x: parseInt(x), y: parseInt(y) };
+       return { x: parseFloat(x), y: parseFloat(y) };
     }
-    private getEdgePosition(element:globalThis.Element):{x:number, y:number, x2:number, y2:number}{
+    private getEdgePosition(element:globalThis.Element, elements:Element[]):{x:number, y:number, x2:number, y2:number}{
         
-        const graphics = Array.from(element.children).filter(
-            (child) => child.tagName == 'graphics'
-        );
-            
-        const positions = Array.from(graphics[0].children).filter(
-            (child) => child.tagName == 'position'
-        );
-        const x = positions[0].getAttribute('x');
-        const y = positions[0].getAttribute('y');
-        const x2 = positions[1].getAttribute('x');
-        const y2 = positions[1].getAttribute('y');
-       
+        const source = element.getAttribute('source');
+        const target = element.getAttribute('target');
+        
+        if(!source || !target) throw new Error('Arc element misses source or target attribute: ' + element );
+        const sourceElement = elements.find((element) => element.id == source);
+        const targetElement = elements.find((element) => element.id == target);
+        
+        let x = sourceElement?.x;
+        let y = sourceElement?.y;
+        let x2 = targetElement?.x;
+        let y2 = targetElement?.y;
        
         if(!x || !y || !x2 || !y2) throw new Error('Arc element misses positional attribute: ' + element );
-        return { x: parseInt(x), y: parseInt(y), x2: parseInt(x2), y2: parseInt(y2) };
+
+        return { x, y, x2, y2 };
        
     }
 

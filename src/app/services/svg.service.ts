@@ -10,6 +10,7 @@ export class SvgService {
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
         const result: Array<SVGElement> = [];
         diagram.elements.forEach(el => {
+           
             
             if(el.svgElement instanceof SVGCircleElement) {
                result.push(this.createSvgCircleForElement(el));

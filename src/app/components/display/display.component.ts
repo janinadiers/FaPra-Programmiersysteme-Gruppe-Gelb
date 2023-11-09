@@ -104,7 +104,6 @@ export class DisplayComponent implements OnDestroy {
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
         for (const element of elements) {
             
-            
             this.drawingArea.nativeElement.appendChild(element);
         }
     }

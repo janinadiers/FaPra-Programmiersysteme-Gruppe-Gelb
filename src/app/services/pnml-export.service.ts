@@ -1,6 +1,5 @@
 import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
-import { Element } from '../classes/diagram/element';
 import { Injectable } from '@angular/core';
 import {DownloadService} from "./helper/download-service";
 
@@ -11,31 +10,22 @@ export class PnmlExport implements ExportService{
     constructor(private _displayService: DisplayService,
                 private downloadService: DownloadService) {}
 
-    private getElements(): Array<Element> {
-        const result: Array<Element> = [];
-
-        const elements = this._displayService.diagram.elements;
-
-        for (const element of elements) {
-            result.push(element);
-        }
-        return result;
-    }
 
     export(): void {
-        const elements = this.getElements();
+        const elements = this._displayService.diagram.elements
+        if(elements.length === 0) return;
         let pnmlString =
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<pnml>\n<net id="" type="http://www.pnml.org/version-2009/grammar/ptnet">\n<name>\n<text>ILovePetriNets.pnml</text>\n</name>\n<page id="p1">';
         for (const element of elements) {
-            
             
             if (element.svgElement?.tagName === 'circle') {
                 pnmlString += `<place id="${element.id}">\n<name>\n<text>name="${element.id}"</text>\n</name>\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n</graphics>\n<initialMarking>\n<text>0</text>\n</initialMarking>\n</place>`;
             } else if (element.svgElement?.tagName === 'rect') {
                 pnmlString += `<transition id="${element.id}"><name><text>"${element.id}"</text></name><graphics><position x="${element.x}" y="${element.y}"/></graphics></transition>`;
             } else if (element.svgElement?.tagName === 'line') {
+                
                 if(element.sourceID && element.targetID){
-                    pnmlString += `\n<arc id="${element.id}" source="${element.sourceID}" target="${element.targetID}">\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n<position x="${element.x2}" y="${element.y2}"/>\n<inscription><text>0</text></inscription></graphics>\n</arc>`;
+                    pnmlString += `\n<arc id="${element.id}" source="${element.sourceID}" target="${element.targetID}">\n<graphics/>\n<inscription><text>1</text></inscription>\n</arc>`;
 
                 }
                 else{
