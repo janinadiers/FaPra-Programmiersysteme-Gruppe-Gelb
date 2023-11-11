@@ -12,7 +12,7 @@ import { Line } from '../classes/diagram/line';
 export class SvgElementService {
  
   private elements: Array<Element> = [];
-  shapes = new Diagram (this.elements);
+  // shapes = new Diagram (this.elements);
 
   selectedCircle: SVGElement | undefined = undefined;
   selectedRect: SVGElement | undefined = undefined;
@@ -31,8 +31,8 @@ export class SvgElementService {
 
     let circleObject = new Place(idString, x, y);
     // Objekt im Array abspeichern
-    this.shapes.pushElement(circleObject);
-    console.log(this.shapes.elements);
+    //this.shapes.pushElement(circleObject);
+  
     return circleObject;
   }
 
@@ -45,8 +45,8 @@ export class SvgElementService {
 
     let rectObject = new Transition(idString, x, y)
     // Objekt im Array abspeichern
-    this.shapes.pushElement(rectObject);
-    console.log(this.shapes.elements);
+    //this.shapes.pushElement(rectObject);
+    
     return rectObject;
   }
 

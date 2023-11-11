@@ -3,7 +3,7 @@
     <a href="https://www.fernuni-hagen.de/ilovepetrinets/"><h1>I <span class="red">❤</span> Petri Nets</h1></a>
     <h2>
         Fachpraktikum Programmiersysteme WiSe23/24 by<br>
-        ..., ..., ..., ... and ...
+        Janina, Cindy, Philipp, Tim G. and Tim L
     </h2>
 
     <!--    Main content    -->
@@ -13,7 +13,12 @@
 
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
-        <app-example-button title="Button"></app-example-button>
+        <app-png-export-button title="Png-Export"></app-png-export-button>
+        <app-export-button title="Pnml-Export"></app-export-button>
+        <app-import-button title="Pnml-Import" (fileContent)="processSourceChange($event)"></app-import-button>
+        <app-export-button-json title="Export JSON"></app-export-button-json>
+
+        <app-export-svg-button title="Export SVG"></app-export-svg-button>
 
         <app-example-file title="File" link="assets/example.json" description="An example .json Petri net"></app-example-file>
 

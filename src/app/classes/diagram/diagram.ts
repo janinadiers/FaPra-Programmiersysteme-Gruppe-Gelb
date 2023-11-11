@@ -1,10 +1,13 @@
 import {Element} from './element';
+import {Line} from './line';
 
 export class Diagram {
     private readonly _elements: Array<Element>;
+    private readonly _lines: Array<Line>;
 
     constructor(elements: Array<Element>) {
         this._elements = elements;
+        this._lines = [];
     }
 
     get elements(): Array<Element> {
@@ -12,8 +15,13 @@ export class Diagram {
     }
 
     pushElement(element: Element): void {
-       
+        console.log('pushElement');
+        
         this._elements.push(element);
+    }
+
+    pushLine(line: Line): void {
+        this._lines.push(line);
     }
 
     clearElements(): void {

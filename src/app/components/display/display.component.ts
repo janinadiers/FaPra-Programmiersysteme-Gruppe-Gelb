@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -18,7 +18,7 @@ export class DisplayComponent implements OnDestroy {
 
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
-    @Output('fileContent') fileContent: EventEmitter<string>;
+    @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
 
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
@@ -28,12 +28,11 @@ export class DisplayComponent implements OnDestroy {
                 private _fileReaderService: FileReaderService,
                 private _http: HttpClient,
                 private activeButtonService: ActivebuttonService,
-                private svgElementService: SvgElementService) {
-                    
-        this.fileContent = new EventEmitter<string>();
+                private svgElementService: SvgElementService ) {
+
+        this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
-            console.log('new diagram');
 
             this._diagram = diagram;
             this.draw();
@@ -63,6 +62,7 @@ export class DisplayComponent implements OnDestroy {
     }
 
     private fetchFile(link: string) {
+        
         this._http.get(link,{
             responseType: 'text'
         }).pipe(
@@ -72,7 +72,11 @@ export class DisplayComponent implements OnDestroy {
             }),
             take(1)
         ).subscribe(content => {
-            this.emitFileContent(content);
+            if (content === undefined) {
+                return;
+            }
+            const fileExtension = link.split('.').pop() || '';
+            this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
         })
     }
 
@@ -81,16 +85,13 @@ export class DisplayComponent implements OnDestroy {
             return;
         }
         this._fileReaderService.readFile(files[0]).pipe(take(1)).subscribe(content => {
-            this.emitFileContent(content);
+            
+            const fileExtension = files[0].name.split('.').pop() || '';
+            this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
         });
     }
 
-    private emitFileContent(content: string | undefined) {
-        if (content === undefined) {
-            return;
-        }
-        this.fileContent.emit(content);
-    }
+    
 
     private draw() {
         if (this.drawingArea === undefined) {
@@ -99,6 +100,7 @@ export class DisplayComponent implements OnDestroy {
         }
 
         this.clearDrawingArea();
+        
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
         for (const element of elements) {
             this.drawingArea.nativeElement.appendChild(element);
@@ -117,7 +119,7 @@ export class DisplayComponent implements OnDestroy {
     }
 
     onCanvasClick(event: MouseEvent) {
-
+        console.log("Canvas clicked", this._diagram);
         // Koordinaten des Klick Events relativ zum SVG Element 
         const svgElement = document.getElementById('canvas');
         if (!svgElement) {
@@ -134,6 +136,7 @@ export class DisplayComponent implements OnDestroy {
 
             let svgCircle = this.drawCircle(mouseX ,mouseY)
             svgElement.appendChild(svgCircle);
+
         }   
 
         else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
@@ -150,7 +153,7 @@ export class DisplayComponent implements OnDestroy {
                 let svgCircle = this.drawCircle(mouseX ,mouseY);
                 svgElement.appendChild(svgCircle);
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this.svgElementService.shapes.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
+                const lastCircleObject = this._diagram?.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
                 this.svgElementService.selectedCircle = lastCircleObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
@@ -164,7 +167,7 @@ export class DisplayComponent implements OnDestroy {
                 let svgRect = this.drawRect(mouseX, mouseY);
                 svgElement.appendChild(svgRect);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this.svgElementService.shapes.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
+                const lastRectObject = this._diagram?.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
                 this.svgElementService.selectedRect = lastRectObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
@@ -182,6 +185,7 @@ export class DisplayComponent implements OnDestroy {
         let svgCircle = circleObject.createSVG();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement = svgCircle;
+        this._diagram?.pushElement(circleObject);
         svgCircle.addEventListener('click', () => {
             this.onCircleSelect(svgCircle);
             console.log("Place " + svgCircle.id  + " ist ausgewählt.");   
@@ -203,6 +207,7 @@ export class DisplayComponent implements OnDestroy {
         svgRect.setAttribute('y', y.toString());
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement = svgRect;
+        this._diagram?.pushElement(rectObject);
         svgRect.addEventListener('click', () => {
             this.onRectSelect(svgRect);
             console.log("Transition " + svgRect.id  + " ist ausgewählt.");  
@@ -217,15 +222,16 @@ export class DisplayComponent implements OnDestroy {
             const svgElement = document.getElementById('canvas');
 
             let cirlceObjectID = circle.id;
-            let circleObject = this.svgElementService.shapes.elements.find(element => element.id === cirlceObjectID);
+            let circleObject = this._diagram?.elements.find(element => element.id === cirlceObjectID);
             let rectobjectID = rect.id;
-            let rectObject =  this.svgElementService.shapes.elements.find(element => element.id === rectobjectID);
+            let rectObject =  this._diagram?.elements.find(element => element.id === rectobjectID);
             
             if(targetIsCircle){
                 // Aufruf der Funktion zu Erzeugung eines Objekts
                 let lineObject = this.svgElementService.createLineObject(rectObject!, circleObject!);
                 lineObject.createSVG();
                 let svgLine = lineObject.svgElement;
+                this._diagram?.pushLine(lineObject);
                 
                 if (svgElement) {
                     if (svgElement.firstChild){
@@ -282,8 +288,6 @@ export class DisplayComponent implements OnDestroy {
             console.log("Right-click event works");
         }
     }
-
-
 
 
 }

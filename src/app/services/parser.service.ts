@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {Diagram} from '../classes/diagram/diagram';
-import {Element} from '../classes/diagram/element';
-import {Coords, JsonPetriNet} from "../classes/json-petri-net";
+import { Injectable } from '@angular/core';
+import { Diagram } from '../classes/diagram/diagram';
+import { Element } from '../classes/diagram/element';
+import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 
 @Injectable({
     providedIn: 'root'
@@ -14,8 +14,9 @@ export class ParserService {
     parse(text: string): Diagram | undefined {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
-
+            
             const elements = this.parseElements(rawData['places']);
+           
             this.setPosition(elements, rawData['layout']);
 
             return new Diagram(elements);
@@ -33,7 +34,9 @@ export class ParserService {
         return placeIds.map(pid => new Element(pid,1,2)); // ACHTUNG: Ich musste hier noch zwei Argumente vergeben, damit ich keinen Error bekomme! Bitte ansehen! - Philipp
     }
 
-    private setPosition(elements: Array<Element>, layout: JsonPetriNet['layout']) {
+    private setPosition(elements: Array<Element>,layout: JsonPetriNet['layout']) {
+
+        
         if (layout === undefined) {
             return;
         }

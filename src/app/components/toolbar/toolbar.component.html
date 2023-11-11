@@ -1,18 +1,18 @@
 <mat-toolbar class ="toolbar">
-
+    
+    <button  mat-icon-button 
+        class="hover-class" 
+        [class.active]="circleActiveColor"
+        (click)="toggleCircleButton()"> 
+        <mat-icon>panorama_fish_eye</mat-icon> 
+    </button>
+    
     <button mat-icon-button 
         class="hover-class"
         [class.active]="rectActiveColor"
         (click)="toggleRectangleButton()">
         <mat-icon>crop_portrait</mat-icon>
     </button>
-        
-    <button  mat-icon-button 
-        class="hover-class" 
-        [class.active]="circleActiveColor"
-        (click)="toggleCircleButton()"> 
-        <mat-icon>panorama_fish_eye</mat-icon> 
-     </button>
       
     <button  mat-icon-button 
         class="hover-class"
