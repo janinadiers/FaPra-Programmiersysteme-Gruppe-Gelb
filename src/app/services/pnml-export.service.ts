@@ -30,8 +30,7 @@ export class PnmlExport implements ExportService{
             if (element.svgElement?.tagName === 'circle') {
                 pnmlString += `<place id="${element.id}">\n<name>\n<text>name="${element.id}"</text>\n</name>\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n</graphics>\n<initialMarking>\n<text>0</text>\n</initialMarking>\n</place>`;
             } else if (element.svgElement?.tagName === 'rect') {
-                console.log('reeeect', element);
-                
+                 
                 pnmlString += `<transition id="${element.id}"><name><text>"${element.id}"</text></name><graphics><position x="${element.x}" y="${element.y}"/></graphics></transition>`;
             } else if (element.svgElement?.tagName === 'line') {
                 pnmlString += `<arc id="${element.id}" source="${element.id}" target="${element.id}"><graphics><position x="${element.x}" y="${element.y}"/></graphics></arc>`;

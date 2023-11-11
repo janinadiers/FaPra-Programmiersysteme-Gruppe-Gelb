@@ -12,6 +12,8 @@ import { Line } from '../classes/diagram/line';
 export class SvgElementService {
  
   private elements: Array<Element> = [];
+  // Das Diagram sollte nur einmal erstellt werden (wird aktuell im Displayservice gemacht), da es sonst zu Problemen mit den imports/exports kommt
+  // die Elemente werden jetzt im display.component.ts file direkt dem Diagram duch pushElement hinzugefügt
   // shapes = new Diagram (this.elements);
 
   selectedCircle: SVGElement | undefined = undefined;

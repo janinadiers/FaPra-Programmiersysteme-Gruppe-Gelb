@@ -8,10 +8,9 @@ import {Element} from '../classes/diagram/element';
 export class SvgService {
 
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
-        console.log('drawing elements');
+       
         const result: Array<SVGElement> = [];
         diagram.elements.forEach(el => {
-            console.log('drawing element');
             
             result.push(this.createSvgCircleForElement(el))
         });
