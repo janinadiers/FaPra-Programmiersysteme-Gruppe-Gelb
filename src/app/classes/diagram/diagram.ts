@@ -6,8 +6,6 @@ import { Transition } from './transition';
 export class Diagram {
     private readonly _elements: Array<Element>;
    
-    
-
     selectedCircle: SVGElement | undefined = undefined;
     selectedRect: SVGElement | undefined = undefined;
     

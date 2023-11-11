@@ -28,10 +28,14 @@ export class ActivebuttonService {
   }
 
   arrowButtonActive() {
+    console.log("arrowButtonActive");
+    
     this.isCircleButtonActive = false;
     this.isRectangleButtonActive = false;
     this.isBoltButtonActive = false;
     this.isArrowButtonActive = !this.isArrowButtonActive;
+    
+    
   }
 
 
