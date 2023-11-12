@@ -14,8 +14,9 @@ export class SvgService {
 
         const result: Array<SVGElement> = [];
         diagram.elements.forEach(el => {
-
-            result.push(this.createSvgCircleForElement(el))
+            const svgElement = this.createSvgCircleForElement(el);
+            el.registerSvg(svgElement);
+            result.push(svgElement);
         });
         return result;
     }
@@ -23,17 +24,13 @@ export class SvgService {
     private createSvgCircleForElement(element: Element): SVGElement {
         // Umformung muss geschehen, da sonst Informationen verloren gehen
         const place = new Place(element.id, element.x, element.y);
-        let svgCircleElement = place.createSVG();
-        element.registerSvg(svgCircleElement);
-        return svgCircleElement;
+        return place.createSVG();
     }
 
     private createSvgRectangleForElement(element: Element): SVGElement {
         // Umformung muss geschehen, da sonst Informationen verloren gehen
         const transition = new Transition(element.id, element.x, element.y);
-        let svgTransitionElement = transition.createSVG();
-        element.registerSvg(svgTransitionElement);
-        return svgTransitionElement;
+        return transition.createSVG();
     }
 
     private createSvgLineForElement(line: Line): SVGElement {
@@ -64,11 +61,15 @@ export class SvgService {
 
         elements.forEach(element => {
             if (element) {
+                let svgElem;
                 if(element.svgElement instanceof SVGCircleElement) {
-                    svgElement += this.createSvgCircleForElement(element).outerHTML;
+                    svgElem = this.createSvgCircleForElement(element)
+                    svgElement += svgElem.outerHTML;
                 } else if (element.svgElement instanceof SVGRectElement) {
-                    svgElement += this.createSvgRectangleForElement(element).outerHTML;
+                    svgElem = this.createSvgRectangleForElement(element)
+                    svgElement += svgElem.outerHTML;
                 }
+                element.registerSvg(svgElem!);
             }
         });
 
