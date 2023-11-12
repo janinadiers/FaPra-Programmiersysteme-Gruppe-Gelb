@@ -56,13 +56,14 @@ export class Line {
     createSVG() {
 
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+
         line.setAttribute('id', this._id.toString());
         line.setAttribute('x1', this._source.x.toString());
         line.setAttribute('y1', this._source.y.toString());
         line.setAttribute('x2', this._target.x.toString());
         line.setAttribute('y2', this._target.y.toString());
         line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', '1');       
+        line.setAttribute('stroke-width', '1');
         this._svgElement = line;
     }
 

@@ -47,7 +47,7 @@ export class ExportSvgButtonComponent {
             console.log('element::: ', diagram.elements);
 
             // Elemente des Diagramms in ein SVG-Format exportieren.
-            const svgWithElements = this.svgService.exportToSvg(diagram.elements);
+            const svgWithElements = this.svgService.exportToSvg(diagram);
 
             // Download der SVG-Datei
             this.downloadService.downloadFile(svgWithElements,'petriNetz.svg', 'image/svg+xml');

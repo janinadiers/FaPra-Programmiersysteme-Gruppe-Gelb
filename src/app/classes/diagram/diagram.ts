@@ -14,17 +14,23 @@ export class Diagram {
         return this._elements;
     }
 
+    get lines(): Array<Line> {
+        return this._lines;
+    }
+
     pushElement(element: Element): void {
         console.log('pushElement');
-        
+
         this._elements.push(element);
     }
 
     pushLine(line: Line): void {
+        console.log('pushLine');
         this._lines.push(line);
     }
 
     clearElements(): void {
         this._elements.splice(0, this._elements.length);
+        this._lines.splice(0, this._lines.length);
     }
 }
