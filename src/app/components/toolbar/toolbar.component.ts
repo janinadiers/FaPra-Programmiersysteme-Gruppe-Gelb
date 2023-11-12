@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import { SvgElementService } from 'src/app/services/svg-element.service';
+import { MarkenspielService } from "../../services/markenspiel.service";
 
 @Component({
   selector: 'app-toolbar',
@@ -10,7 +11,9 @@ import { SvgElementService } from 'src/app/services/svg-element.service';
 export class ToolbarComponent {
 
   constructor(private activeButtonService: ActivebuttonService,
-              private svgElementService: SvgElementService) { }
+              private svgElementService: SvgElementService,
+              public markenspielService: MarkenspielService,
+  ) { }
 
   rectActiveColor: boolean = false;
   circleActiveColor: boolean = false;
@@ -22,15 +25,15 @@ export class ToolbarComponent {
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
     this.rectActiveColor = !this.rectActiveColor;
-    this.activeButtonService.RectangleButtonActive(); 
+    this.activeButtonService.RectangleButtonActive();
   }
-  
+
   toggleCircleButton() {
     this.rectActiveColor = false;
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
     this.circleActiveColor = !this.circleActiveColor;
-    this.activeButtonService.circleButtonActive(); 
+    this.activeButtonService.circleButtonActive();
   }
 
   toggleArrowButton () {
@@ -54,6 +57,5 @@ export class ToolbarComponent {
     this.activeButtonService.boltButtonActive();
   }
 
-  
-  
+    protected readonly MouseEvent = MouseEvent;
 }

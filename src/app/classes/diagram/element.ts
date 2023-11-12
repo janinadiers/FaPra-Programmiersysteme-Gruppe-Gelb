@@ -39,7 +39,7 @@ export class Element {
     }
 
 
-   
+
     public registerSvg(svg: SVGElement) {
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
@@ -64,6 +64,4 @@ export class Element {
         this._svgElement.setAttribute('fill', 'black');
     }
 
-
-    
 }

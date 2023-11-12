@@ -13,7 +13,7 @@ export class Line {
         this._id = id;
         this._source = source;
         this._target = target;
-        this._tokens = 0;      //Standardmäßig keine Marken
+        this._tokens = 0;      // Standardmäßig keine Gewichte
     }
 
     get id(): string {
@@ -62,10 +62,8 @@ export class Line {
         line.setAttribute('x2', this._target.x.toString());
         line.setAttribute('y2', this._target.y.toString());
         line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', '1');       
+        line.setAttribute('stroke-width', '3'); // Kanten lassen sich leichter anklicken, wenn sie breiter sind
         this._svgElement = line;
     }
-
-
 }
 

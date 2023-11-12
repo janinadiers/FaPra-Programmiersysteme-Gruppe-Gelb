@@ -1,42 +1,66 @@
 <mat-toolbar class ="toolbar">
-    
-    <button  mat-icon-button 
-        class="hover-class" 
+
+    <button  mat-icon-button
+        class="hover-class"
         [class.active]="circleActiveColor"
-        (click)="toggleCircleButton()"> 
-        <mat-icon>panorama_fish_eye</mat-icon> 
+        (click)="toggleCircleButton()">
+        <mat-icon>panorama_fish_eye</mat-icon>
     </button>
-    
-    <button mat-icon-button 
+
+    <button mat-icon-button
         class="hover-class"
         [class.active]="rectActiveColor"
         (click)="toggleRectangleButton()">
         <mat-icon>crop_portrait</mat-icon>
     </button>
-      
-    <button  mat-icon-button 
+
+    <button  mat-icon-button
         class="hover-class"
         [class.active]="arrowActiveColor"
-        (click)="toggleArrowButton()"> 
-        <mat-icon>north_east</mat-icon> 
+        (click)="toggleArrowButton()">
+        <mat-icon>north_east</mat-icon>
     </button>
 
-    <button  mat-icon-button 
+    <button  mat-icon-button
         class="hover-class"
         [class.active]="boltActiveColor"
-        (click)="toggleBoltButton()"> 
-        <mat-icon>bolt</mat-icon> 
+        (click)="toggleBoltButton()">
+        <mat-icon>bolt</mat-icon>
     </button>
-     
-    <button  mat-icon-button 
-        class="hover-class"> 
-        <mat-icon>delete</mat-icon> 
+
+    <button  mat-icon-button
+        class="hover-class">
+        <mat-icon>delete</mat-icon>
     </button>
-    
-    <button  mat-icon-button 
-        class="hover-class"> 
-        <mat-icon>clear</mat-icon> 
+
+    <button  mat-icon-button
+        class="hover-class">
+        <mat-icon>clear</mat-icon>
     </button>
-      
+
+    <mat-card-content>
+        Marken/Gewichte: &nbsp; &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getItemId()}} &nbsp; &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getCount()}} &nbsp; &nbsp;
+    </mat-card-content>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.addCount($event)">
+        +
+    </button>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.removeCount($event)">
+        -
+    </button>
+
 </mat-toolbar>
 

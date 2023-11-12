@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ReactiveFormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { FooterComponent } from './components/footer/footer.component';
 import { ExampleFileComponent } from './components/example-file/example-file.component';
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
@@ -21,6 +21,7 @@ import { PngExportButtonComponent } from './components/png-export-button/png-exp
 import { ExportButtonComponent} from "./components/export-button/export-button.component";
 import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
 import { ExportJsonButtonComponent } from './components/export-button-json/export-button-json.component';
+import {MatCardModule} from "@angular/material/card";
 
 
 @NgModule({
@@ -48,6 +49,8 @@ import { ExportJsonButtonComponent } from './components/export-button-json/expor
         ReactiveFormsModule,
         HttpClientModule,
         MatToolbarModule,
+        MatCardModule,
+        FormsModule,
     ],
     providers: [
         {

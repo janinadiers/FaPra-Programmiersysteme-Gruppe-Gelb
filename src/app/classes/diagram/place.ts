@@ -11,7 +11,7 @@ export class Place extends Element {
         super(id, x, y);
         this._radius = 25; // Default Radius
         this._amountToken = 0; //Default sind keine Marken gesetzt
-        this._children = []; 
+        this._children = [];
     }
 
     get radius(): number {
@@ -39,16 +39,19 @@ export class Place extends Element {
     }
 
     createSVG(){
-       
+
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('id', this.id.toString());
         circle.setAttribute('cx', this.x.toString());
-        circle.setAttribute('cy', this.y.toString()); 
-        circle.setAttribute('r', this._radius.toString());  
-        circle.setAttribute('fill', 'white'); 
-        circle.setAttribute('stroke', 'black'); 
-        circle.setAttribute('stroke-width', '2'); 
+        circle.setAttribute('cy', this.y.toString());
+        circle.setAttribute('r', this._radius.toString());
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', 'black');
+        circle.setAttribute('stroke-width', '2');
+
+        // Idee: Anzahl der Marken als Text auf dem SVG ausgeben, klappt aber noch nicht
+        // circle.setAttribute('text-content',this._amountToken.toString());
+
         return circle;
     }
-
 }
