@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -7,7 +7,6 @@ import {ExampleFileComponent} from "../example-file/example-file.component";
 import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
-import { Element } from 'src/app/classes/diagram/element';
 import { SvgElementService } from 'src/app/services/svg-element.service';
 
 @Component({
@@ -34,7 +33,6 @@ export class DisplayComponent implements OnDestroy {
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
-            console.log('new diagram');
 
             this._diagram = diagram;
             this.draw();
@@ -102,6 +100,7 @@ export class DisplayComponent implements OnDestroy {
         }
 
         this.clearDrawingArea();
+
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
         for (const element of elements) {
             this.drawingArea.nativeElement.appendChild(element);
@@ -120,196 +119,150 @@ export class DisplayComponent implements OnDestroy {
     }
 
     onCanvasClick(event: MouseEvent) {
-
+        console.log("Canvas clicked", this._diagram);
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
         if (!svgElement) {
             return;
-           }
+        }
         // Position des SVG Elements relativ zum Viewport
         const svgContainer = svgElement.getBoundingClientRect();
+        // Berechnung der Maus Koordinanten relativ zum SVG Element
+        const mouseX = event.clientX - svgContainer.left;
+        const mouseY = event.clientY - svgContainer.top;
 
-       // Check ob linker Mouse Button geklickt und Button aktiviert
+        // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
 
-         // Berechnung der Maus Koordinanten relativ zum SVG Element
-         const x = event.clientX - svgContainer.left;
-         const y = event.clientY - svgContainer.top;
-         // SVG Kreis Element malen
-         this.drawCircle(x,y);
-       }
+            let svgCircle = this.drawCircle(mouseX ,mouseY)
+            svgElement.appendChild(svgCircle);
 
-       else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
+        }
 
-         // Berechnung der Maus Koordinanten relativ zum SVG Element
-         const mouseX = event.clientX - svgContainer.left;
-         const mouseY = event.clientY - svgContainer.top;
-         const width = 20;
-         const height = 40;
-         // Berechne Koordinaten der linken oberen Ecke des Rechtecks von der Mitte aus
-         const x = mouseX - width / 2;
-         const y = mouseY - height / 2;
-         // SVG Rechteck Element malen
-         this.drawRectangle(x,y,width,height);
-       }
+        else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
 
-       else if (event.button === 0 && this.activeButtonService.isBoltButtonActive){
-            //Blitz-Tool
+            let svgRect = this.drawRect(mouseX, mouseY);
+            svgElement.appendChild(svgRect);
+        }
+        //Blitz-Tool
+        else if (event.button === 0 && this.activeButtonService.isBoltButtonActive){
+
             if(this.svgElementService.lightningCount === 0){
-                const x = event.clientX - svgContainer.left;
-                const y = event.clientY - svgContainer.top;
-                this.drawCircle(x,y);
+
+                let targetIsCircle: boolean = true;
+                let svgCircle = this.drawCircle(mouseX ,mouseY);
+                svgElement.appendChild(svgCircle);
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this.svgElementService.circles[this.svgElementService.circles.length - 1];
-                this.svgElementService.selectedCircle = lastCircleObject.svgElement;
+                const lastCircleObject = this._diagram?.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
+                this.svgElementService.selectedCircle = lastCircleObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
-                    this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
+                    this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
                 }
                 this.svgElementService.lightningCount++;
             }
 
             else if (this.svgElementService.lightningCount === 1){
 
-                const mouseX = event.clientX - svgContainer.left;
-                const mouseY = event.clientY - svgContainer.top;
-                const width = 20;
-                const height = 40;
-                const x = mouseX - width / 2;
-                const y = mouseY - height / 2;
-                this.drawRectangle(x,y,width,height);
+                let targetIsCircle: boolean = false;
+                let svgRect = this.drawRect(mouseX, mouseY);
+                svgElement.appendChild(svgRect);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this.svgElementService.rectangles[this.svgElementService.rectangles.length - 1];
-                this.svgElementService.selectedRect = lastRectObject.svgElement;
+                const lastRectObject = this._diagram?.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
+                this.svgElementService.selectedRect = lastRectObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
-                    this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
+                    this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
                 }
+
                 this.svgElementService.lightningCount--;
             }
-
         }
     }
 
-    private drawCircle (x:number, y: number){
+    drawCircle(mouseX:number, mouseY:number){
 
-        const svgElement = document.getElementById('canvas');
-        if (!svgElement) {
-            return;
-        }
-        // ID String für jeden Kreis um 1 erhöhen (p0, p1,..)
-        let idString: string = "p" + this.svgElementService.idCircleCount;
-        this.svgElementService.idCircleCount++;
-
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        // Attribute
-        circle.setAttribute('cx', x.toString()); // x-Koordinate
-        circle.setAttribute('cy', y.toString()); // y-Koordinate
-        circle.setAttribute('r', '25'); // Radius
-        circle.setAttribute('fill', 'white'); // Farbe
-        circle.setAttribute('stroke', 'black'); // Border Farbe
-        circle.setAttribute('stroke-width', '2');
-        circle.addEventListener('click', () => {
-            this.onCircleSelect(circle);
-            console.log(idString + " ist ausgewählt");
+        // Aufruf der Funktion zu Erzeugung eines Objekts
+        let circleObject = this.svgElementService.createCircleObject(mouseX, mouseY);
+        let svgCircle = circleObject.createSVG();
+        // Objekt mit SVG Element verknüpfen
+        circleObject.svgElement = svgCircle;
+        this._diagram?.pushElement(circleObject);
+        svgCircle.addEventListener('click', () => {
+            this.onCircleSelect(svgCircle);
+            console.log("Place " + svgCircle.id  + " ist ausgewählt.");
         });
-        svgElement.appendChild(circle);
-
-        // Kreis-Objekt erzeugen
-        let circleObject = new Element(idString);
-        circleObject.x=x;
-        circleObject.y=y;
-        circleObject.svgElement=circle; // mit SVG Element verknüpfen
-
-        this._diagram?.elements.push(circleObject);
-
-        // Objekt im Array speichern
-        this.svgElementService.addCircle(circleObject);
+        return svgCircle;
     }
 
-    private drawRectangle(x:number, y: number, width: number, height: number){
+    drawRect(mouseX: number, mouseY: number){
 
-        const svgElement = document.getElementById('canvas');
-        if (!svgElement) {
-            return;
-        }
-        // ID String für jedes Rechteck um 1 erhöhen (t0, t1,..)
-        let idString: string = "t" + this.svgElementService.idRectCount;
-        this.svgElementService.idRectCount++;
-
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        // Attribute
-        rect.setAttribute('x', x.toString());
-        rect.setAttribute('y', y.toString());
-        rect.setAttribute('width', width.toString());
-        rect.setAttribute('height', height.toString());
-        rect.setAttribute('fill', 'black');
-        rect.setAttribute('stroke', 'black');
-        rect.setAttribute('stroke-width', '2');
-        rect.addEventListener('click', () => {
-            this.onRectSelect(rect);
-            console.log(idString + " ist ausgewählt");
+        //  Aufruf der Funktion zu Erzeugung eines Objekts
+        let rectObject = this.svgElementService.createRectObject(mouseX, mouseY);
+        const width = rectObject.width;
+        const height = rectObject.height;
+        let svgRect = rectObject.createSVG();
+        // Anpassen der Koord. des SVGRects, damit es von der Mitte aufgezogen wird
+        const x = mouseX - width / 2;
+        const y = mouseY - height / 2;
+        svgRect.setAttribute('x', x.toString());
+        svgRect.setAttribute('y', y.toString());
+        // Objekt mit SVG Element verknüpfen
+        rectObject.svgElement = svgRect;
+        this._diagram?.pushElement(rectObject);
+        svgRect.addEventListener('click', () => {
+            this.onRectSelect(svgRect);
+            console.log("Transition " + svgRect.id  + " ist ausgewählt.");
         });
-        svgElement.appendChild(rect);
-
-        // Rechteck-Objekt erzeugen
-        let rectObject = new Element(idString);
-        rectObject.x=x;
-        rectObject.y=y;
-        rectObject.svgElement=rect; // mit SVG Element verknüpfen
-
-        this._diagram?.elements.push(rectObject);
-
-        // Objekt im Array speichern
-        this.svgElementService.addRectangle(rectObject);
+        return svgRect
     }
 
 
-    connectElements(circle: SVGElement, rect: SVGElement) {
+    connectElements(circle: SVGElement, rect: SVGElement, targetIsCircle: boolean) {
+
         if (this.activeButtonService.isArrowButtonActive || this.activeButtonService.isBoltButtonActive) {
             const svgElement = document.getElementById('canvas');
-            const circleX = parseFloat(circle.getAttribute('cx') || '0');
-            const circleY = parseFloat(circle.getAttribute('cy') || '0');
-            const rectX = parseFloat(rect.getAttribute('x') || '0') + parseFloat(rect.getAttribute('width') || '0') / 2;
-            const rectY = parseFloat(rect.getAttribute('y') || '0') + parseFloat(rect.getAttribute('height') || '0') / 2;
 
-            // SVG Line Element
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', circleX.toString());
-            line.setAttribute('y1', circleY.toString());
-            line.setAttribute('x2', rectX.toString());
-            line.setAttribute('y2', rectY.toString());
-            line.setAttribute('stroke', 'black');
-            line.setAttribute('stroke-width', '1');
+            let cirlceObjectID = circle.id;
+            let circleObject = this._diagram?.elements.find(element => element.id === cirlceObjectID);
+            let rectobjectID = rect.id;
+            let rectObject =  this._diagram?.elements.find(element => element.id === rectobjectID);
 
-            if (svgElement) {
-                if (svgElement.firstChild) {
-                    svgElement.insertBefore(line,svgElement.firstChild);
+            if(targetIsCircle){
+                // Aufruf der Funktion zu Erzeugung eines Objekts
+                let lineObject = this.svgElementService.createLineObject(rectObject!, circleObject!);
+                lineObject.createSVG();
+                let svgLine = lineObject.svgElement;
+                this._diagram?.pushLine(lineObject);
+
+                if (svgElement) {
+                    if (svgElement.firstChild){
+                        svgElement.insertBefore(svgLine!,svgElement.firstChild);
+                    }
+                }
+
+            }
+            else{
+                let lineObject = this.svgElementService.createLineObject(circleObject!, rectObject!);
+                lineObject.createSVG();
+                let svgLine = lineObject.svgElement;
+                if (svgElement) {
+                    if (svgElement.firstChild){
+                        svgElement.insertBefore(svgLine!,svgElement.firstChild);
+                    }
                 }
             }
 
-            // ToDo: circle und rect verlieren ihre ID-Info
-            let idString: string = "p" + circle.id + ', t' + rect.id;
-            this.svgElementService.idArrowCount++;
-            console.log(idString)
-            let lineObject = new Element(idString);
-            lineObject.x=circleX;
-            lineObject.y=circleY;
-            lineObject.x2=rectX;
-            lineObject.y2=rectY;
-            lineObject.svgElement=line; // mit SVG Element verknüpfen
-
-            this._diagram?.elements.push(lineObject);
-
             if(this.activeButtonService.isArrowButtonActive){
-                this.svgElementService.selectedCircle = undefined;
-                this.svgElementService.selectedRect = undefined;
+                this.svgElementService.resetSelectedElements();
             }
         }
     }
+
 
     onCircleSelect(circle: SVGElement){
         this.svgElementService.selectedCircle = circle;
         if (this.svgElementService.selectedRect) {
-            this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
+            let circleIsTarget: boolean = true;
+            this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, circleIsTarget);
         }
         else
         return;
@@ -318,21 +271,23 @@ export class DisplayComponent implements OnDestroy {
     onRectSelect(rect: SVGElement){
         this.svgElementService.selectedRect= rect;
         if (this.svgElementService.selectedCircle) {
-            this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect);
+            let circleIsTarget: boolean = false;
+            this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, circleIsTarget);
         }
         else
         return;
     }
 
-    handleRightClick(event: MouseEvent) {
+  handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
 
         if(this.activeButtonService.isBoltButtonActive){
 
-            this.svgElementService.selectedCircle = undefined;
-            this.svgElementService.selectedRect = undefined;
+            this.svgElementService.resetSelectedElements();
             this.svgElementService.lightningCount = 0;
             console.log("Right-click event works");
         }
     }
+
+
 }

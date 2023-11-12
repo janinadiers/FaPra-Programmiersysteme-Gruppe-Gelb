@@ -35,14 +35,17 @@ export class ExportSvgButtonComponent {
         target.classList.remove('mouse-hover');
     }
 
-    async exportSvg(e: MouseEvent) {
-        this.prevent(e);
+    async exportSvg() {
+        console.log('exportSvg');
 
         // Das Diagramm wird über den displayService abgerufen und als Observable behandelt.
         // Mit take(1) wird sichergestellt, dass nur das erste Element abgerufen wird, und mit toPromise() wird es zu einem Promise.
         const diagram = await this.displayService.diagram$.pipe(take(1)).toPromise();
+        console.log('diagram::: ', this.displayService.diagram);
 
         if (diagram && diagram.elements.length > 0) {
+            console.log('element::: ', diagram.elements);
+
             // Elemente des Diagramms in ein SVG-Format exportieren.
             const svgWithElements = this.svgService.exportToSvg(diagram.elements);
 
