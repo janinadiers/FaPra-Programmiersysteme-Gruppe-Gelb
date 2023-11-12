@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -8,8 +8,6 @@ import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import { SvgElementService } from 'src/app/services/svg-element.service';
-import { MarkenspielService } from "../../services/markenspiel.service";
-import {Line} from "../../classes/diagram/line";
 
 @Component({
     selector: 'app-display',
@@ -31,7 +29,6 @@ export class DisplayComponent implements OnDestroy {
                 private _http: HttpClient,
                 private activeButtonService: ActivebuttonService,
                 private svgElementService: SvgElementService,
-                private markenspiel: MarkenspielService
                 ) {
 
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
@@ -275,15 +272,19 @@ export class DisplayComponent implements OnDestroy {
 
     onLineSelect(line: SVGElement) {
         this.svgElementService.selectedLine = line;
-        this.markenspiel.getItemId();
-        console.log("Kante "+this.svgElementService.selectedLine.id+" ist ausgewählt.");
+        // this.markenspiel.getLineItemId();
+        console.log("Kante "+this.svgElementService.selectedLine.id+" ist ausgewählt und enthält "+
+           this.svgElementService.selectedLineObjectArray
+               [+this.svgElementService.selectedLine.id.charAt(1)||0].tokens+" Gewichte.");
         return;
     }
 
 
     onCircleSelect(circle: SVGElement){
         this.svgElementService.selectedCircle = circle;
-        console.log("Place " + this.svgElementService.selectedCircle.id  + " ist ausgewählt.");
+        console.log("Place " + this.svgElementService.selectedCircle.id  + " ist ausgewählt und enthält " +
+            this.svgElementService.selectedCircleObjectArray
+                [+this.svgElementService.selectedCircle.id.charAt(1)||0].amountToken+" Marken.");
 
         if (this.svgElementService.selectedRect) {
             let circleIsTarget: boolean = true;

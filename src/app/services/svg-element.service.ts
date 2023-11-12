@@ -67,13 +67,11 @@ export class SvgElementService {
     return lineObject;
   }
 
-
   resetSelectedElements() {
     this.selectedCircle = undefined;
     this.selectedRect = undefined;
     this.selectedLine = undefined;
   }
-
 
   resetCounterVar() {
     this.idCircleCount = 0;

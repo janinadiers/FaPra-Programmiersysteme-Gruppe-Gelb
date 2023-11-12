@@ -49,6 +49,7 @@ export class Place extends Element {
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', '2');
 
+
         // Idee: Anzahl der Marken als Text auf dem SVG ausgeben, klappt aber noch nicht
         // circle.setAttribute('text-content',this._amountToken.toString());
 

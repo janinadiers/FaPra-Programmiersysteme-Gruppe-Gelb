@@ -39,26 +39,50 @@
     </button>
 
     <mat-card-content>
-        Marken/Gewichte: &nbsp; &nbsp;
+        Marken: &nbsp;
     </mat-card-content>
 
     <mat-card-content>
-        {{markenspielService.getItemId()}} &nbsp; &nbsp;
+        {{markenspielService.getCircleItemId()}} &nbsp;
     </mat-card-content>
 
     <mat-card-content>
-        {{markenspielService.getCount()}} &nbsp; &nbsp;
+        {{markenspielService.getCircleCount()}} &nbsp;
     </mat-card-content>
 
     <button mat-button
             class ="hover-class"
-            (click) = "markenspielService.addCount($event)">
+            (click) = "markenspielService.addCircleCount()">
         +
     </button>
 
     <button mat-button
             class ="hover-class"
-            (click) = "markenspielService.removeCount($event)">
+            (click) = "markenspielService.removeCircleCount()">
+        -
+    </button>
+
+    <mat-card-content>
+        Gewichte: &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getLineItemId()}} &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getLineCount()}} &nbsp;
+    </mat-card-content>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.addLineCount()">
+        +
+    </button>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.removeLineCount()">
         -
     </button>
 
