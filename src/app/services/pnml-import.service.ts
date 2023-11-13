@@ -4,6 +4,9 @@ import { Element } from '../classes/diagram/element';
 import { ImportService } from '../classes/import-service';
 import { Diagram } from '../classes/diagram/diagram';
 import { SvgService } from './svg.service';
+import { Place } from '../classes/diagram/place';
+import { Transition } from '../classes/diagram/transition';
+import { Line } from '../classes/diagram/line';
 
 @Injectable({
     providedIn: 'root',
@@ -19,10 +22,11 @@ export class PnmlImportService implements ImportService {
         let places = this.importPlaces(rawData);
         // get all transitions as an Element instance from DOM object
         let transitions = this.importTransitions(rawData);
+        
         // get all arcs as an Element instance from DOM object
         let arcs = this.importArcs(rawData, [...places, ...transitions]);
        
-        return new Diagram([...places, ...transitions, ...arcs]);
+        return new Diagram([...places, ...transitions], [...arcs]);
       
     }
 
@@ -57,17 +61,17 @@ export class PnmlImportService implements ImportService {
             
     }
 
-    importArcs(rawData: Document, elements: Element[]): Array<Element> {
+    importArcs(rawData: Document, elements: Element[]): Array<Line> {
         const arcs = rawData.querySelectorAll('arc');
-        const result:Array<Element> = []
+        const lines:Array<Line> = []
         arcs.forEach((arc) => {
             const arcId = arc.getAttribute('id');
-            const arcPosition = this.getEdgePosition(arc, elements);
+            const arcPosition = this.getSourceAndTargetElements(arc, elements);
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
-            const arcElement = this.createEdge(arcId, arcPosition.x, arcPosition.y, arcPosition.x2, arcPosition.y2);
-            result.push(arcElement);
+            const arcElement = this.createEdge(arcId, arcPosition.sourceElement, arcPosition.targetElement);
+            lines.push(arcElement);
         });
-       return result;
+       return lines;
     }
 
 
@@ -105,57 +109,47 @@ export class PnmlImportService implements ImportService {
 
        return { x: parseFloat(x), y: parseFloat(y) };
     }
-    private getEdgePosition(element:globalThis.Element, elements:Element[]):{x:number, y:number, x2:number, y2:number}{
+    private getSourceAndTargetElements(element:globalThis.Element, elements:Element[]):{sourceElement:Element, targetElement: Element}{
         
         const source = element.getAttribute('source');
         const target = element.getAttribute('target');
         
         if(!source || !target) throw new Error('Arc element misses source or target attribute: ' + element );
-        const sourceElement = elements.find((element) => element.id == source);
-        const targetElement = elements.find((element) => element.id == target);
-        
-        let x = sourceElement?.x;
-        let y = sourceElement?.y;
-        let x2 = targetElement?.x;
-        let y2 = targetElement?.y;
+        const sourceElement:Element| undefined = elements.find((element) => element.id == source);
+        const targetElement: Element|undefined = elements.find((element) => element.id == target);
        
-        if(!x || !y || !x2 || !y2) throw new Error('Arc element misses positional attribute: ' + element );
+        if(!sourceElement || !targetElement) throw new Error('Arc element misses source and target attribute: ' + element );
 
-        return { x, y, x2, y2 };
+        return { sourceElement, targetElement };
        
     }
 
 
     private createPlace(id:string, x:number, y:number): Element {
-        const element = new Element(id);
+        const element = new Place(id, x, y);
         element.x = x;
         element.y = y;
-        element.svgElement = this._svgService.createSvgCircleForElement(element);
+        element.svgElement = element.createSVG();
         return element;
        
 
     }
 
     private createTransition(id:string, x:number, y:number): Element {
-        const element = new Element(id);
+        const element = new Transition(id, x, y);
         element.x = x;
         element.y = y;
-        element.svgElement = this._svgService.createSvgRectangleForElement(element);
+        element.svgElement = element.createSVG();
         return element;
        
 
     }
 
-    private createEdge(id:string, x:number, y:number, x2:number, y2:number): Element {
-        const element = new Element(id);
-        element.x = x;
-        element.y = y;
-        element.x2 = x2;
-        element.y2 = y2;
-        element.svgElement = this._svgService.createSvgLineForElement(element);
+    private createEdge(id:string, source:Element, target:Element): Line{
+        const element:Line = new Line(id, source, target);
+        element.createSVG();
         return element;
       
-
     }
 
 

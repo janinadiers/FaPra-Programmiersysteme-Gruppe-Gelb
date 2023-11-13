@@ -17,7 +17,7 @@ export class ToolbarComponent {
   arrowActiveColor: boolean = false;
   boltActiveColor: boolean = false;
 
-  toggleRectangleButton(mouseEvent: MouseEvent) {
+  toggleRectangleButton() {
     this.circleActiveColor = false;
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
@@ -25,7 +25,7 @@ export class ToolbarComponent {
     this.activeButtonService.RectangleButtonActive(); 
   }
   
-  toggleCircleButton(mouseEvent: MouseEvent) {
+  toggleCircleButton() {
     this.rectActiveColor = false;
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
@@ -33,27 +33,27 @@ export class ToolbarComponent {
     this.activeButtonService.circleButtonActive(); 
   }
 
-  toggleArrowButton (mouseEvent: MouseEvent) {
+  toggleArrowButton () {
     this.circleActiveColor = false;
     this.rectActiveColor = false;
     this.boltActiveColor = false;
     this.arrowActiveColor = !this.arrowActiveColor;
     // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-    this.svgElementService.selectedCircle = undefined;
-    this.svgElementService.selectedRect = undefined;
+    this.svgElementService.resetSelectedElements();
     this.activeButtonService.arrowButtonActive();
   }
 
-  toggleBoltButton (mouseEvent: MouseEvent) {
+  toggleBoltButton () {
     this.circleActiveColor = false;
     this.rectActiveColor = false;
     this.arrowActiveColor = false;
     this.boltActiveColor = !this.boltActiveColor;
     // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-    this.svgElementService.selectedCircle = undefined;
-    this.svgElementService.selectedRect = undefined;
+    this.svgElementService.resetSelectedElements();
     this.svgElementService.lightningCount = 0;
     this.activeButtonService.boltButtonActive();
   }
 
+  
+  
 }

@@ -7,24 +7,27 @@ import {Element} from '../classes/diagram/element';
 })
 export class SvgService {
 
-    public createSvgElements(diagram: Diagram): Array<SVGElement> {
-        const result: Array<SVGElement> = [];
-        diagram.elements.forEach(el => {
+    // public createSvgElements(diagram: Diagram): Array<SVGElement> {
+       
+    //     const result: Array<SVGElement> = [];
+    //     diagram.elements.forEach(el => {
            
             
-            if(el.svgElement instanceof SVGCircleElement) {
-               result.push(this.createSvgCircleForElement(el));
-            } else if (el.svgElement instanceof SVGRectElement) {
-                result.push(this.createSvgRectangleForElement(el));
-            } else if(el.svgElement instanceof SVGLineElement) {
-                result.push(this.createSvgLineForElement(el));
-            }
+    //         if(el.svgElement instanceof SVGCircleElement) {
+    //            result.push(this.createSvgCircleForElement(el));
+    //         } else if (el.svgElement instanceof SVGRectElement) {
+    //             result.push(this.createSvgRectangleForElement(el));
+    //         } else if(el.svgElement instanceof SVGLineElement) {
+    //             console.log("SVGLineElement", SVGLineElement);
+                
+    //             //result.push(this.createSvgLineForElement(el));
+    //         }
            
             
-        });
+    //     });
         
-        return result;
-    }
+    //     return result;
+    // }
 
     public createSvgCircleForElement(element: Element): SVGElement {
         const svg = this.createSvgElement('circle');
@@ -55,20 +58,20 @@ export class SvgService {
         return svg;
     }
 
-    public createSvgLineForElement(element: Element): SVGElement {
-        const svg = this.createSvgElement('line');
+    // public createSvgLineForElement(element: Element): SVGElement {
+    //     // const svg = this.createSvgElement('line');
 
-        svg.setAttribute('x1', `${element.x}`);
-        svg.setAttribute('y1', `${element.y}`);
-        svg.setAttribute('x2', `${element.x2}`);
-        svg.setAttribute('y2', `${element.y2}`);
-        svg.setAttribute('stroke', 'black');
-        svg.setAttribute('stroke-width', '1');
+    //     // svg.setAttribute('x1', `${element.x}`);
+    //     // svg.setAttribute('y1', `${element.y}`);
+    //     // svg.setAttribute('x2', `${element.x2}`);
+    //     // svg.setAttribute('y2', `${element.y2}`);
+    //     // svg.setAttribute('stroke', 'black');
+    //     // svg.setAttribute('stroke-width', '1');
 
-        element.registerSvg(svg);
+    //     // element.registerSvg(svg);
 
-        return svg;
-    }
+    //     // return svg;
+    // }
 
     private createSvgElement(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);

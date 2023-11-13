@@ -3,19 +3,11 @@ export class Element {
     private _x: number;
     private _y: number;
     private _svgElement: SVGElement | undefined;
-    private _x2: number;
-    private _y2: number;
-    private _sourceID: string | undefined;
-    private _targetID: string | undefined;
 
-    constructor(id: string) {
+    constructor(id: string, x: number , y: number) {
         this._id = id;
-        this._x = 0;
-        this._y = 0;
-        this._x2 = 0;
-        this._y2 = 0;
-        this._sourceID = undefined;
-        this._targetID = undefined;
+        this._x = x;
+        this._y = y;
     }
 
     get id(): string {
@@ -38,39 +30,16 @@ export class Element {
         this._y = value;
     }
 
-
-    get x2(): number {
-        return this._x2;
+    get svgElement(): SVGElement | undefined {
+        return this._svgElement;
     }
 
-    set x2(value: number) {
-        this._x2 = value;
+    set svgElement(svgElement: SVGElement) {
+        this._svgElement = svgElement;
     }
 
-    get y2(): number {
-        return this._y2;
-    }
 
-    set y2(value: number) {
-        this._y2 = value;
-    }
-
-    get sourceID(): string | undefined {
-        return this._sourceID;
-    }
-
-    set sourceID(value: string) {
-        this._sourceID = value;
-    }
-
-    get targetID(): string | undefined {
-        return this._targetID;
-    }
-
-    set targetID(value: string) {
-        this._targetID = value;
-    }
-    
+   
     public registerSvg(svg: SVGElement) {
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
@@ -95,11 +64,6 @@ export class Element {
         this._svgElement.setAttribute('fill', 'black');
     }
 
-    get svgElement(): SVGElement | undefined {
-        return this._svgElement;
-    }
 
-    set svgElement(svgElement: SVGElement) {
-        this._svgElement = svgElement;
-    }
+    
 }
