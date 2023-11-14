@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Diagram } from '../classes/diagram/diagram';
 import { Element } from '../classes/diagram/element';
+import { Line } from '../classes/diagram/line';
 import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 
 @Injectable({
@@ -14,12 +15,20 @@ export class ParserService {
     parse(text: string): Diagram | undefined {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
-            
-            const elements = this.parseElements(rawData['places']);
+
+            const places = this.parseElements(rawData['places']);
+            const transitions = this.parseElements(rawData['transitions']);
+
+            //Concatenate both Element-Objects
+            const elements = [...places, ...transitions];
            
+            //Set coordinates of places and transitions
             this.setPosition(elements, rawData['layout']);
 
-            return new Diagram(elements);
+            //Set Lines from Layout Array
+            const lines = this.setLines(elements, rawData['layout']);
+
+            return new Diagram(elements, lines);
         } catch (e) {
             console.error('Error while parsing JSON', e, text);
             return undefined;
@@ -31,12 +40,31 @@ export class ParserService {
             return [];
         }
 
-        return placeIds.map(pid => new Element(pid,1,2)); // ACHTUNG: Ich musste hier noch zwei Argumente vergeben, damit ich keinen Error bekomme! Bitte ansehen! - Philipp
+        //Create temporary Element-Object without coords
+        return placeIds.map(pid => new Element(pid));
+    }
+
+    private setLines(elements: Array<Element>,layout: JsonPetriNet['layout']): Array<Line> {
+        const lines: Array<Line> = [];
+
+        if (layout) {
+            for (const pid in layout) {
+                const coords = layout[pid];
+                //Check if layout has Array -> Array indicates line coordinates
+                if (Array.isArray(coords)) {
+                    const elements: Array<Element> = [];
+                    coords.forEach(coord => {
+                        elements.push(new Element(pid, coord.x, coord.y));
+                    })
+                    lines.push(new Line(pid, elements[0], elements[1]));
+                }
+            }
+        }
+
+        return lines;
     }
 
     private setPosition(elements: Array<Element>,layout: JsonPetriNet['layout']) {
-
-        
         if (layout === undefined) {
             return;
         }
@@ -48,5 +76,7 @@ export class ParserService {
                 el.y = pos.y;
             }
         }
+
+
     }
 }

@@ -48,6 +48,8 @@ export class Place extends Element {
         circle.setAttribute('fill', 'white'); 
         circle.setAttribute('stroke', 'black'); 
         circle.setAttribute('stroke-width', '2'); 
+
+        super.registerSvg;
         return circle;
     }
 

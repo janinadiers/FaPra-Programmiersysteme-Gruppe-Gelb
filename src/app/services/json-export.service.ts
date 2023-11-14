@@ -54,10 +54,10 @@ export class JsonExport implements ExportService{
 
         elements.forEach(element => {
             //check if svgElement is place
-            if (element.svgElement?.nodeName == 'circle')
+            if (element.svgElement?.nodeName.match('circle'))
                 petriNet.places.push(element.id);
             //check if svgElement is transition
-            if (element.svgElement?.nodeName == 'rect')
+            if (element.svgElement?.nodeName.match('rect'))
                 petriNet.transitions.push(element.id);
 
             //set coordinates of either place or transition

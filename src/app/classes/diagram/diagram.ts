@@ -5,9 +5,9 @@ export class Diagram {
     private readonly _elements: Array<Element>;
     private readonly _lines: Array<Line>;
 
-    constructor(elements: Array<Element>) {
+    constructor(elements: Array<Element>, lines?: Array<Line>) {
         this._elements = elements;
-        this._lines = [];
+        this._lines = lines ?? [];
     }
 
     get elements(): Array<Element> {

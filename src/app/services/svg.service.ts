@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from '../classes/diagram/diagram';
 import {Element} from '../classes/diagram/element';
+import { Place } from '../classes/diagram/place';
+import { Transition } from '../classes/diagram/transition';
 
 @Injectable({
     providedIn: 'root'
@@ -10,13 +12,22 @@ export class SvgService {
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
        
         const result: Array<SVGElement> = [];
-        diagram.elements.forEach(el => {
-            
-            result.push(this.createSvgCircleForElement(el))
+        diagram.elements.forEach(element => {
+            //check if imported element is place
+            if (element.id.startsWith('p')) 
+                result.push(new Place(element.id, element.x, element.y).createSVG());
+                //check if imported element is transition
+            if (element.id.startsWith('t'))
+                result.push(new Transition(element.id, element.x, element.y).createSVG());
         });
+
+        diagram.lines.forEach(line => {
+            result.push(line.createSVG());
+        })
         return result;
     }
 
+    //Could be removed, not needed for JSON
     private createSvgCircleForElement(element: Element): SVGElement {
         const svg = this.createSvgElement('circle');
 

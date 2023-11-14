@@ -64,8 +64,19 @@ export class Line {
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
         this._svgElement = line;
+        return line;
     }
 
+    // Might be needed for "Markenspiel"
+    // public registerSvg(svg: SVGElement) {
+    //     this._svgElement = svg;
+    //     this._svgElement.onmousedown = (event) => {
+    //         this.processMouseDown(event);
+    //     };
+    //     this._svgElement.onmouseup = (event) => {
+    //         this.processMouseUp(event);
+    //     };
+    // }
 
 }
 
