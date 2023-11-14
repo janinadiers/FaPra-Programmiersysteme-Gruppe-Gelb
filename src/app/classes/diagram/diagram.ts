@@ -14,6 +14,10 @@ export class Diagram {
         return this._elements;
     }
 
+    get lines(): Array<Line> {
+        return this._lines;
+    }
+
     pushElement(element: Element): void {
         console.log('pushElement');
         

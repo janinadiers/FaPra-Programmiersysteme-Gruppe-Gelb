@@ -244,6 +244,7 @@ export class DisplayComponent implements OnDestroy {
                 let lineObject = this.svgElementService.createLineObject(circleObject!, rectObject!);
                 lineObject.createSVG();
                 let svgLine = lineObject.svgElement;
+                this._diagram?.pushLine(lineObject);
                 if (svgElement) {
                     if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);

@@ -1,6 +1,7 @@
 import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
 import { Element } from '../classes/diagram/element';
+import { Line } from '../classes/diagram/line';
 import { Injectable } from '@angular/core';
 import { JsonPetriNet } from '../classes/json-petri-net';
 import {DownloadService} from "./helper/download-service";
@@ -17,13 +18,27 @@ export class JsonExport implements ExportService{
 
         const elements = this._displayService.diagram.elements;
 
-        for (const element of elements) {
+        elements.forEach(element => {
             result.push(element);
-        }
+        })
+
+        return result;
+    }
+    
+    private getLines(): Array<Line> {
+        const result: Array<Line> = [];
+
+        const lines = this._displayService.diagram.lines;
+
+        lines.forEach(line => {
+            result.push(line);
+        })
+
         return result;
     }
 
     export(): void {
+        //usage of given Json interface for PetriNet
         const petriNet: JsonPetriNet = {
             places: [],
             transitions: [],
@@ -35,11 +50,27 @@ export class JsonExport implements ExportService{
           };
 
         const elements = this.getElements();
+        const lines = this.getLines();
 
         elements.forEach(element => {
-            petriNet.places.push(element.id);
+            //check if svgElement is place
+            if (element.svgElement?.nodeName == 'circle')
+                petriNet.places.push(element.id);
+            //check if svgElement is transition
+            if (element.svgElement?.nodeName == 'rect')
+                petriNet.transitions.push(element.id);
+
+            //set coordinates of either place or transition
             petriNet.layout![element.id] = { x: element.x, y: element.y }
+
         });
+
+        //Both versions for saving lines are possible and legit with example.json (discussion with Group and/or Stakeholder needed)
+        lines.forEach(line => {
+            petriNet.layout![`${line.source.id},${line.target.id}`] = [{ x: line.source.x, y: line.source.y },{ x: line.target.x, y: line.target.y }]
+            // petriNet.layout![`${line.source.id},${line.target.id}`] = { x: line.source.x, y: line.source.y }
+            // petriNet.layout![`${line.target.id},${line.source.id}`] = { x: line.target.x, y: line.target.y }
+        })
 
         var jsonString = JSON.stringify(petriNet);
 
