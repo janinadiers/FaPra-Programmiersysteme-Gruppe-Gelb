@@ -52,7 +52,9 @@ export class PnmlImportService implements ImportService {
         if (placeIds === undefined || !Array.isArray(placeIds)) {
             return [];
         }
-        return placeIds.map((pid) => new Element(pid));
+
+        // Ich musste hier auch übergangswerte für x und y Werte weitergeben -Janina
+        return placeIds.map((pid) => new Element(pid, 0, 0));
     }
 
     private setPosition(
