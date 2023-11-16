@@ -63,17 +63,29 @@ export class Line {
         this._coords = coods;
     }
 
+    private getCoordsString(): string {
+        const result = '';
+        if(this._coords) {
+            this._coords.forEach(coord => {
+                result.concat(result + coord.x + ',' + coord.y + ' ');
+            });
+        } 
+        return result;
+    }
+
 
     createSVG() {
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
-        line.setAttribute('x1', this._source.x.toString());
-        line.setAttribute('y1', this._source.y.toString());
-        line.setAttribute('x2', this._target.x.toString());
-        line.setAttribute('y2', this._target.y.toString());
+        line.setAttribute('points', (`${this._source.x},${this._source.y} ${this.getCoordsString()}${this._target.x},${this._target.y}`))
+        // line.setAttribute('x1', this._source.x.toString());
+        // line.setAttribute('y1', this._source.y.toString());
+        // line.setAttribute('x2', this._target.x.toString());
+        // line.setAttribute('y2', this._target.y.toString());
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
+        line.setAttribute('fill', 'transparent')
         this._svgElement = line;
         return line;
     }

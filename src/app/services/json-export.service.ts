@@ -92,7 +92,7 @@ export class JsonExport implements ExportService{
                 });
                 petriNet.layout![`${line.source.id},${line.target.id}`] = intermediates;
             }
-        })
+        });
 
         var jsonString = JSON.stringify(petriNet);
 
