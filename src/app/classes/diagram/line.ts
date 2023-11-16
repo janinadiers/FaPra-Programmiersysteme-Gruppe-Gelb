@@ -1,4 +1,5 @@
 import { Element } from 'src/app/classes/diagram/element';
+import { Coords } from '../json-petri-net';
 
 
 export class Line {
@@ -8,12 +9,14 @@ export class Line {
     private _target: Element;
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
+    private _coords?: Coords[];
 
-    constructor(id: string, source: Element, target: Element) {
+    constructor(id: string, source: Element, target: Element, coords?: Coords[]) {
         this._id = id;
         this._source = source;
         this._target = target;
         this._tokens = 0;      //Standardmäßig keine Marken
+        this._coords = coords;  //undefined if not given
     }
 
     get id(): string {
@@ -50,6 +53,14 @@ export class Line {
 
     set svgElement(svgElement: SVGElement) {
         this._svgElement = svgElement;
+    }
+
+    get coords(): Coords[] | undefined {
+        return this._coords;
+    }
+
+    set coords(coods: Coords[]) {
+        this._coords = coods;
     }
 
 

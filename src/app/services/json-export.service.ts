@@ -1,10 +1,11 @@
 import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
-import { Element } from '../classes/diagram/element';
 import { Line } from '../classes/diagram/line';
 import { Injectable } from '@angular/core';
-import { JsonPetriNet } from '../classes/json-petri-net';
+import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 import {DownloadService} from "./helper/download-service";
+import { Place } from '../classes/diagram/place';
+import { Transition } from '../classes/diagram/transition';
 
 @Injectable({
     providedIn: 'root',
@@ -13,13 +14,27 @@ export class JsonExport implements ExportService{
     constructor(private _displayService: DisplayService,
                 private downloadService: DownloadService) {}
 
-    private getElements(): Array<Element> {
-        const result: Array<Element> = [];
+    private getPlaces(): Array<Place> {
+        const result: Array<Place> = [];
 
         const elements = this._displayService.diagram.elements;
 
         elements.forEach(element => {
-            result.push(element);
+            if (element.svgElement?.nodeName.match('circle'))
+                result.push(new Place(element.id, element.x, element.y));
+        })
+
+        return result;
+    }
+
+    private getTransitions(): Array<Transition> {
+        const result: Array<Transition> = [];
+
+        const elements = this._displayService.diagram.elements;
+
+        elements.forEach(element => {
+            if (element.svgElement?.nodeName.match('rect'))
+                result.push(new Transition(element.id, element.x, element.y));
         })
 
         return result;
@@ -49,27 +64,34 @@ export class JsonExport implements ExportService{
             layout: {}
           };
 
-        const elements = this.getElements();
+        const places = this.getPlaces();
+        const transitions = this.getTransitions();
         const lines = this.getLines();
 
-        elements.forEach(element => {
-            //check if svgElement is place
-            if (element.svgElement?.nodeName.match('circle'))
-                petriNet.places.push(element.id);
-            //check if svgElement is transition
-            if (element.svgElement?.nodeName.match('rect'))
-                petriNet.transitions.push(element.id);
+        places.forEach(place => {
+            petriNet.places.push(place.id);
 
-            //set coordinates of either place or transition
-            petriNet.layout![element.id] = { x: element.x, y: element.y }
+            petriNet.marking![place.id] = place.amountToken;
 
+            petriNet.layout![place.id] = { x: place.x, y: place.y }
         });
 
-        //Both versions for saving lines are possible and legit with example.json (discussion with Group and/or Stakeholder needed)
+        transitions.forEach(transition => {
+            petriNet.transitions.push(transition.id);
+            
+            petriNet.layout![transition.id] = { x: transition.x, y: transition.y }
+        });
+
         lines.forEach(line => {
-            petriNet.layout![`${line.source.id},${line.target.id}`] = [{ x: line.source.x, y: line.source.y },{ x: line.target.x, y: line.target.y }]
-            // petriNet.layout![`${line.source.id},${line.target.id}`] = { x: line.source.x, y: line.source.y }
-            // petriNet.layout![`${line.target.id},${line.source.id}`] = { x: line.target.x, y: line.target.y }
+            petriNet.arcs![`${line.source.id},${line.target.id}`] = line.tokens;
+            //if line has coords, save coords within given layout as array
+            if (line.coords) {
+                const intermediates: Coords[] = [];
+                line.coords.forEach(coord => {
+                    intermediates.push({x: coord.x, y: coord.y});
+                });
+                petriNet.layout![`${line.source.id},${line.target.id}`] = intermediates;
+            }
         })
 
         var jsonString = JSON.stringify(petriNet);

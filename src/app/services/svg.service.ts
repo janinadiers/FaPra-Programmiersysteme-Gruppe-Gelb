@@ -12,6 +12,11 @@ export class SvgService {
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
        
         const result: Array<SVGElement> = [];
+
+        diagram.lines.forEach(line => {
+            result.push(line.createSVG());
+        });
+        
         diagram.elements.forEach(element => {
             //check if imported element is place
             if (element.id.startsWith('p')) 
@@ -20,10 +25,6 @@ export class SvgService {
             if (element.id.startsWith('t'))
                 result.push(new Transition(element.id, element.x, element.y).createSVG());
         });
-
-        diagram.lines.forEach(line => {
-            result.push(line.createSVG());
-        })
         return result;
     }
 
