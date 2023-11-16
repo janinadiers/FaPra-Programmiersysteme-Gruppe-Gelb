@@ -64,6 +64,7 @@ export class Line {
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
         this._svgElement = line;
+        return line;
     }
 
 

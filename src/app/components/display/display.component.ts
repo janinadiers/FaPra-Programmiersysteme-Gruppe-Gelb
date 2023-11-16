@@ -105,6 +105,13 @@ export class DisplayComponent implements OnDestroy {
         const lines = this._displayService.diagram.lines;
         
         // Anpassung an neue Struktur, die SVG Elemente existieren bereits als Attribute in den Element und Line Objekten
+        // Hier werden zuerst die lines an die Zeichenfläche angehängt, damit sie unter den Kreisen liegen
+        for (const line of lines) {
+            if(line.svgElement){
+                this.drawingArea.nativeElement.appendChild(line.svgElement);
+            }
+        }
+
         for (const element of elements) {
             if(element.svgElement){
                 this.drawingArea.nativeElement.appendChild(element.svgElement);
@@ -112,11 +119,7 @@ export class DisplayComponent implements OnDestroy {
             
         }
 
-        for (const line of lines) {
-            if(line.svgElement){
-                this.drawingArea.nativeElement.appendChild(line.svgElement);
-            }
-        }
+       
     }
 
     private clearDrawingArea() {
