@@ -8,7 +8,7 @@ export class Transition extends Element {
     private _height: number;
     private _children: Array<Place>;
 
-    constructor(id: string, x: number, y: number) {
+    constructor(id: string, x?: number, y?: number) {
         super(id, x, y);
         this._isActive = false; //Standardmäßig nicht aktiviert
         this._width = 20;

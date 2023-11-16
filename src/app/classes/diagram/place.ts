@@ -7,7 +7,7 @@ export class Place extends Element {
     private _amountToken: number;
     private _children: Array<Transition>;
 
-    constructor(id: string, x: number, y: number) {
+    constructor(id: string, x?: number, y?: number) {
         super(id, x, y);
         this._radius = 25; // Default Radius
         this._amountToken = 0; //Default sind keine Marken gesetzt

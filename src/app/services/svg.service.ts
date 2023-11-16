@@ -17,18 +17,21 @@ export class SvgService {
             result.push(line.createSVG());
         });
         
-        diagram.elements.forEach(element => {
-            //check if imported element is place
-            if (element.id.startsWith('p')) 
-                result.push(new Place(element.id, element.x, element.y).createSVG());
+        diagram.places.forEach(place => {
+            result.push(new Place(place.id, place.x, place.y).createSVG());
                 //check if imported element is transition
-            if (element.id.startsWith('t'))
-                result.push(new Transition(element.id, element.x, element.y).createSVG());
+            if (place.id.startsWith('t'))
+                result.push(new Transition(place.id, place.x, place.y).createSVG());
         });
+
+        diagram.transitions.forEach(transition => {
+            result.push(new Transition(transition.id, transition.x, transition.y).createSVG());
+        });
+
+
         return result;
     }
 
-    //Could be removed, not needed for JSON
     private createSvgCircleForElement(element: Element): SVGElement {
         const svg = this.createSvgElement('circle');
 

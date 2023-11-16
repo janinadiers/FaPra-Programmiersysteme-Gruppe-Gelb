@@ -14,7 +14,7 @@ export class PnmlExport implements ExportService{
     private getElements(): Array<Element> {
         const result: Array<Element> = [];
 
-        const elements = this._displayService.diagram.elements;
+        const elements = [...this._displayService.diagram!.places, ...this._displayService.diagram!.transitions]
 
         for (const element of elements) {
             result.push(element);

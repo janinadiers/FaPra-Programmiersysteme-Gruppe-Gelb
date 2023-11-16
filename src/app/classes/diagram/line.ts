@@ -75,14 +75,9 @@ export class Line {
 
 
     createSVG() {
-
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._source.x},${this._source.y} ${this.getCoordsString()}${this._target.x},${this._target.y}`))
-        // line.setAttribute('x1', this._source.x.toString());
-        // line.setAttribute('y1', this._source.y.toString());
-        // line.setAttribute('x2', this._target.x.toString());
-        // line.setAttribute('y2', this._target.y.toString());
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
         line.setAttribute('fill', 'transparent')
