@@ -63,11 +63,12 @@ export class Line {
         this._coords = coods;
     }
 
+    //Iterate through found coords and return them as string
     private getCoordsString(): string {
-        const result = '';
+        let result = '';
         if(this._coords) {
             this._coords.forEach(coord => {
-                result.concat(result + coord.x + ',' + coord.y + ' ');
+                result += coord.x + ',' + coord.y + ' ';
             });
         } 
         return result;

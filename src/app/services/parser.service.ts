@@ -29,11 +29,10 @@ export class ParserService {
             this.setPosition(transitions, rawData['layout']);
 
             //Set Lines from Layout Array
-            // const lines = this.setLines(elements, rawData['layout']);
-            // const lines = this.setLines()
+            const lines = this.setLines(rawData['layout'], places, transitions, arcs)
             
 
-            return new Diagram(places, transitions); //lines
+            return new Diagram(places, transitions, lines);
         } catch (e) {
             console.error('Error while parsing JSON', e, text);
             return undefined;
@@ -44,7 +43,6 @@ export class ParserService {
         if (placeIds === undefined || !Array.isArray(placeIds)) {
             return [];
         }
-
         //Create temporary Element-Object without coords
         return placeIds.map(pid => new Place(pid));
     }
@@ -53,30 +51,48 @@ export class ParserService {
         if (transitionIds === undefined || !Array.isArray(transitionIds)) {
             return [];
         }
-
         //Create temporary Element-Object without coords
         return transitionIds.map(tid => new Transition(tid));
     }
 
-    // private setLines(elements: Array<Element>,layout: JsonPetriNet['layout']): Array<Line> {
-    //     const lines: Array<Line> = [];
+    private setLines(layout: JsonPetriNet['layout'], places: Array<Place>, transitions: Array<Transition>, arcs: JsonPetriNet['arcs']): Array<Line> {
+        const lines: Array<Line> = [];
 
-    //     if (layout) {
-    //         for (const pid in layout) {
-    //             const coords = layout[pid];
-    //             //Check if layout has Array -> Array indicates line coordinates
-    //             if (Array.isArray(coords)) {
-    //                 const elements: Array<Element> = [];
-    //                 coords.forEach(coord => {
-    //                     elements.push(new Element(pid, coord.x, coord.y));
-    //                 })
-    //                 lines.push(new Line(pid, elements[0], elements[1]));
-    //             }
-    //         }
-    //     }
-
-    //     return lines;
-    // }
+        if (arcs) {
+            // let arcCounter = 0;
+            for (const arc in arcs) {
+                //sourceTarget[0] -> SourceID || sourceTarget[1] -> TargetID
+                const sourceTarget = arc.split(','); 
+                if (arc.startsWith('p')) { //Place
+                    lines.push(new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element));
+                } else { //Transition
+                    lines.push(new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element));
+                }
+                // arcCounter++;
+            }
+            if (layout) {
+                //Loop through layout and check if entry is an array
+                for (const pid in layout) {
+                    const coords = layout[pid];
+                    if (Array.isArray(coords)) {
+                        //Loop through each line and search for same id
+                        lines.forEach(line => {
+                            if (line.id === pid) {
+                                //Loop through each found coordinate (intermediate point) and create temporary var
+                                const intermediates: Coords[] = [];
+                                coords.forEach(coord => {
+                                    intermediates.push({x: coord.x, y: coord.y});
+                                });
+                                //Save temporary var within line to
+                                line.coords = intermediates;
+                            }
+                        });                  
+                    }
+                }
+            }
+        }
+        return lines;
+    }
 
     private setPosition(elements: Array<Element>, layout: JsonPetriNet['layout']) {
         if (layout === undefined) {

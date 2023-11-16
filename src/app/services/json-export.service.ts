@@ -1,11 +1,8 @@
 import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
-import { Line } from '../classes/diagram/line';
 import { Injectable } from '@angular/core';
 import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 import {DownloadService} from "./helper/download-service";
-import { Place } from '../classes/diagram/place';
-import { Transition } from '../classes/diagram/transition';
 
 @Injectable({
     providedIn: 'root',

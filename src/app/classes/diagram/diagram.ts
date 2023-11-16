@@ -36,12 +36,6 @@ export class Diagram {
         this._transitions.push(transition);
     }
 
-    // pushElement(element: Element): void {
-    //     console.log('pushElement');
-        
-    //     this._elements.push(element);
-    // }
-
     pushLine(line: Line): void {
         console.log('pushLine');
         this._lines.push(line);
