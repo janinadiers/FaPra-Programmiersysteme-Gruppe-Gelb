@@ -101,7 +101,8 @@ export class DisplayComponent implements OnDestroy {
 
         this.clearDrawingArea();
         
-        const elements = this._displayService.diagram.elements;
+        const places = this._displayService.diagram.places;
+        const transitions = this._displayService.diagram.transitions;
         const lines = this._displayService.diagram.lines;
         
         // Anpassung an neue Struktur, die SVG Elemente existieren bereits als Attribute in den Element und Line Objekten
@@ -112,11 +113,16 @@ export class DisplayComponent implements OnDestroy {
             }
         }
 
-        for (const element of elements) {
-            if(element.svgElement){
-                this.drawingArea.nativeElement.appendChild(element.svgElement);
+        for (const place of places) {
+            if(place.svgElement){
+                this.drawingArea.nativeElement.appendChild(place.svgElement);
             }
             
+        }
+        for(const transition of transitions){
+            if(transition.svgElement){
+                this.drawingArea.nativeElement.appendChild(transition.svgElement);
+            }
         }
 
        
@@ -168,7 +174,7 @@ export class DisplayComponent implements OnDestroy {
                 let svgCircle = this.drawCircle(mouseX ,mouseY);
                 svgElement.appendChild(svgCircle);
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this._diagram?.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
+                const lastCircleObject = this._diagram?.places[this._diagram?.places.length - 1];
                 this.svgElementService.selectedCircle = lastCircleObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
@@ -182,7 +188,7 @@ export class DisplayComponent implements OnDestroy {
                 let svgRect = this.drawRect(mouseX, mouseY);
                 svgElement.appendChild(svgRect);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this._diagram?.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
+                const lastRectObject = this._diagram?.transitions[this._diagram?.transitions.length - 1];
                 this.svgElementService.selectedRect = lastRectObject!.svgElement;
                 if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
                     this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
@@ -200,7 +206,7 @@ export class DisplayComponent implements OnDestroy {
         let svgCircle = circleObject.createSVG();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement = svgCircle;
-        this._diagram?.pushElement(circleObject);
+        this._diagram?.pushPlace(circleObject);
         svgCircle.addEventListener('click', () => {
             this.onCircleSelect(svgCircle);
             console.log("Place " + svgCircle.id  + " ist ausgewählt.");   
@@ -222,7 +228,7 @@ export class DisplayComponent implements OnDestroy {
         svgRect.setAttribute('y', y.toString());
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement = svgRect;
-        this._diagram?.pushElement(rectObject);
+        this._diagram?.pushTransition(rectObject);
         svgRect.addEventListener('click', () => {
             this.onRectSelect(svgRect);
         });  
@@ -236,9 +242,9 @@ export class DisplayComponent implements OnDestroy {
             const svgElement = document.getElementById('canvas');
 
             let cirlceObjectID = circle.id;
-            let circleObject = this._diagram?.elements.find(element => element.id === cirlceObjectID);
+            let circleObject = this._diagram?.places.find(place => place.id === cirlceObjectID);
             let rectobjectID = rect.id;
-            let rectObject =  this._diagram?.elements.find(element => element.id === rectobjectID);
+            let rectObject =  this._diagram?.transitions.find(transition => transition.id === rectobjectID);
             
             if(targetIsCircle){
                 
