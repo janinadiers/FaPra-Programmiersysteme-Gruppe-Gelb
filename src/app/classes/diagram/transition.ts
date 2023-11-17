@@ -51,8 +51,8 @@ export class Transition extends Element {
     override createSVG(){
         const rect = super.createSVG('rect');
         rect.setAttribute('id', this.id.toString());
-        rect.setAttribute('x', this.x.toString());
-        rect.setAttribute('y', this.y.toString());
+        rect.setAttribute('x', (this.x - this._width / 2).toString());
+        rect.setAttribute('y', (this.y - this._height / 2).toString());
         rect.setAttribute('width', this._width.toString());
         rect.setAttribute('height', this._height.toString());
         rect.setAttribute('fill', 'black');
