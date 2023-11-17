@@ -2,12 +2,14 @@ import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
 import { Element } from '../classes/diagram/element';
 import { Injectable } from '@angular/core';
+import {DownloadService} from "./helper/download-service";
 
 @Injectable({
     providedIn: 'root',
 })
 export class PnmlExport implements ExportService{
-    constructor(private _displayService: DisplayService) {}
+    constructor(private _displayService: DisplayService,
+                private downloadService: DownloadService) {}
 
     private getElements(): Array<Element> {
         const result: Array<Element> = [];
@@ -28,6 +30,7 @@ export class PnmlExport implements ExportService{
             if (element.svgElement?.tagName === 'circle') {
                 pnmlString += `<place id="${element.id}">\n<name>\n<text>name="${element.id}"</text>\n</name>\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n</graphics>\n<initialMarking>\n<text>0</text>\n</initialMarking>\n</place>`;
             } else if (element.svgElement?.tagName === 'rect') {
+                 
                 pnmlString += `<transition id="${element.id}"><name><text>"${element.id}"</text></name><graphics><position x="${element.x}" y="${element.y}"/></graphics></transition>`;
             } else if (element.svgElement?.tagName === 'line') {
                 pnmlString += `<arc id="${element.id}" source="${element.id}" target="${element.id}"><graphics><position x="${element.x}" y="${element.y}"/></graphics></arc>`;
@@ -35,18 +38,6 @@ export class PnmlExport implements ExportService{
         }
         pnmlString += '</page>\n</net>\n</pnml>';
 
-        const blob = new Blob([pnmlString], { type: 'text/xml' });
-
-        // Erstellen einer URL für den Blob, um sie als Link zu verwenden.
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-
-        // Zuweisen der URL zum Link und Festlegen des Dateinamens für den Download.
-        a.href = url;
-        a.download = 'petriNetz.pnml';
-
-        // Download starten
-        a.click();
-        window.URL.revokeObjectURL(url);
+        this.downloadService.downloadFile(pnmlString, 'petriNetz.pnml', 'text/xml');
     }
 }

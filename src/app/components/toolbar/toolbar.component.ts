@@ -30,44 +30,42 @@ export class ToolbarComponent {
     arrowActiveColor: boolean = false;
     boltActiveColor: boolean = false;
 
-    toggleRectangleButton(mouseEvent: MouseEvent) {
-        this.circleActiveColor = false;
-        this.arrowActiveColor = false;
-        this.boltActiveColor = false;
-        this.rectActiveColor = !this.rectActiveColor;
-        this.activeButtonService.RectangleButtonActive();
-    }
+  toggleRectangleButton() {
+    this.circleActiveColor = false;
+    this.arrowActiveColor = false;
+    this.boltActiveColor = false;
+    this.rectActiveColor = !this.rectActiveColor;
+    this.activeButtonService.RectangleButtonActive();
+  }
 
-    toggleCircleButton(mouseEvent: MouseEvent) {
-        this.rectActiveColor = false;
-        this.arrowActiveColor = false;
-        this.boltActiveColor = false;
-        this.circleActiveColor = !this.circleActiveColor;
-        this.activeButtonService.circleButtonActive();
-    }
+  toggleCircleButton() {
+    this.rectActiveColor = false;
+    this.arrowActiveColor = false;
+    this.boltActiveColor = false;
+    this.circleActiveColor = !this.circleActiveColor;
+    this.activeButtonService.circleButtonActive();
+  }
 
-    toggleArrowButton(mouseEvent: MouseEvent) {
-        this.circleActiveColor = false;
-        this.rectActiveColor = false;
-        this.boltActiveColor = false;
-        this.arrowActiveColor = !this.arrowActiveColor;
-        // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-        this.svgElementService.selectedCircle = undefined;
-        this.svgElementService.selectedRect = undefined;
-        this.activeButtonService.arrowButtonActive();
-    }
+  toggleArrowButton () {
+    this.circleActiveColor = false;
+    this.rectActiveColor = false;
+    this.boltActiveColor = false;
+    this.arrowActiveColor = !this.arrowActiveColor;
+    // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
+    this.svgElementService.resetSelectedElements();
+    this.activeButtonService.arrowButtonActive();
+  }
 
-    toggleBoltButton(mouseEvent: MouseEvent) {
-        this.circleActiveColor = false;
-        this.rectActiveColor = false;
-        this.arrowActiveColor = false;
-        this.boltActiveColor = !this.boltActiveColor;
-        // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-        this.svgElementService.selectedCircle = undefined;
-        this.svgElementService.selectedRect = undefined;
-        this.svgElementService.lightningCount = 0;
-        this.activeButtonService.boltButtonActive();
-    }
+  toggleBoltButton () {
+    this.circleActiveColor = false;
+    this.rectActiveColor = false;
+    this.arrowActiveColor = false;
+    this.boltActiveColor = !this.boltActiveColor;
+    // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
+    this.svgElementService.resetSelectedElements();
+    this.svgElementService.lightningCount = 0;
+    this.activeButtonService.boltButtonActive();
+  }
 
     exportPnml(): void {
         this.pnmlExportService.export();
