@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
-import { SvgElementService } from 'src/app/services/svg-element.service';
+import { Diagram } from './../../classes/diagram/diagram';
+import { DisplayService } from 'src/app/services/display.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -9,8 +10,14 @@ import { SvgElementService } from 'src/app/services/svg-element.service';
 })
 export class ToolbarComponent {
 
-  constructor(private activeButtonService: ActivebuttonService,
-              private svgElementService: SvgElementService) { }
+  private _diagram: Diagram | undefined;
+
+  constructor(private activeButtonService: ActivebuttonService, 
+              private _displayService: DisplayService) { 
+  this._displayService.diagram$.subscribe(diagram => {
+  this._diagram = diagram; 
+  });
+  }
 
   rectActiveColor: boolean = false;
   circleActiveColor: boolean = false;
@@ -39,7 +46,7 @@ export class ToolbarComponent {
     this.boltActiveColor = false;
     this.arrowActiveColor = !this.arrowActiveColor;
     // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-    this.svgElementService.resetSelectedElements();
+    this._diagram?.resetSelectedElements();
     this.activeButtonService.arrowButtonActive();
   }
 
@@ -49,8 +56,8 @@ export class ToolbarComponent {
     this.arrowActiveColor = false;
     this.boltActiveColor = !this.boltActiveColor;
     // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-    this.svgElementService.resetSelectedElements();
-    this.svgElementService.lightningCount = 0;
+    this._diagram?.resetSelectedElements();
+    this._diagram!.lightningCount = 0;
     this.activeButtonService.boltButtonActive();
   }
 
