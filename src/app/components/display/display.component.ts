@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnInit, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -14,12 +14,13 @@ import { ActivebuttonService } from 'src/app/services/activebutton.service';
     templateUrl: './display.component.html',
     styleUrls: ['./display.component.css']
 })
-export class DisplayComponent implements OnDestroy {
+export class DisplayComponent implements OnInit, OnDestroy {
 
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
 
+    private subscriptionOfToolbar: Subscription = new Subscription;
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
 
@@ -38,9 +39,24 @@ export class DisplayComponent implements OnDestroy {
         });
     }
 
+    ngOnInit() {
+        this.subscriptionOfToolbar = 
+        this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
+        if (buttonId === "clear"){
+            this.clearDrawingArea();
+        }
+        /*
+        else if (buttonId === "deleteLast") {
+        this.deleteLastElement();
+        }
+        */
+        });
+    }
+
     ngOnDestroy(): void {
         this._sub.unsubscribe();
         this.fileContent.complete();
+        this.subscriptionOfToolbar.unsubscribe();
     }
 
     public processDropEvent(e: DragEvent) {
@@ -115,6 +131,12 @@ export class DisplayComponent implements OnDestroy {
         while (drawingArea.childElementCount > 0) {
             drawingArea.removeChild(drawingArea.lastChild as ChildNode);
         }
+        
+        //Array leeren, selektierte Elemente und Counter Variablen zurücksetzen
+         
+        this._diagram?.clearElements();
+        this._diagram?.resetSelectedElements();
+        this._diagram?.resetCounterVar();
     }
 
     onCanvasClick(event: MouseEvent) {

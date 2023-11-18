@@ -61,6 +61,8 @@ export class ToolbarComponent {
     this.activeButtonService.boltButtonActive();
   }
 
-  
+  onButtonClick(buttonId: string){
+    this.activeButtonService.sendButtonClick(buttonId);
+  }
   
 }
