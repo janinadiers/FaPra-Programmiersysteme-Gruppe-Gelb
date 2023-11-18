@@ -8,7 +8,7 @@ export class Transition extends Element {
     private _height: number;
     private _children: Array<Place>;
 
-    constructor(id: string, x: number, y: number) {
+    constructor(id: string, x?: number, y?: number) {
         super(id, x, y);
         this._isActive = false; //Standardmäßig nicht aktiviert
         this._width = 20;
@@ -52,13 +52,14 @@ export class Transition extends Element {
        
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('id', this.id.toString());
-        rect.setAttribute('x', this.x.toString()); 
-        rect.setAttribute('y', this.y.toString()); 
+        rect.setAttribute('x', (this.x - this._width / 2).toString()); 
+        rect.setAttribute('y', (this.y - this.height / 2).toString()); 
         rect.setAttribute('width', this._width.toString()); 
         rect.setAttribute('height', this._height.toString()); 
         rect.setAttribute('fill', 'black'); 
         rect.setAttribute('stroke', 'black');
         rect.setAttribute('stroke-width', '2'); 
+
         return rect; 
     }
 

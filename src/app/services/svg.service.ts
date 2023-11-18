@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from '../classes/diagram/diagram';
 import {Element} from '../classes/diagram/element';
+import { Place } from '../classes/diagram/place';
+import { Transition } from '../classes/diagram/transition';
 
 @Injectable({
     providedIn: 'root'
@@ -10,10 +12,23 @@ export class SvgService {
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
        
         const result: Array<SVGElement> = [];
-        diagram.elements.forEach(el => {
-            
-            result.push(this.createSvgCircleForElement(el))
+
+        diagram.lines.forEach(line => {
+            result.push(line.createSVG());
         });
+        
+        diagram.places.forEach(place => {
+            result.push(new Place(place.id, place.x, place.y).createSVG());
+                //check if imported element is transition
+            if (place.id.startsWith('t'))
+                result.push(new Transition(place.id, place.x, place.y).createSVG());
+        });
+
+        diagram.transitions.forEach(transition => {
+            result.push(new Transition(transition.id, transition.x, transition.y).createSVG());
+        });
+
+
         return result;
     }
 

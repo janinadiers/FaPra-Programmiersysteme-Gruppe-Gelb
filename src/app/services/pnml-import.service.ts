@@ -4,6 +4,7 @@ import { Element } from '../classes/diagram/element';
 import { ImportService } from '../classes/import-service';
 import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 import { Diagram } from '../classes/diagram/diagram';
+import { Place } from '../classes/diagram/place';
 
 @Injectable({
     providedIn: 'root',
@@ -26,7 +27,7 @@ export class PnmlImportService implements ImportService {
         const elements = this.parseElements(placeIds);
         this.setPosition(elements, layout);
 
-        return new Diagram(elements);
+        return new Diagram(elements, []);
     }
 
     private setLayout(places: NodeListOf<globalThis.Element>, layout: JsonPetriNet['layout']){
@@ -48,13 +49,13 @@ export class PnmlImportService implements ImportService {
         });
     }
 
-    private parseElements(placeIds: Array<string> | undefined): Array<Element> {
+    private parseElements(placeIds: Array<string> | undefined): Array<Place> {
         if (placeIds === undefined || !Array.isArray(placeIds)) {
             return [];
         }
 
         // Ich musste hier auch übergangswerte für x und y Werte weitergeben -Janina
-        return placeIds.map((pid) => new Element(pid, 0, 0));
+        return placeIds.map((pid) => new Place(pid));
     }
 
     private setPosition(
