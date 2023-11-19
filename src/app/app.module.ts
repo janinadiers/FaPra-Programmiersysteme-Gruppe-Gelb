@@ -17,10 +17,6 @@ import { ExampleButtonComponent } from './components/example-button/example-butt
 import { ImportButtonComponent } from './components/import-button/import-button.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { PngExportButtonComponent } from './components/png-export-button/png-export-button.component';
-import { ExportButtonComponent} from "./components/export-button/export-button.component";
-import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
-import { ExportJsonButtonComponent } from './components/export-button-json/export-button-json.component';
 import {MatMenuModule} from "@angular/material/menu";
 
 
@@ -32,11 +28,7 @@ import {MatMenuModule} from "@angular/material/menu";
         ExampleFileComponent,
         ExampleButtonComponent,
         ToolbarComponent,
-        ExportSvgButtonComponent,
         ImportButtonComponent,
-        PngExportButtonComponent,
-        ExportButtonComponent,
-        ExportJsonButtonComponent,
     ],
     imports: [
         BrowserModule,
