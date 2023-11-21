@@ -43,13 +43,12 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this.subscriptionOfToolbar = 
         this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
         if (buttonId === "clear"){
-            this.clearDrawingArea();
-        }
-        /*
+            let clearElements: boolean = true;
+            this.clearDrawingArea(clearElements);
+        } 
         else if (buttonId === "deleteLast") {
         this.deleteLastElement();
         }
-        */
         });
     }
 
@@ -122,7 +121,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
     }
 
-    private clearDrawingArea() {
+    private clearDrawingArea(clearElements?: boolean) {
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -133,11 +132,55 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
         
         //Array leeren, selektierte Elemente und Counter Variablen zurücksetzen
-         
-        this._diagram?.clearElements();
-        this._diagram?.resetSelectedElements();
-        this._diagram?.resetCounterVar();
+        if(clearElements) {
+            this._diagram?.clearElements();
+            this._diagram?.resetSelectedElements();
+            this._diagram?.resetCounterVar();
+            this._diagram?.clearOrder();
+        }
     }
+    
+    private deleteLastElement() {
+
+        const drawingArea = this.drawingArea?.nativeElement;
+        if (drawingArea?.childElementCount === undefined) {
+            return;
+        }
+
+        if (this._diagram && drawingArea.childElementCount > 0) {
+        
+            let elementOrder = this._diagram.order;
+            let lastID = elementOrder.pop();
+            if (lastID?.startsWith("p")) {
+                let lastCircleObject = this._diagram.places.pop();
+                let lastSvgShape = lastCircleObject?.svgElement;
+                if (lastCircleObject && lastSvgShape) {
+                drawingArea.removeChild(lastSvgShape);
+                this._diagram.idCircleCount--;
+                }  
+            }
+            else if (lastID?.startsWith("t")) {
+                let lastRectObject = this._diagram.transitions.pop();
+                let lastSvgShape = lastRectObject?.svgElement;
+                if (lastRectObject && lastSvgShape) {
+                    drawingArea.removeChild(lastSvgShape);
+                    this._diagram.idRectCount--;
+                }  
+            }
+            else if (lastID?.startsWith("a")){
+
+                let lastLineObject = this._diagram.lines.pop();
+                let lastSvgLine = lastLineObject?.svgElement;
+                if(lastLineObject && lastSvgLine){
+                    drawingArea.removeChild(lastSvgLine);
+                    this._diagram.idLineCount--;
+                }
+            }
+            this._diagram.resetSelectedElements();
+            this._diagram.lightningCount = 0;
+        }         
+    }  
+                
 
     onCanvasClick(event: MouseEvent) {
         console.log("Canvas clicked", this._diagram);

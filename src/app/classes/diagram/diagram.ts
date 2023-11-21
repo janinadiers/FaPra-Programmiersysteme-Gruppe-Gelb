@@ -72,11 +72,10 @@ export class Diagram {
         // ID String für jeden Kreis um 1 erhöhen (p0, p1,..)
         let idString: string = "p" + this.idCircleCount;
         this.idCircleCount++;
-    
         let circleObject = new Place(idString, x, y);
         // Objekt im Array abspeichern
         this.pushPlace(circleObject);
-        
+        this.pushID(idString);
         return circleObject;
       }
 
@@ -86,11 +85,10 @@ export class Diagram {
         // ID String für jedes Rechteck um 1 erhöhen (t0, t1,..)
         let idString: string = "t" + this.idRectCount;
         this.idRectCount++;
-    
         let rectObject = new Transition(idString, x, y)
         // Objekt im Array abspeichern
         this.pushTransition(rectObject);
-        
+        this.pushID(idString);
         return rectObject;
       }
 
@@ -102,6 +100,7 @@ export class Diagram {
         let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
+        this.pushID(idString);
         return lineObject;
       }
 
@@ -115,6 +114,10 @@ export class Diagram {
         this.idRectCount = 0;
         this.idLineCount = 0;
         this.lightningCount = 0;
+      }
+
+      clearOrder() {
+        this._order.splice(0, this._order.length);
       }
 
 
