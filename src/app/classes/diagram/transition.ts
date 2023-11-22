@@ -14,7 +14,7 @@ export class Transition extends Element {
         this._isActive = false; //Standardmäßig nicht aktiviert
         this._width = 20;
         this._height = 40;
-        this._children = []; 
+        this._children = [];
         this._label = id;
     }
 
@@ -61,15 +61,15 @@ export class Transition extends Element {
     override createSVG(){
         const rect = super.createSVG('rect');
         rect.setAttribute('id', this.id.toString());
-        rect.setAttribute('x', (this.x - this._width / 2).toString()); 
-        rect.setAttribute('y', (this.y - this.height / 2).toString()); 
-        rect.setAttribute('width', this._width.toString()); 
-        rect.setAttribute('height', this._height.toString()); 
-        rect.setAttribute('fill', 'black'); 
+        rect.setAttribute('x', (this.x - this._width / 2).toString());
+        rect.setAttribute('y', (this.y - this.height / 2).toString());
+        rect.setAttribute('width', this._width.toString());
+        rect.setAttribute('height', this._height.toString());
+        rect.setAttribute('fill', 'black');
         rect.setAttribute('stroke', 'black');
-        rect.setAttribute('stroke-width', '2'); 
+        rect.setAttribute('stroke-width', '2');
         super.registerSvg(rect);
-        return rect; 
+        return rect;
     }
 
 
