@@ -69,7 +69,7 @@ export class Transition extends Element {
         rect.setAttribute('fill', 'black'); 
         rect.setAttribute('stroke', 'black');
         rect.setAttribute('stroke-width', '2'); 
-
+        super.registerSvg(rect);
         return rect; 
     }
 

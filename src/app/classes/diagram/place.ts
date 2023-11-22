@@ -59,7 +59,7 @@ export class Place extends Element {
         circle.setAttribute('stroke', 'black'); 
         circle.setAttribute('stroke-width', '2'); 
 
-        super.registerSvg;
+        super.registerSvg(circle)
         return circle;
     }
 
