@@ -102,9 +102,12 @@ export class DisplayComponent implements OnDestroy {
         this.clearDrawingArea();
         
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
+        let groupedElements = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        groupedElements.setAttribute('id', 'groupedSvgDiagram');
         for (const element of elements) {
-            this.drawingArea.nativeElement.appendChild(element);
+            groupedElements.appendChild(element);
         }
+        this.drawingArea.nativeElement.appendChild(groupedElements);
     }
 
     private clearDrawingArea() {
