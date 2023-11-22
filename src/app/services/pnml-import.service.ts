@@ -1,76 +1,180 @@
-import { map } from 'rxjs';
+
 import { Injectable } from '@angular/core';
 import { Element } from '../classes/diagram/element';
 import { ImportService } from '../classes/import-service';
-import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 import { Diagram } from '../classes/diagram/diagram';
+import { SvgService } from './svg.service';
+import { Place } from '../classes/diagram/place';
+import { Transition } from '../classes/diagram/transition';
+import { Line } from '../classes/diagram/line';
+import { Coords } from '../classes/json-petri-net';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PnmlImportService implements ImportService {
-
+   
+    constructor(private _svgService: SvgService) {}
     import(content: string): Diagram | undefined {
-        // TODO: implement transitions and arcs
+        
+        // convert pnml string to DOM object
         let rawData = new DOMParser().parseFromString(content, 'text/xml');
-        const places = rawData.querySelectorAll('place');
-        const placeIds: Array<string> = Array.from(places)
-            .map((place) => {
-                return place.getAttribute('id');
-            })
-            .filter((id): id is string => id !== null);
-
-        let layout: JsonPetriNet['layout'] = {};
-        this.setLayout(places, layout);
-
-        const elements = this.parseElements(placeIds);
-        this.setPosition(elements, layout);
-
-        return new Diagram(elements);
+        // get all places as an Element instance from DOM object
+        let places = this.importPlaces(rawData);
+        // get all transitions as an Element instance from DOM object
+        let transitions = this.importTransitions(rawData);
+        
+        // get all arcs as an Element instance from DOM object
+        let arcs = this.importArcs(rawData, [...places, ...transitions]);
+       
+        return new Diagram([...places], [...transitions], [...arcs]);
+      
     }
 
-    private setLayout(places: NodeListOf<globalThis.Element>, layout: JsonPetriNet['layout']){
+    importPlaces(rawData: Document): Array<Place> {
+
+        const places:NodeListOf<globalThis.Element> = rawData.querySelectorAll('place');
+        const result:Array<Place> = []
         places.forEach((place) => {
-            const id = place.getAttribute('id');
-            const graphics = Array.from(place.children).filter(
+            const placePosition = this.getPlacePosition(place);
+            const placeId = place.getAttribute('id');
+            if(!placeId) throw new Error('Place element misses id: ' + place);
+            const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y);
+            result.push(placeElement);
+        });
+       
+        
+        return result;
+    }
+
+    importTransitions(rawData: Document): Array<Transition> {
+        const transitions = rawData.querySelectorAll('transition');
+        const result:Array<Transition> = []
+        transitions.forEach((transition) => {
+            const transitionId = transition.getAttribute('id');
+            const transitionPosition = this.getTransitionPosition(transition);
+            if(!transitionId) throw new Error('Transition element misses id: ' + transition);
+            const transitionElement = this.createTransition(transitionId, transitionPosition.x, transitionPosition.y);
+            result.push(transitionElement);
+        });
+        
+        return result;
+            
+    }
+
+    importArcs(rawData: Document, elements: Element[]): Array<Line> {
+        const arcs = rawData.querySelectorAll('arc');
+        const lines:Array<Line> = []
+        arcs.forEach((arc) => {
+            const arcId = arc.getAttribute('id');
+            const sourceAndTargetObject = this.getSourceAndTargetElements(arc, elements);
+            const positions = this.getArcPositions(arc);
+            if(!arcId) throw new Error('Arc element misses id: ' + arc);
+            const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions);
+
+            lines.push(arcElement);
+        });
+        
+        
+       return lines;
+    }
+
+
+    private getPlacePosition(element: globalThis.Element):{x:number, y:number}{
+        
+            
+            const graphics = Array.from(element.children).filter(
                 (child) => child.tagName == 'graphics'
             );
-            const position = Array.from(graphics[0].children).filter(
+            const positions = Array.from(graphics[0].children).filter(
                 (child) => child.tagName == 'position'
             );
-            const x = position[0].getAttribute('x');
-            const y = position[0].getAttribute('y');
+            const x = positions[0].getAttribute('x');
+            const y = positions[0].getAttribute('y');
 
-            if (!id || !x || !y) return;
-            if (!layout) layout = {};
+            if (!x || !y) throw new Error('Place element misses id or positional attribute: ' + element );
+            
 
-            layout[id] = { x: parseInt(x), y: parseInt(y) };
-        });
+           return { x: parseFloat(x), y: parseFloat(y) };
+        
     }
 
-    private parseElements(placeIds: Array<string> | undefined): Array<Element> {
-        if (placeIds === undefined || !Array.isArray(placeIds)) {
-            return [];
+    private getArcPositions(element: globalThis.Element):{x:number, y:number}[]{
+        let result:{x:number, y:number}[] = [];
+        const graphics = Array.from(element.children).filter(
+            (child) => child.tagName == 'graphics'
+        );
+        const positions = Array.from(graphics[0].children).filter(
+            (child) => child.tagName == 'position'
+        );
+        for(let position of positions){
+            const x = position.getAttribute('x');
+            const y = position.getAttribute('y');
+            if (!x || !y) throw new Error('Arc element misses id or positional attribute: ' + element );
+            result.push({ x: parseFloat(x), y: parseFloat(y) });
         }
-
-        // Ich musste hier auch übergangswerte für x und y Werte weitergeben -Janina
-        return placeIds.map((pid) => new Element(pid, 0, 0));
+        
+       return result
     }
 
-    private setPosition(
-        elements: Array<Element>,
-        layout: JsonPetriNet['layout']
-    ): void {
-        if (layout === undefined) {
-            return;
-        }
+    private getTransitionPosition(element:globalThis.Element):{x:number, y:number}{
+        const graphics = Array.from(element.children).filter(
+            (child) => child.tagName == 'graphics'
+        );
+        const positions = Array.from(graphics[0].children).filter(
+            (child) => child.tagName == 'position'
+        );
+        const x = positions[0].getAttribute('x');
+        const y = positions[0].getAttribute('y');
 
-        for (const el of elements) {
-            const pos = layout[el.id] as Coords | undefined;
-            if (pos !== undefined) {
-                el.x = pos.x;
-                el.y = pos.y;
-            }
-        }
+        if (!x || !y) throw new Error('Transition element misses id or positional attribute: ' + element );
+        
+
+       return { x: parseFloat(x), y: parseFloat(y) };
     }
+    private getSourceAndTargetElements(element:globalThis.Element, elements:Element[]):{sourceElement:Element, targetElement: Element}{
+        
+        const source = element.getAttribute('source');
+        const target = element.getAttribute('target');
+        
+        if(!source || !target) throw new Error('Arc element misses source or target attribute: ' + element );
+        const sourceElement:Element| undefined = elements.find((element) => element.id == source);
+        const targetElement: Element|undefined = elements.find((element) => element.id == target);
+       
+        if(!sourceElement || !targetElement) throw new Error('Arc element misses source and target attribute: ' + element );
+
+        return { sourceElement, targetElement };
+       
+    }
+
+
+    private createPlace(id:string, x:number, y:number): Place {
+        const place = new Place(id, x, y);
+        place.x = x;
+        place.y = y;
+        place.svgElement = place.createSVG();
+        return place;
+       
+
+    }
+
+    private createTransition(id:string, x:number, y:number): Transition {
+        const transition = new Transition(id, x, y);
+        transition.x = x;
+        transition.y = y;
+        transition.svgElement = transition.createSVG();
+        return transition;
+       
+
+    }
+
+    private createEdge(id:string, source:Element, target:Element, coords: Coords[]): Line{
+        const line:Line = new Line(id, source, target);
+        line.coords = coords;
+        line.createSVG();
+        return line;
+      
+    }
+
+
 }

@@ -10,14 +10,24 @@ import {Line} from "../classes/diagram/line";
 })
 export class SvgService {
 
+  
+
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
 
         const result: Array<SVGElement> = [];
-        diagram.elements.forEach(el => {
-            const svgElement = this.createSvgCircleForElement(el);
-            el.registerSvg(svgElement);
-            result.push(svgElement);
+
+        diagram.lines.forEach(line => {
+            result.push(line.createSVG());
         });
+        
+        diagram.places.forEach(place => {
+            result.push(new Place(place.id, place.x, place.y).createSVG());
+        });
+
+        diagram.transitions.forEach(transition => {
+            result.push(new Transition(transition.id, transition.x, transition.y).createSVG());
+        });
+        
         return result;
     }
 
@@ -39,11 +49,12 @@ export class SvgService {
     }
 
     public exportToSvg(diagram: Diagram): string {
-        const elements = diagram.elements;
+        const places = diagram.places;
+        const transitions = diagram.transitions;
         const lines = diagram.lines;
 
         // Prüfen, dass das SVG nicht abgeschnitten wird, sondern die Größe sich u. U. nach den Element-Koordinaten richtet
-        const { maxX, maxY } = this.calculateMaxCoordinates(elements);
+        const { maxX, maxY } = this.calculateMaxCoordinates([...places, ...transitions]);
 
         const circleRadius = 25;
 
@@ -59,19 +70,18 @@ export class SvgService {
             }
         });
 
-        elements.forEach(element => {
-            if (element) {
-                let svgElem;
-                if(element.svgElement instanceof SVGCircleElement) {
-                    svgElem = this.createSvgCircleForElement(element)
-                    svgElement += svgElem.outerHTML;
-                } else if (element.svgElement instanceof SVGRectElement) {
-                    svgElem = this.createSvgRectangleForElement(element)
-                    svgElement += svgElem.outerHTML;
-                }
-                element.registerSvg(svgElem!);
+        places.forEach((place) => {
+            if(place) {
+                svgElement += this.createSvgCircleForElement(place).outerHTML;
             }
         });
+
+        transitions.forEach((transition) => {
+            if(transition) {
+                svgElement += this.createSvgRectangleForElement(transition).outerHTML;
+            }
+        });
+
 
         svgElement += `</svg>`;
 

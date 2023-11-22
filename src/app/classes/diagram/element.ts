@@ -4,10 +4,10 @@ export class Element {
     private _y: number;
     private _svgElement: SVGElement | undefined;
 
-    constructor(id: string, x: number , y: number) {
+    constructor(id: string, x?: number , y?: number) {
         this._id = id;
-        this._x = x;
-        this._y = y;
+        this._x = x ?? 0;
+        this._y = y ?? 0;
     }
 
     get id(): string {
@@ -41,6 +41,7 @@ export class Element {
 
 
     public registerSvg(svg: SVGElement) {
+        
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
             this.processMouseDown(event);

@@ -43,9 +43,11 @@ export class ExportSvgButtonComponent {
         const diagram = await this.displayService.diagram$.pipe(take(1)).toPromise();
         console.log('diagram::: ', this.displayService.diagram);
 
-        if (diagram && diagram.elements.length > 0) {
-            console.log('element::: ', diagram.elements);
+        const elements = [...diagram!.places, ...diagram!.transitions]
 
+        if (diagram && elements.length > 0) {
+            console.log('element::: ', elements);
+            
             // Elemente des Diagramms in ein SVG-Format exportieren.
             const svgWithElements = this.svgService.exportToSvg(diagram);
 

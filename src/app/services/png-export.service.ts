@@ -15,6 +15,7 @@ export class PngExportService {
 
     createPngFile() {
         const diagram = this.displayService.diagram;
+        const elements = [...diagram!.places, ...diagram!.transitions]
         const svgString = this.svgService.exportToSvg(diagram);
 
         const image = new Image();
