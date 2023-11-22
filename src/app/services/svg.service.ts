@@ -22,16 +22,12 @@ export class SvgService {
         
         diagram.places.forEach(place => {
             result.push(new Place(place.id, place.x, place.y).createSVG());
-                //check if imported element is transition
-            if (place.id.startsWith('t'))
-                result.push(new Transition(place.id, place.x, place.y).createSVG());
         });
 
         diagram.transitions.forEach(transition => {
             result.push(new Transition(transition.id, transition.x, transition.y).createSVG());
         });
-
-
+        
         return result;
     }
 
