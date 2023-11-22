@@ -1,5 +1,5 @@
 <mat-toolbar class ="toolbar">
-    
+    <div>
     <button  mat-icon-button 
         class="hover-class" 
         [class.active]="circleActiveColor"
@@ -37,6 +37,17 @@
         class="hover-class"> 
         <mat-icon>clear</mat-icon> 
     </button>
+</div>
+<div class="zoom-button-wrapper">
+    <button mat-icon-button class="hover-class" [class.active]="zoomInActiveColor"
+    (click)="onZoomButtonClick('zoom-in')">
+        <mat-icon>zoom_in</mat-icon>
+    </button>
+    <button mat-icon-button class="hover-class" [class.active]="zoomOutActiveColor"
+    (click)="onZoomButtonClick('zoom-out')">
+        <mat-icon>zoom_out</mat-icon>
+    </button>
+</div>
       
 </mat-toolbar>
 

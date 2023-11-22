@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -22,7 +22,9 @@ export class DisplayComponent implements OnDestroy {
 
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
-
+    
+    public zoomFactor: number = 1;
+    public viewBox:string = '0 0 0 0';     
     constructor(private _svgService: SvgService,
                 private _displayService: DisplayService,
                 private _fileReaderService: FileReaderService,
@@ -33,15 +35,49 @@ export class DisplayComponent implements OnDestroy {
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
-
-            this._diagram = diagram;
-            this.draw();
+        
+        this._diagram = diagram;
+        this.draw();
+        
         });
+
+        this.activeButtonService.zoomClickObservable().subscribe(buttonId => {
+          
+            
+            if(buttonId === "zoom-in"){
+                this.zoomFactor = this.zoomFactor - 0.1;
+                this.viewBox = this.viewBoxVal;
+                
+            }
+            else if(buttonId === "zoom-out"){
+               this.zoomFactor = this.zoomFactor + 0.1;
+                this.viewBox = this.viewBoxVal;
+               
+                
+            }
+        });
+    }
+
+    ngOnInit(): void {
+        this.viewBox = this.viewBoxVal;
     }
 
     ngOnDestroy(): void {
         this._sub.unsubscribe();
         this.fileContent.complete();
+    }
+
+    get viewBoxVal(): string {
+        
+        const canvas = document.getElementById('canvas');
+       
+        if (canvas) {
+            console.log("canvas", canvas.getBoundingClientRect());
+            
+          const rect = canvas.getBoundingClientRect();
+          return `0 0 ${rect.width * this.zoomFactor} ${rect.height * this.zoomFactor}`;
+        }
+        return '0 0 0 0'; // Default viewBox if canvas is not available
     }
 
     public processDropEvent(e: DragEvent) {
@@ -128,8 +164,8 @@ export class DisplayComponent implements OnDestroy {
         // Position des SVG Elements relativ zum Viewport
         const svgContainer = svgElement.getBoundingClientRect();
         // Berechnung der Maus Koordinanten relativ zum SVG Element 
-        const mouseX = event.clientX - svgContainer.left;
-        const mouseY = event.clientY - svgContainer.top;
+        const mouseX = (event.clientX - svgContainer.left) * this.zoomFactor;
+        const mouseY = (event.clientY - svgContainer.top) * this.zoomFactor;
       
         // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
@@ -175,7 +211,8 @@ export class DisplayComponent implements OnDestroy {
                 
                 this.svgElementService.lightningCount--;
             }
-        }     
+        } 
+       
     }
 
     drawCircle(mouseX:number, mouseY:number){
