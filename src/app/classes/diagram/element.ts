@@ -39,7 +39,7 @@ export class Element {
     }
 
 
-   
+
     public registerSvg(svg: SVGElement) {
         
         this._svgElement = svg;
@@ -65,6 +65,9 @@ export class Element {
         this._svgElement.setAttribute('fill', 'black');
     }
 
+    public createSVG(name: string): SVGElement {
+        return document.createElementNS('http://www.w3.org/2000/svg', name);
+    }
 
-    
+
 }

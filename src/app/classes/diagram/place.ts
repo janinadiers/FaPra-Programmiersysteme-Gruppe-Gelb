@@ -48,9 +48,9 @@ export class Place extends Element {
         this._children = value;
     }
 
-    createSVG(){
-       
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    override createSVG(){
+
+        const circle = super.createSVG('circle');
         circle.setAttribute('id', this.id.toString());
         circle.setAttribute('cx', this.x.toString());
         circle.setAttribute('cy', this.y.toString()); 

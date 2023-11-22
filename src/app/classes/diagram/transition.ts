@@ -58,9 +58,8 @@ export class Transition extends Element {
         this._children = value;
     }
 
-    createSVG(){
-       
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    override createSVG(){
+        const rect = super.createSVG('rect');
         rect.setAttribute('id', this.id.toString());
         rect.setAttribute('x', (this.x - this._width / 2).toString()); 
         rect.setAttribute('y', (this.y - this.height / 2).toString()); 
