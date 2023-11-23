@@ -23,8 +23,6 @@ export class ToolbarComponent {
   circleActiveColor: boolean = false;
   arrowActiveColor: boolean = false;
   boltActiveColor: boolean = false;
-  zoomInActiveColor: boolean = false;
-  zoomOutActiveColor: boolean = false;
 
   toggleRectangleButton() {
     this.circleActiveColor = false;
