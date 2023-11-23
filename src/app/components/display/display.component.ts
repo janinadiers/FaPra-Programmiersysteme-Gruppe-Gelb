@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, untracked} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -22,9 +22,10 @@ export class DisplayComponent implements OnDestroy {
 
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
-    
+    // 
     public zoomFactor: number = 1;
-    public viewBox:string = '0 0 0 0';     
+    
+
     constructor(private _svgService: SvgService,
                 private _displayService: DisplayService,
                 private _fileReaderService: FileReaderService,
@@ -46,35 +47,34 @@ export class DisplayComponent implements OnDestroy {
             
             if(buttonId === "zoom-in"){
                 this.zoomFactor = this.zoomFactor - 0.1;
-                this.viewBox = this.viewBoxVal;
+              
                 
             }
             else if(buttonId === "zoom-out"){
                this.zoomFactor = this.zoomFactor + 0.1;
-                this.viewBox = this.viewBoxVal;
+               
                
                 
             }
         });
     }
 
-    ngOnInit(): void {
-        this.viewBox = this.viewBoxVal;
-    }
 
     ngOnDestroy(): void {
         this._sub.unsubscribe();
         this.fileContent.complete();
     }
 
-    get viewBoxVal(): string {
+    get viewBox(): string {
         
         const canvas = document.getElementById('canvas');
        
         if (canvas) {
-            console.log("canvas", canvas.getBoundingClientRect());
             
           const rect = canvas.getBoundingClientRect();
+            
+          // die viewBox des svg Elements wird an den Zoomfaktor angepasst (Je größer die viewBox, desto kleiner das Diagramm)
+          // die viewBox ist eine Art zusätzlicher innerer Canvas der die Größe des Diagramms bestimmt unabhängig von der Größe des äußeren Canvas
           return `0 0 ${rect.width * this.zoomFactor} ${rect.height * this.zoomFactor}`;
         }
         return '0 0 0 0'; // Default viewBox if canvas is not available
@@ -155,7 +155,7 @@ export class DisplayComponent implements OnDestroy {
     }
 
     onCanvasClick(event: MouseEvent) {
-        console.log("Canvas clicked", this._diagram);
+     
         // Koordinaten des Klick Events relativ zum SVG Element 
         const svgElement = document.getElementById('canvas');
         if (!svgElement) {
@@ -164,6 +164,7 @@ export class DisplayComponent implements OnDestroy {
         // Position des SVG Elements relativ zum Viewport
         const svgContainer = svgElement.getBoundingClientRect();
         // Berechnung der Maus Koordinanten relativ zum SVG Element 
+        // und Anpassung an den Zoomfaktor, da es sonst zu einem Offset beim Klicken kommt
         const mouseX = (event.clientX - svgContainer.left) * this.zoomFactor;
         const mouseY = (event.clientY - svgContainer.top) * this.zoomFactor;
       
