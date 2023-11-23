@@ -37,17 +37,19 @@ export class ExportSvgButtonComponent {
 
     async exportSvg() {
         console.log('exportSvg');
-        
+
         // Das Diagramm wird über den displayService abgerufen und als Observable behandelt.
         // Mit take(1) wird sichergestellt, dass nur das erste Element abgerufen wird, und mit toPromise() wird es zu einem Promise.
         const diagram = await this.displayService.diagram$.pipe(take(1)).toPromise();
         console.log('diagram::: ', this.displayService.diagram);
-        
-        if (diagram && diagram.elements.length > 0) {
-            console.log('element::: ', diagram.elements);
+
+        const elements = [...diagram!.places, ...diagram!.transitions]
+
+        if (diagram && elements.length > 0) {
+            console.log('element::: ', elements);
             
             // Elemente des Diagramms in ein SVG-Format exportieren.
-            const svgWithElements = this.svgService.exportToSvg(diagram.elements);
+            const svgWithElements = this.svgService.exportToSvg(diagram);
 
             // Download der SVG-Datei
             this.downloadService.downloadFile(svgWithElements,'petriNetz.svg', 'image/svg+xml');

@@ -1,8 +1,8 @@
 import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
-import { Element } from '../classes/diagram/element';
 import { Injectable } from '@angular/core';
 import {DownloadService} from "./helper/download-service";
+
 
 @Injectable({
     providedIn: 'root',
@@ -11,32 +11,36 @@ export class PnmlExport implements ExportService{
     constructor(private _displayService: DisplayService,
                 private downloadService: DownloadService) {}
 
-    private getElements(): Array<Element> {
-        const result: Array<Element> = [];
-
-        const elements = this._displayService.diagram.elements;
-
-        for (const element of elements) {
-            result.push(element);
-        }
-        return result;
-    }
 
     export(): void {
-        const elements = this.getElements();
+        const places = this._displayService.diagram.places;
+        const transitions = this._displayService.diagram.transitions;
+        const lines = this._displayService.diagram.lines
         let pnmlString =
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<pnml>\n<net id="" type="http://www.pnml.org/version-2009/grammar/ptnet">\n<name>\n<text>ILovePetriNets.pnml</text>\n</name>\n<page id="p1">';
-        for (const element of elements) {
-            if (element.svgElement?.tagName === 'circle') {
-                pnmlString += `<place id="${element.id}">\n<name>\n<text>name="${element.id}"</text>\n</name>\n<graphics>\n<position x="${element.x}" y="${element.y}"/>\n</graphics>\n<initialMarking>\n<text>0</text>\n</initialMarking>\n</place>`;
-            } else if (element.svgElement?.tagName === 'rect') {
-                 
-                pnmlString += `<transition id="${element.id}"><name><text>"${element.id}"</text></name><graphics><position x="${element.x}" y="${element.y}"/></graphics></transition>`;
-            } else if (element.svgElement?.tagName === 'line') {
-                pnmlString += `<arc id="${element.id}" source="${element.id}" target="${element.id}"><graphics><position x="${element.x}" y="${element.y}"/></graphics></arc>`;
-            }
+        for (const place of places) {
+            pnmlString += `<place id="${place.id}">\n<name>\n<text>${place.label}</text>\n</name>\n<graphics>\n<position x="${place.x}" y="${place.y}"/>\n</graphics>\n<initialMarking>\n<text>${place.amountToken}</text>\n</initialMarking>\n</place>`;
+            
         }
-        pnmlString += '</page>\n</net>\n</pnml>';
+
+        for (const transition of transitions) {
+            pnmlString += `<transition id="${transition.id}"><name><text>${transition.label}</text></name><graphics><position x="${transition.x}" y="${transition.y}"/></graphics></transition>`;
+
+        }
+
+        for (const line of lines) {
+            let graphics = '<graphics>\n';
+            if(line.coords){
+                for (const coord of line.coords) {
+                    graphics += `<position x="${coord.x}" y="${coord.y}"/>\n`;
+                }
+
+            }
+            graphics += '</graphics>\n';
+            pnmlString += `\n<arc id="${line.id}" source="${line.source.id}" target="${line.target.id}">\n${graphics}\n<inscription><text>${line.tokens}</text></inscription>\n</arc>`;
+
+        }
+        pnmlString += '\n</page>\n</net>\n</pnml>';
 
         this.downloadService.downloadFile(pnmlString, 'petriNetz.pnml', 'text/xml');
     }

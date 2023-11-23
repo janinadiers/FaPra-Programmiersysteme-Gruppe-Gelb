@@ -1,8 +1,7 @@
 import { ExportService } from '../classes/export-service';
 import { DisplayService } from './display.service';
-import { Element } from '../classes/diagram/element';
 import { Injectable } from '@angular/core';
-import { JsonPetriNet } from '../classes/json-petri-net';
+import { Coords, JsonPetriNet } from '../classes/json-petri-net';
 import {DownloadService} from "./helper/download-service";
 
 @Injectable({
@@ -12,18 +11,8 @@ export class JsonExport implements ExportService{
     constructor(private _displayService: DisplayService,
                 private downloadService: DownloadService) {}
 
-    private getElements(): Array<Element> {
-        const result: Array<Element> = [];
-
-        const elements = this._displayService.diagram.elements;
-
-        for (const element of elements) {
-            result.push(element);
-        }
-        return result;
-    }
-
     export(): void {
+        //usage of given Json interface for PetriNet
         const petriNet: JsonPetriNet = {
             places: [],
             transitions: [],
@@ -34,11 +23,31 @@ export class JsonExport implements ExportService{
             layout: {}
           };
 
-        const elements = this.getElements();
+        this._displayService.diagram.places.forEach(place => {
+            petriNet.places.push(place.id);
 
-        elements.forEach(element => {
-            petriNet.places.push(element.id);
-            petriNet.layout![element.id] = { x: element.x, y: element.y }
+            if (place.amountToken > 0)
+                petriNet.marking![place.id] = place.amountToken;
+
+            petriNet.layout![place.id] = { x: place.x, y: place.y }
+        });
+
+        this._displayService.diagram.transitions.forEach(transition => {
+            petriNet.transitions.push(transition.id);
+            
+            petriNet.layout![transition.id] = { x: transition.x, y: transition.y }
+        });
+
+        this._displayService.diagram.lines.forEach(line => {
+            petriNet.arcs![`${line.source.id},${line.target.id}`] = line.tokens;
+            //if line has coords, save coords within given layout as array
+            if (line.coords) {
+                const intermediates: Coords[] = [];
+                line.coords.forEach(coord => {
+                    intermediates.push({x: coord.x, y: coord.y});
+                });
+                petriNet.layout![`${line.source.id},${line.target.id}`] = intermediates;
+            }
         });
 
         var jsonString = JSON.stringify(petriNet);

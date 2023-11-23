@@ -14,15 +14,10 @@ export class ActivebuttonService {
   isZoomInButtonActive: boolean = false;
   isZoomOutButtonActive: boolean = false;
 
-  private zoomButtonClickSubject = new Subject<string>();
+    //Observable für Delete-Button und Zoom-Button
 
-zoomButtonClick(buttonId: string) {
-  this.zoomButtonClickSubject.next(buttonId);
-}
-
-zoomClickObservable() {
-  return this.zoomButtonClickSubject.asObservable();
-}
+private buttonClickSubject = new Subject<string>();
+private zoomButtonClickSubject = new Subject<string>();
   
   RectangleButtonActive() {
     this.isCircleButtonActive = false;
@@ -60,26 +55,41 @@ zoomClickObservable() {
     this.isBoltButtonActive = !this.isBoltButtonActive;
   }
 
-  zoomInButtonActive() {
-    console.log("zoomInButtonActive");
-    this.isCircleButtonActive = false;
-    this.isRectangleButtonActive = false;
-    this.isArrowButtonActive = false;
-    this.isBoltButtonActive = false;
-    this.isZoomOutButtonActive = false;
-    this.isZoomInButtonActive = !this.isZoomInButtonActive;
-  }
+  // zoomInButtonActive() {
+   
+  //   this.isCircleButtonActive = false;
+  //   this.isRectangleButtonActive = false;
+  //   this.isArrowButtonActive = false;
+  //   this.isBoltButtonActive = false;
+  //   this.isZoomOutButtonActive = false;
+  //   this.isZoomInButtonActive = !this.isZoomInButtonActive;
+  // }
 
-  zoomOutButtonActive() {
-    console.log("zoomOutButtonActive");
+  // zoomOutButtonActive() {
     
-    this.isCircleButtonActive = false;
-    this.isRectangleButtonActive = false;
-    this.isArrowButtonActive = false;
-    this.isBoltButtonActive = false;
-    this.isZoomInButtonActive = false;
-    this.isZoomOutButtonActive = !this.isZoomOutButtonActive;
+  //   this.isCircleButtonActive = false;
+  //   this.isRectangleButtonActive = false;
+  //   this.isArrowButtonActive = false;
+  //   this.isBoltButtonActive = false;
+  //   this.isZoomInButtonActive = false;
+  //   this.isZoomOutButtonActive = !this.isZoomOutButtonActive;
    
     
+  // }
+
+  zoomButtonClick(buttonId: string) {
+    this.zoomButtonClickSubject.next(buttonId);
+  }
+    
+  zoomButtonClickObservable() {
+    return this.zoomButtonClickSubject.asObservable();
+  }
+
+  sendButtonClick(buttonId: string) {
+    this.buttonClickSubject.next(buttonId);
+  }
+
+  getButtonClickObservable() {
+    return this.buttonClickSubject.asObservable();
   }
 }

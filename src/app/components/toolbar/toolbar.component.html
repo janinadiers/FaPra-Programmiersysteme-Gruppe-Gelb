@@ -29,12 +29,14 @@
     </button>
      
     <button  mat-icon-button 
-        class="hover-class"> 
+        class="hover-class"
+        (click)="onButtonClick('deleteLast')"> 
         <mat-icon>delete</mat-icon> 
     </button>
     
     <button  mat-icon-button 
-        class="hover-class"> 
+        class="hover-class"
+        (click)="onButtonClick('clear')"> 
         <mat-icon>clear</mat-icon> 
     </button>
 </div>
