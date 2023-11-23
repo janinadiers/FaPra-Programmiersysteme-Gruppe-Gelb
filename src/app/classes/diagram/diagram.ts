@@ -12,7 +12,8 @@ export class Diagram {
 
     selectedCircle: SVGElement | undefined = undefined;
     selectedRect: SVGElement | undefined = undefined;
-    
+    selectedLine: SVGElement | undefined = undefined;
+
     idCircleCount: number = 0;
     idRectCount: number = 0;
     idLineCount: number = 0;
@@ -81,7 +82,7 @@ export class Diagram {
 
 
       createRectObject (x: number, y: number){
-    
+
         // ID String für jedes Rechteck um 1 erhöhen (t0, t1,..)
         let idString: string = "t" + this.idRectCount;
         this.idRectCount++;
@@ -93,7 +94,7 @@ export class Diagram {
       }
 
       createLineObject (source: Element, target: Element){
-    
+
         // ID String für jeden Pfeil/Linie um 1 erhöhen (a0, a1,..)
         let idString: string = "a" + this.idLineCount;
         this.idLineCount++;
@@ -108,7 +109,7 @@ export class Diagram {
         this.selectedCircle = undefined;
         this.selectedRect = undefined;
       }
-    
+
       resetCounterVar() {
         this.idCircleCount = 0;
         this.idRectCount = 0;
