@@ -297,6 +297,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 let lineObject = this._diagram?.createLineObject(rectObject!, circleObject!);
 
                if(!lineObject){ throw new Error("LineObject is undefined")}
+
                 lineObject.createSVG();
 
                 let svgLine = lineObject.svgElement;
@@ -307,14 +308,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     }
                 }
 
-                /*
-                if(!svgLine) {
-                    return;
-                }
-                svgLine.addEventListener(('click'), () => {
+                svgLine?.addEventListener(('click'), () => {
                     if(svgLine){
                         this.onLineSelect(svgLine);
-                        console.log(this._diagram?.selectedLine?.id); // id ist im Moment undefined (?)
                     }
                 } );  // Event-Listener, damit Kante angeklickt werden kann (eine Richtung) */
 
@@ -331,14 +327,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     }
                 }
 
-                /*
-                if(!svgLine){
-                    return;
-                }
-                svgLine.addEventListener(('click'), () => {
+
+
+                svgLine?.addEventListener(('click'), () => {
                     if(svgLine != undefined){
                         this.onLineSelect(svgLine);
-                        console.log(this._diagram?.selectedLine?.id); // id ist im Moment undefined
                         }
                     } );  // Event-Listener, damit Kante angeklickt werden kann (andere Richtung) */
             }
@@ -350,17 +343,37 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onLineSelect(line: SVGElement) {
-        if(!this._diagram?.selectedLine){
-            return;
-        }
-        console.log("Kante ausgewählt");
-        this._diagram.selectedLine = line;
+        this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
+
+        // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement?.setAttribute('stroke', 'black');
+            element.svgElement?.setAttribute('stroke-width', '2');
+        });
+        this._diagram?.places.forEach((element) => {
+            element.svgElement?.setAttribute('stroke', 'black');
+        });
+        // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
+
+
         return;
     }
 
 
     onCircleSelect(circle: SVGElement){
         this._diagram!.selectedCircle = circle;
+
+        // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
+        this._diagram?.places.forEach((element) => {
+            element.svgElement?.setAttribute('stroke', 'black');
+        });
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement?.setAttribute('stroke', 'black');
+            element.svgElement?.setAttribute('stroke-width', '2');
+        });
+        // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
+
+
         if (this._diagram?.selectedRect) {
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);

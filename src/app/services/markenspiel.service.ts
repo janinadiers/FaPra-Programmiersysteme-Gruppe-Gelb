@@ -25,10 +25,16 @@ export class MarkenspielService {
                 return;
             }
 
+            /*
             // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
             this._diagram?.places.forEach((element) => {
                 element.svgElement?.setAttribute('stroke', 'black');
             });
+            this._diagram?.lines.forEach((element) => {
+                element.svgElement?.setAttribute('stroke', 'black');
+                element.svgElement?.setAttribute('stroke-width', '2');
+            }); */
+            // ist in die Display-Component zu onCircleSelect gewandert
 
             let idNumber = +this._diagram.selectedCircle.id.charAt(1);
             this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
@@ -78,12 +84,16 @@ export class MarkenspielService {
             if(!this._diagram?.selectedLine){
                 return;
             }
-
-            // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
-            let i = 0;
+            /*
+            // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
             this._diagram?.lines.forEach((element) => {
                 element.svgElement?.setAttribute('stroke', 'black');
+                element.svgElement?.setAttribute('stroke-width', '2');
             });
+            this._diagram?.places.forEach((element) => {
+                element.svgElement?.setAttribute('stroke', 'black');
+            }); */
+            // ist in die Display-Component zu OnLineSelect gewandert
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
             this._diagram.lines[idNumber].svgElement?.setAttribute('stroke','red');
@@ -96,8 +106,6 @@ export class MarkenspielService {
             if(!this._diagram?.selectedLine){
                 return;
             }
-
-            console.log(this._diagram.selectedLine.id);
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
 

@@ -68,7 +68,7 @@ export class Diagram {
         this._lines.splice(0, this._lines.length);
     }
 
-    createCircleObject(x: number, y:number){
+      createCircleObject(x: number, y:number){
 
         // ID String für jeden Kreis um 1 erhöhen (p0, p1,..)
         let idString: string = "p" + this.idCircleCount;
@@ -108,6 +108,7 @@ export class Diagram {
       resetSelectedElements() {
         this.selectedCircle = undefined;
         this.selectedRect = undefined;
+        this.selectedLine = undefined;
       }
 
       resetCounterVar() {
@@ -120,14 +121,5 @@ export class Diagram {
       clearOrder() {
         this._order.splice(0, this._order.length);
       }
-
-
-
-
-
-
-
-
-
 
 }
