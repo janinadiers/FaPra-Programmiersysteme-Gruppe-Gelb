@@ -35,6 +35,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
+            console.log(this._diagram.places, this._diagram.transitions, this._diagram.lines);
+            
             this.draw();
         });
     }
