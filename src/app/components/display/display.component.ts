@@ -267,11 +267,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
         const width = rectObject.width;
         const height = rectObject.height;
         let svgRect = rectObject.createSVG();
-        // Anpassen der Koord. des SVGRects, damit es von der Mitte aufgezogen wird
-        const x = mouseX - width / 2;
-        const y = mouseY - height / 2;
-        svgRect.setAttribute('x', x.toString());
-        svgRect.setAttribute('y', y.toString());
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement = svgRect;
         svgRect.addEventListener('click', () => {
