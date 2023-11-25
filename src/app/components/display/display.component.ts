@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnInit, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
 import {catchError, of, Subscription, take} from 'rxjs';
 import {SvgService} from '../../services/svg.service';
@@ -7,19 +7,20 @@ import {ExampleFileComponent} from "../example-file/example-file.component";
 import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
-import { SvgElementService } from 'src/app/services/svg-element.service';
+
 
 @Component({
     selector: 'app-display',
     templateUrl: './display.component.html',
     styleUrls: ['./display.component.css']
 })
-export class DisplayComponent implements OnDestroy {
+export class DisplayComponent implements OnInit, OnDestroy {
 
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
 
+    private subscriptionOfToolbar: Subscription = new Subscription;
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
 
@@ -27,8 +28,7 @@ export class DisplayComponent implements OnDestroy {
                 private _displayService: DisplayService,
                 private _fileReaderService: FileReaderService,
                 private _http: HttpClient,
-                private activeButtonService: ActivebuttonService,
-                private svgElementService: SvgElementService ) {
+                private activeButtonService: ActivebuttonService) {
 
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
@@ -39,9 +39,23 @@ export class DisplayComponent implements OnDestroy {
         });
     }
 
+    ngOnInit() {
+        this.subscriptionOfToolbar = 
+        this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
+        if (buttonId === "clear"){
+            let clearElements: boolean = true;
+            this.clearDrawingArea(clearElements);
+        } 
+        else if (buttonId === "deleteLast") {
+        this.deleteLastElement();
+        }
+        });
+    }
+
     ngOnDestroy(): void {
         this._sub.unsubscribe();
         this.fileContent.complete();
+        this.subscriptionOfToolbar.unsubscribe();
     }
 
     public processDropEvent(e: DragEvent) {
@@ -62,7 +76,7 @@ export class DisplayComponent implements OnDestroy {
     }
 
     private fetchFile(link: string) {
-        
+
         this._http.get(link,{
             responseType: 'text'
         }).pipe(
@@ -85,13 +99,13 @@ export class DisplayComponent implements OnDestroy {
             return;
         }
         this._fileReaderService.readFile(files[0]).pipe(take(1)).subscribe(content => {
-            
+
             const fileExtension = files[0].name.split('.').pop() || '';
             this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
         });
     }
 
-    
+
 
     private draw() {
         if (this.drawingArea === undefined) {
@@ -100,14 +114,17 @@ export class DisplayComponent implements OnDestroy {
         }
 
         this.clearDrawingArea();
-        
+
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
+        let groupedElements = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        groupedElements.setAttribute('id', 'groupedSvgDiagram');
         for (const element of elements) {
-            this.drawingArea.nativeElement.appendChild(element);
+            groupedElements.appendChild(element);
         }
+        this.drawingArea.nativeElement.appendChild(groupedElements);
     }
 
-    private clearDrawingArea() {
+    private clearDrawingArea(clearElements?: boolean) {
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -116,28 +133,78 @@ export class DisplayComponent implements OnDestroy {
         while (drawingArea.childElementCount > 0) {
             drawingArea.removeChild(drawingArea.lastChild as ChildNode);
         }
+        
+        //Array leeren, selektierte Elemente und Counter Variablen zurücksetzen
+        if(clearElements) {
+            this._diagram?.clearElements();
+            this._diagram?.resetSelectedElements();
+            this._diagram?.resetCounterVar();
+            this._diagram?.clearOrder();
+        }
     }
+    
+    private deleteLastElement() {
+
+        const drawingArea = this.drawingArea?.nativeElement;
+        if (drawingArea?.childElementCount === undefined) {
+            return;
+        }
+
+        if (this._diagram && drawingArea.childElementCount > 0) {
+        
+            let elementOrder = this._diagram.order;
+            let lastID = elementOrder.pop();
+            if (lastID?.startsWith("p")) {
+                let lastCircleObject = this._diagram.places.pop();
+                let lastSvgShape = lastCircleObject?.svgElement;
+                if (lastCircleObject && lastSvgShape) {
+                drawingArea.removeChild(lastSvgShape);
+                this._diagram.idCircleCount--;
+                }  
+            }
+            else if (lastID?.startsWith("t")) {
+                let lastRectObject = this._diagram.transitions.pop();
+                let lastSvgShape = lastRectObject?.svgElement;
+                if (lastRectObject && lastSvgShape) {
+                    drawingArea.removeChild(lastSvgShape);
+                    this._diagram.idRectCount--;
+                }  
+            }
+            else if (lastID?.startsWith("a")){
+
+                let lastLineObject = this._diagram.lines.pop();
+                let lastSvgLine = lastLineObject?.svgElement;
+                if(lastLineObject && lastSvgLine){
+                    drawingArea.removeChild(lastSvgLine);
+                    this._diagram.idLineCount--;
+                }
+            }
+            this._diagram.resetSelectedElements();
+            this._diagram.lightningCount = 0;
+        }         
+    }  
+                
 
     onCanvasClick(event: MouseEvent) {
         console.log("Canvas clicked", this._diagram);
-        // Koordinaten des Klick Events relativ zum SVG Element 
+        // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
         if (!svgElement) {
             return;
         }
         // Position des SVG Elements relativ zum Viewport
         const svgContainer = svgElement.getBoundingClientRect();
-        // Berechnung der Maus Koordinanten relativ zum SVG Element 
+        // Berechnung der Maus Koordinanten relativ zum SVG Element
         const mouseX = event.clientX - svgContainer.left;
         const mouseY = event.clientY - svgContainer.top;
-      
+
         // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
 
             let svgCircle = this.drawCircle(mouseX ,mouseY)
             svgElement.appendChild(svgCircle);
 
-        }   
+        }
 
         else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
 
@@ -147,48 +214,47 @@ export class DisplayComponent implements OnDestroy {
         //Blitz-Tool
         else if (event.button === 0 && this.activeButtonService.isBoltButtonActive){
             
-            if(this.svgElementService.lightningCount === 0){
+            if(this._diagram?.lightningCount === 0){
 
                 let targetIsCircle: boolean = true;
                 let svgCircle = this.drawCircle(mouseX ,mouseY);
                 svgElement.appendChild(svgCircle);
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this._diagram?.elements.find(element=> element.id === "p" + (this.svgElementService.idCircleCount-1));
-                this.svgElementService.selectedCircle = lastCircleObject!.svgElement;
-                if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
-                    this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
+                const lastCircleObject = this._diagram?.places[this._diagram?.places.length - 1];
+                this._diagram.selectedCircle = lastCircleObject!.svgElement;
+                if (this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
+                    this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
                 }
-                this.svgElementService.lightningCount++;
+                this._diagram.lightningCount++;
             }
             
-            else if (this.svgElementService.lightningCount === 1){
+            else if (this._diagram?.lightningCount === 1){
 
                 let targetIsCircle: boolean = false;
                 let svgRect = this.drawRect(mouseX, mouseY);
                 svgElement.appendChild(svgRect);
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this._diagram?.elements.find(element=> element.id === "t" + (this.svgElementService.idRectCount-1));
-                this.svgElementService.selectedRect = lastRectObject!.svgElement;
-                if (this.svgElementService.selectedRect !== undefined && this.svgElementService.selectedCircle!== undefined) {
-                    this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, targetIsCircle);
+                const lastRectObject = this._diagram?.transitions[this._diagram?.transitions.length - 1];
+                this._diagram.selectedRect = lastRectObject!.svgElement;
+                if ( this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
+                    this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
                 }
                 
-                this.svgElementService.lightningCount--;
+                this._diagram.lightningCount--;
             }
-        }     
+        }
     }
 
     drawCircle(mouseX:number, mouseY:number){
 
         // Aufruf der Funktion zu Erzeugung eines Objekts
-        let circleObject = this.svgElementService.createCircleObject(mouseX, mouseY);
+        let circleObject = this._diagram?.createCircleObject(mouseX, mouseY);
+        if(!circleObject){ throw new Error("CircleObject is undefined") }
         let svgCircle = circleObject.createSVG();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement = svgCircle;
-        this._diagram?.pushElement(circleObject);
         svgCircle.addEventListener('click', () => {
-            this.onCircleSelect(svgCircle);
-            console.log("Place " + svgCircle.id  + " ist ausgewählt.");   
+            this.onCircleSelect(svgCircle);  
         });
         return svgCircle;
     }
@@ -196,7 +262,8 @@ export class DisplayComponent implements OnDestroy {
     drawRect(mouseX: number, mouseY: number){
 
         //  Aufruf der Funktion zu Erzeugung eines Objekts
-        let rectObject = this.svgElementService.createRectObject(mouseX, mouseY);
+        let rectObject = this._diagram?.createRectObject(mouseX, mouseY);
+        if(!rectObject){ throw new Error("RectObject is undefined") }
         const width = rectObject.width;
         const height = rectObject.height;
         let svgRect = rectObject.createSVG();
@@ -207,72 +274,75 @@ export class DisplayComponent implements OnDestroy {
         svgRect.setAttribute('y', y.toString());
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement = svgRect;
-        this._diagram?.pushElement(rectObject);
         svgRect.addEventListener('click', () => {
             this.onRectSelect(svgRect);
-            console.log("Transition " + svgRect.id  + " ist ausgewählt.");  
         });  
         return svgRect
     }
 
-    
+
     connectElements(circle: SVGElement, rect: SVGElement, targetIsCircle: boolean) {
-        
+
         if (this.activeButtonService.isArrowButtonActive || this.activeButtonService.isBoltButtonActive) {
             const svgElement = document.getElementById('canvas');
 
             let cirlceObjectID = circle.id;
-            let circleObject = this._diagram?.elements.find(element => element.id === cirlceObjectID);
+            let circleObject = this._diagram?.places.find(place => place.id === cirlceObjectID);
             let rectobjectID = rect.id;
-            let rectObject =  this._diagram?.elements.find(element => element.id === rectobjectID);
+            let rectObject =  this._diagram?.transitions.find(transition => transition.id === rectobjectID);
             
             if(targetIsCircle){
+                
                 // Aufruf der Funktion zu Erzeugung eines Objekts
-                let lineObject = this.svgElementService.createLineObject(rectObject!, circleObject!);
-                lineObject.createSVG();
+                let lineObject = this._diagram?.createLineObject(rectObject!, circleObject!);
+
+               if(!lineObject){ throw new Error("LineObject is undefined")}
+                lineObject.createSVG();    
+
                 let svgLine = lineObject.svgElement;
-                this._diagram?.pushLine(lineObject);
                 
                 if (svgElement) {
                     if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
-                    }              
+                    }
                 }
-        
+
             }
             else{
-                let lineObject = this.svgElementService.createLineObject(circleObject!, rectObject!);
+                let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
+                if(!lineObject){ throw new Error("LineObject is undefined")}
                 lineObject.createSVG();
+               
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
                     if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
-                    }              
-                }  
-            }   
-            
+                    }
+                }
+            }
+
             if(this.activeButtonService.isArrowButtonActive){
-                this.svgElementService.resetSelectedElements();
+                this._diagram?.resetSelectedElements();
             }      
         }
     }
 
 
     onCircleSelect(circle: SVGElement){
-        this.svgElementService.selectedCircle = circle;
-        if (this.svgElementService.selectedRect) {
+        this._diagram!.selectedCircle = circle;
+        if (this._diagram?.selectedRect) {
             let circleIsTarget: boolean = true;
-            this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, circleIsTarget);    
+            this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);    
         }
         else
-        return; 
+        return;
     }
 
     onRectSelect(rect: SVGElement){
-        this.svgElementService.selectedRect= rect;
-        if (this.svgElementService.selectedCircle) {
+        this._diagram!.selectedRect= rect;
+        if (this._diagram?.selectedCircle) {
             let circleIsTarget: boolean = false;
-            this.connectElements(this.svgElementService.selectedCircle, this.svgElementService.selectedRect, circleIsTarget);    
+            this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);    
         }
         else
         return;
@@ -280,12 +350,11 @@ export class DisplayComponent implements OnDestroy {
 
   handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
-      
+
         if(this.activeButtonService.isBoltButtonActive){
             
-            this.svgElementService.resetSelectedElements();
-            this.svgElementService.lightningCount = 0;
-            console.log("Right-click event works");
+            this._diagram?.resetSelectedElements();
+            this._diagram!.lightningCount = 0;
         }
     }
 

@@ -6,12 +6,14 @@ export class Place extends Element {
     private _radius: number;
     private _amountToken: number;
     private _children: Array<Transition>;
+    private _label: string;
 
-    constructor(id: string, x: number, y: number) {
+    constructor(id: string, x?: number, y?: number) {
         super(id, x, y);
         this._radius = 25; // Default Radius
         this._amountToken = 0; //Default sind keine Marken gesetzt
         this._children = []; 
+        this._label = id;
     }
 
     get radius(): number {
@@ -20,6 +22,14 @@ export class Place extends Element {
 
     set radius(value: number) {
         this._radius = value;
+    }
+
+    get label(): string {
+        return this._label;
+    }
+
+    set label(value: string) {
+        this._label = value;
     }
 
     get amountToken(): number {
@@ -38,9 +48,9 @@ export class Place extends Element {
         this._children = value;
     }
 
-    createSVG(){
-       
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    override createSVG(){
+
+        const circle = super.createSVG('circle');
         circle.setAttribute('id', this.id.toString());
         circle.setAttribute('cx', this.x.toString());
         circle.setAttribute('cy', this.y.toString()); 
@@ -48,6 +58,8 @@ export class Place extends Element {
         circle.setAttribute('fill', 'white'); 
         circle.setAttribute('stroke', 'black'); 
         circle.setAttribute('stroke-width', '2'); 
+
+        super.registerSvg(circle)
         return circle;
     }
 

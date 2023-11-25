@@ -1,9 +1,9 @@
 import {Component} from '@angular/core';
 import {ActivebuttonService} from 'src/app/services/activebutton.service';
-import {SvgElementService} from 'src/app/services/svg-element.service';
 import {DisplayService} from "../../services/display.service";
 import {ExportService} from "../../services/export.service";
 import {DownloadService} from "../../services/helper/download-service";
+import { Diagram } from '../../classes/diagram/diagram';
 
 @Component({
     selector: 'app-toolbar',
@@ -12,8 +12,10 @@ import {DownloadService} from "../../services/helper/download-service";
 })
 export class ToolbarComponent {
 
-    private readonly PNML_FILE: string = 'petriNetz.pnml';
-    private readonly PNML_TYPE: string = 'text/xml';
+  private _diagram: Diagram | undefined;
+
+  private readonly PNML_FILE: string = 'petriNetz.pnml';
+  private readonly PNML_TYPE: string = 'text/xml';
 
     private readonly JSON_FILE: string = 'petriNetz.json';
     private readonly JSON_TYPE: string = 'application/json';
@@ -24,12 +26,14 @@ export class ToolbarComponent {
     private readonly SVG_FILE: string = 'petriNetz.svg'
     private readonly SVG_TYPE: string = 'image/svg+xml';
 
-    constructor(private activeButtonService: ActivebuttonService,
-                private svgElementService: SvgElementService,
-                private exportService: ExportService,
-                private displayService: DisplayService,
-                private downloadService: DownloadService
+    constructor(private _activeButtonService: ActivebuttonService,
+                private _exportService: ExportService,
+                private _displayService: DisplayService,
+                private _downloadService: DownloadService
                 ) {
+        this._displayService.diagram$.subscribe(diagram => {
+            this._diagram = diagram;
+        });
     }
 
     rectActiveColor: boolean = false;
@@ -42,7 +46,7 @@ export class ToolbarComponent {
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
     this.rectActiveColor = !this.rectActiveColor;
-    this.activeButtonService.RectangleButtonActive();
+    this._activeButtonService.RectangleButtonActive();
   }
 
   toggleCircleButton() {
@@ -50,7 +54,7 @@ export class ToolbarComponent {
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
     this.circleActiveColor = !this.circleActiveColor;
-    this.activeButtonService.circleButtonActive();
+    this._activeButtonService.circleButtonActive();
   }
 
   toggleArrowButton () {
@@ -59,8 +63,8 @@ export class ToolbarComponent {
     this.boltActiveColor = false;
     this.arrowActiveColor = !this.arrowActiveColor;
     // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-    this.svgElementService.resetSelectedElements();
-    this.activeButtonService.arrowButtonActive();
+    this._diagram?.resetSelectedElements();
+    this._activeButtonService.arrowButtonActive();
   }
 
   toggleBoltButton () {
@@ -69,32 +73,36 @@ export class ToolbarComponent {
     this.arrowActiveColor = false;
     this.boltActiveColor = !this.boltActiveColor;
     // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
-    this.svgElementService.resetSelectedElements();
-    this.svgElementService.lightningCount = 0;
-    this.activeButtonService.boltButtonActive();
+    this._diagram?.resetSelectedElements();
+    this._diagram!.lightningCount = 0;
+    this._activeButtonService.boltButtonActive();
+  }
+
+  onButtonClick(buttonId: string){
+    this._activeButtonService.sendButtonClick(buttonId);
   }
 
     exportPnml(): void {
-        const pnmlString = this.exportService.exportAsPNML();
-        this.downloadService.downloadFile(pnmlString, this.PNML_FILE, this.PNML_TYPE);
+        const pnmlString = this._exportService.exportAsPNML();
+        this._downloadService.downloadFile(pnmlString, this.PNML_FILE, this.PNML_TYPE);
     }
 
     exportJson(): void {
-      const jsonString = this.exportService.exportAsJSON();
-      this.downloadService.downloadFile(jsonString, this.JSON_FILE, this.JSON_TYPE);
+      const jsonString = this._exportService.exportAsJSON();
+      this._downloadService.downloadFile(jsonString, this.JSON_FILE, this.JSON_TYPE);
     }
 
     exportPng(): void {
-      this.exportService.exportAsPNG().then((blob) => {
+      this._exportService.exportAsPNG().then((blob) => {
           console.log(blob);
-          this.downloadService.downloadFile(blob, this.PNG_FILE, this.PNG_TYPE);
+          this._downloadService.downloadFile(blob, this.PNG_FILE, this.PNG_TYPE);
       }).catch((error) => {
           console.log('Error creating the PNG file', error);
       });
     }
 
     exportSvg(): void {
-        const svgString = this.exportService.exportAsSVG();
-        this.downloadService.downloadFile(svgString, this.SVG_FILE, this.SVG_TYPE)
+        const svgString = this._exportService.exportAsSVG();
+        this._downloadService.downloadFile(svgString, this.SVG_FILE, this.SVG_TYPE)
     }
 }
