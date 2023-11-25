@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Diagram } from '../classes/diagram/diagram';
-import { Element } from '../classes/diagram/element';
-import { Line } from '../classes/diagram/line';
-import { Coords, JsonPetriNet } from '../classes/json-petri-net';
-import { Place } from '../classes/diagram/place';
-import { Transition } from '../classes/diagram/transition';
+import {Injectable} from '@angular/core';
+import {Diagram} from '../classes/diagram/diagram';
+import {Element} from '../classes/diagram/element';
+import {Line} from '../classes/diagram/line';
+import {Coords, JsonPetriNet} from '../classes/json-petri-net';
+import {Place} from '../classes/diagram/place';
+import {Transition} from '../classes/diagram/transition';
 
 @Injectable({
     providedIn: 'root'

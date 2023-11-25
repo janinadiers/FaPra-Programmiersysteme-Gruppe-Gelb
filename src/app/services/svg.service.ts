@@ -11,7 +11,6 @@ import {Line} from "../classes/diagram/line";
 export class SvgService {
 
 
-
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
 
         const result: Array<SVGElement> = [];

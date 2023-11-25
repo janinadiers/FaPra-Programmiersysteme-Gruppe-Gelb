@@ -45,7 +45,7 @@ export class ExportService {
 
         for (const line of this.getLines()) {
             let graphics = '<graphics>\n';
-            if(line.coords){
+            if (line.coords) {
                 for (const coord of line.coords) {
                     graphics += `<position x="${coord.x}" y="${coord.y}"/>\n`;
                 }
@@ -75,13 +75,13 @@ export class ExportService {
             if (place.amountToken > 0)
                 petriNet.marking![place.id] = place.amountToken;
 
-            petriNet.layout![place.id] = { x: place.x, y: place.y }
+            petriNet.layout![place.id] = {x: place.x, y: place.y}
         });
 
         this.getTransitions().forEach(transition => {
             petriNet.transitions.push(transition.id);
 
-            petriNet.layout![transition.id] = { x: transition.x, y: transition.y }
+            petriNet.layout![transition.id] = {x: transition.x, y: transition.y}
         });
 
         this.getLines().forEach(line => {
@@ -144,7 +144,7 @@ export class ExportService {
 
     exportAsSVG(): string {
         // Prüfen, dass das SVG nicht abgeschnitten wird, sondern die Größe sich u. U. nach den Element-Koordinaten richtet
-        const { maxX, maxY } = this
+        const {maxX, maxY} = this
             .calculateMaxCoordinates([...this.getPlaces(), ...this.getTransitions()]);
 
         const circleRadius = 25;
@@ -156,19 +156,19 @@ export class ExportService {
         let svgElement = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`;
 
         this.getLines().forEach((line) => {
-            if(line) {
+            if (line) {
                 svgElement += this._svgService.createSvgLineForElement(line).outerHTML;
             }
         });
 
         this.getPlaces().forEach((place) => {
-            if(place) {
+            if (place) {
                 svgElement += this._svgService.createSvgCircleForElement(place).outerHTML;
             }
         });
 
         this.getTransitions().forEach((transition) => {
-            if(transition) {
+            if (transition) {
                 svgElement += this._svgService.createSvgRectangleForElement(transition).outerHTML;
             }
         });
@@ -184,17 +184,17 @@ export class ExportService {
         let maxY = 0;
 
         elements.forEach(element => {
-            if(element) {
+            if (element) {
                 // Überprüfen, ob das Element die maximalen x- und y-Koordinaten überschreitet
-                if(element.x > maxX) {
+                if (element.x > maxX) {
                     maxX = element.x;
                 }
-                if(element.y > maxY) {
+                if (element.y > maxY) {
                     maxY = element.y;
                 }
             }
         });
 
-        return { maxX, maxY };
+        return {maxX, maxY};
     }
 }
