@@ -9,13 +9,13 @@ export class Transition extends Element {
     private _children: Array<Place>;
     private _label: string;
 
-    constructor(id: string, x?: number, y?: number) {
+    constructor(id: string, x?: number, y?: number, label?: string) {
         super(id, x, y);
         this._isActive = false; //Standardmäßig nicht aktiviert
         this._width = 20;
         this._height = 40;
         this._children = [];
-        this._label = id;
+        this._label = label ?? '';
     }
 
     get isActive(): boolean {
@@ -60,11 +60,11 @@ export class Transition extends Element {
 
     override createSVG(){
         const group = super.createSVG('g');
-        group.setAttribute('id', this._label);
+        group.setAttribute('id', this.id);
 
         //Transition
         const rect = super.createSVG('rect');
-        rect.setAttribute('id', this._label.toString());
+        rect.setAttribute('id', this.id.toString());
         rect.setAttribute('x', (this.x - this._width / 2).toString());
         rect.setAttribute('y', (this.y - this.height / 2).toString());
         rect.setAttribute('width', this._width.toString());

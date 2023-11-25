@@ -8,10 +8,10 @@ export class Place extends Element {
     private _children: Array<Transition>;
     private _label: string;
 
-    constructor(id: string, x?: number, y?: number) {
+    constructor(id: string, x?: number, y?: number, amountToken?: number) {
         super(id, x, y);
         this._radius = 25; // Default Radius
-        this._amountToken = 0; //Default sind keine Marken gesetzt
+        this._amountToken = amountToken ?? 0; //Default sind keine Marken gesetzt
         this._children = []; 
         this._label = id;
     }
@@ -69,7 +69,10 @@ export class Place extends Element {
         marker.setAttribute('y', this.y.toString());
         marker.setAttribute('text-anchor', 'middle');
         marker.setAttribute('dy', '.3em');
-        marker.textContent = this._amountToken.toString();
+        if (this._amountToken > 0)
+            marker.textContent = this._amountToken.toString();
+        else
+            marker.textContent = '';
         group.appendChild(marker);
 
         //Text

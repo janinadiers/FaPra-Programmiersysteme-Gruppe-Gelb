@@ -11,11 +11,11 @@ export class Line {
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
 
-    constructor(id: string, source: Element, target: Element, coords?: Coords[]) {
+    constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
         this._source = source;
         this._target = target;
-        this._tokens = 0;      //Standardmäßig keine Marken
+        this._tokens = tokens ?? 0;      //Standardmäßig keine Marken
         this._coords = coords;  //undefined if not given
     }
 
