@@ -49,18 +49,40 @@ export class Place extends Element {
     }
 
     override createSVG(){
+        const group = super.createSVG('g');
+        group.setAttribute('id', this._label);
 
+        //Circle
         const circle = super.createSVG('circle');
-        circle.setAttribute('id', this.id.toString());
+        circle.setAttribute('id', this._label.toString());
         circle.setAttribute('cx', this.x.toString());
         circle.setAttribute('cy', this.y.toString()); 
         circle.setAttribute('r', this._radius.toString());  
         circle.setAttribute('fill', 'white'); 
         circle.setAttribute('stroke', 'black'); 
         circle.setAttribute('stroke-width', '2'); 
+        group.appendChild(circle);
 
-        super.registerSvg(circle)
-        return circle;
+        //Marker
+        const marker = super.createSVG('text');
+        marker.setAttribute('x', this.x.toString());
+        marker.setAttribute('y', this.y.toString());
+        marker.setAttribute('text-anchor', 'middle');
+        marker.setAttribute('dy', '.3em');
+        marker.textContent = this._amountToken.toString();
+        group.appendChild(marker);
+
+        //Text
+        const text = super.createSVG('text');
+        text.setAttribute('x', this.x.toString());
+        text.setAttribute('y', (this.y + 40).toString());
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('alignment-baseline', 'central');
+        text.textContent = this._label.toString();
+        group.appendChild(text);
+
+        super.registerSvg(group);
+        return group;
     }
 
 }

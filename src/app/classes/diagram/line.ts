@@ -76,13 +76,19 @@ export class Line {
 
 
     createSVG() {
-        
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('id', this._id.toString());
+
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._source.x},${this._source.y} ${this.getCoordsString()}${this._target.x},${this._target.y}`))
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
-        line.setAttribute('fill', 'transparent')
+        line.setAttribute('fill', 'transparent');
+
+
+
+
         this._svgElement = line;
         return line;
     }
