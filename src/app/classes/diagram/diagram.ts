@@ -98,7 +98,7 @@ export class Diagram {
         // ID String für jeden Pfeil/Linie um 1 erhöhen (a0, a1,..)
         let idString: string = "a" + this.idLineCount;
         this.idLineCount++;
-        let lineObject = new Line (idString, source.getPositionChangeObservable(), target.getPositionChangeObservable());
+        let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
         this.pushID(idString);

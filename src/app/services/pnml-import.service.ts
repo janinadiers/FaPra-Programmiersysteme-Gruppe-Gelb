@@ -171,7 +171,7 @@ export class PnmlImportService implements ImportService {
 
     private createEdge(id:string, source:Element, target:Element, coords: Coords[]): Line{
         
-        const line:Line = new Line(id, new BehaviorSubject(source).asObservable(), new BehaviorSubject(target).asObservable());
+        const line:Line = new Line(id, source, target);
         line.coords = coords;
         line.createSVG();
         return line;

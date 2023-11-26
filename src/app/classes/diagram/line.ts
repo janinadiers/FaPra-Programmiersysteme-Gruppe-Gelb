@@ -7,22 +7,26 @@ export class Line  {
 
     private readonly _id: string;
     private _sourcePosition: Coords | undefined;
-    private _targetPosition: Coords | undefined
+    private _targetPosition: Coords | undefined;
+    private _source : Element | undefined;
+    private _target : Element | undefined;
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
     
 
-    constructor(id: string, source$: Observable<Coords>, target$: Observable<Coords>, coords?: Coords[]) {
+    constructor(id: string, source: Element, target: Element, coords?: Coords[]) {
         this._id = id;
         this._tokens = 0;      //Standardmäßig keine Marken
         this._coords = coords;  //undefined if not given
-        source$.subscribe((source) => {
+        this._source = source;
+        this._target = target;
+        source.getPositionChangeObservable().subscribe((source) => {
             this._sourcePosition = source;
             this.updateSource(source);
             
         });
-        target$.subscribe((target) => {
+        target.getPositionChangeObservable().subscribe((target) => {
             this._targetPosition = target;
             this.updateTarget(target);
         
@@ -34,20 +38,20 @@ export class Line  {
         return this._id;
     }
 
-    get source(): Coords | undefined {
-        return this._sourcePosition;
+    get source(): Element | undefined {
+        return this._source;
     }
 
     set source(value: Element) {
-        this._sourcePosition = value;
+        this._source = value;
     }
 
-    get target(): Coords | undefined {
-        return this._targetPosition;
+    get target(): Element| undefined {
+        return this._target;
     }
 
     set target(value: Element) {
-        this._targetPosition = value;
+        this._target = value;
     }
 
     get tokens(): number {
