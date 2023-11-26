@@ -134,7 +134,10 @@ export class Line {
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
         backgroundCircle.setAttribute('cy', midCoords.y.toString()); 
         backgroundCircle.setAttribute('r', '8');  
-        backgroundCircle.setAttribute('fill', 'white');
+        if (this._tokens > 0)
+            backgroundCircle.setAttribute('fill', 'white');
+        else 
+            backgroundCircle.setAttribute('fill', 'transparent');
         group.appendChild(backgroundCircle);
 
 
@@ -143,7 +146,8 @@ export class Line {
         token.setAttribute('y', midCoords.y.toString());
         token.setAttribute('text-anchor', 'middle');
         token.setAttribute('dy', '.3em');
-        token.textContent = this._tokens.toString();
+        if (this._tokens > 0)
+            token.textContent = this._tokens.toString();
         group.appendChild(token);
 
         this._svgElement = group;
