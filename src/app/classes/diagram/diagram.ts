@@ -2,6 +2,7 @@ import {Element} from './element';
 import {Line} from './line';
 import { Place } from './place';
 import { Transition } from './transition';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export class Diagram {
     // private readonly _elements: Array<Element>;
@@ -29,6 +30,7 @@ export class Diagram {
     get places(): Array<Place> {
         return this._places;
     }
+
 
     get transitions(): Array<Transition> {
         return this._transitions;
@@ -72,8 +74,7 @@ export class Diagram {
         // ID String für jeden Kreis um 1 erhöhen (p0, p1,..)
         let idString: string = "p" + this.idCircleCount;
         this.idCircleCount++;
-        let circleObject = new Place(idString, x, y);
-        // Objekt im Array abspeichern
+        let circleObject = new Place(idString, x, y)
         this.pushPlace(circleObject);
         this.pushID(idString);
         return circleObject;
@@ -92,12 +93,12 @@ export class Diagram {
         return rectObject;
       }
 
-      createLineObject (source: Element, target: Element){
+      createLineObject (source: Transition | Place, target: Transition| Place){
     
         // ID String für jeden Pfeil/Linie um 1 erhöhen (a0, a1,..)
         let idString: string = "a" + this.idLineCount;
         this.idLineCount++;
-        let lineObject = new Line (idString, source, target);
+        let lineObject = new Line (idString, source.getPositionChangeObservable(), target.getPositionChangeObservable());
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
         this.pushID(idString);
@@ -119,14 +120,6 @@ export class Diagram {
       clearOrder() {
         this._order.splice(0, this._order.length);
       }
-
-
-
-
-
-
-
-
 
 
 }

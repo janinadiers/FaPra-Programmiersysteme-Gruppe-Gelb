@@ -1,12 +1,14 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Transition } from './transition';
 
+
 export class Place extends Element {
 
     private _radius: number;
     private _amountToken: number;
     private _children: Array<Transition>;
     private _label: string;
+    
 
     constructor(id: string, x?: number, y?: number) {
         super(id, x, y);
@@ -14,6 +16,7 @@ export class Place extends Element {
         this._amountToken = 0; //Default sind keine Marken gesetzt
         this._children = []; 
         this._label = id;
+     
     }
 
     get radius(): number {

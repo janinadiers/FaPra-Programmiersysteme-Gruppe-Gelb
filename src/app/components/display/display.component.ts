@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, OnInit, OnDestroy, Output, ViewChild, untracked} from '@angular/core';
 import {DisplayService} from '../../services/display.service';
-import {catchError, of, Subscription, take} from 'rxjs';
+import { catchError, of, Subscription, take, BehaviorSubject } from 'rxjs';
 import {SvgService} from '../../services/svg.service';
 import {Diagram} from '../../classes/diagram/diagram';
 import {ExampleFileComponent} from "../example-file/example-file.component";
@@ -35,7 +35,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
-            console.log(this._diagram.places, this._diagram.transitions, this._diagram.lines);
             
             this.draw();
         });

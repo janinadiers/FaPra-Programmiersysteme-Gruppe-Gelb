@@ -1,3 +1,6 @@
+import { BehaviorSubject, Observable} from 'rxjs';
+import { Coords } from '../json-petri-net';
+
 
 export class Element {
     private readonly _id: string;
@@ -5,12 +8,24 @@ export class Element {
     private _y: number;
     private _svgElement: SVGElement | undefined;
     private isDragging = false;
+    private positionChange = new BehaviorSubject<Coords>({x: 0, y: 0});
     
 
     constructor(id: string, x?: number , y?: number) {
         this._id = id;
         this._x = x ?? 0;
         this._y = y ?? 0;
+        this.updatePosition({x: this._x, y: this._y});
+    }
+
+    // Method to update position
+    updatePosition(newPosition: Coords) {
+        this.positionChange.next(newPosition);
+        // Update SVG element or any other necessary logic
+    }
+
+    getPositionChangeObservable(): Observable<Coords> {
+        return this.positionChange.asObservable();
     }
 
     get id(): string {
@@ -76,9 +91,7 @@ export class Element {
         //this._svgElement.setAttribute('fill', 'black');
         if (this.isDragging) {
             this.isDragging = false;
-          
-            
-            console.log('Stopped dragging');
+
         }
     }
 
@@ -93,8 +106,6 @@ export class Element {
         const mouseX = event.clientX - svgContainer!.left;
         const mouseY = event.clientY - svgContainer!.top;
         if (this.isDragging) {
-            // Your logic to handle dragging
-            console.log('Element is being dragged');
             
             this.x = mouseX;
             this.y = mouseY;
@@ -104,9 +115,15 @@ export class Element {
                 this.svgElement.setAttribute('cy', this.y.toString());
             }
             else if(this.svgElement && this.svgElement instanceof SVGRectElement){
+                let transitionWidth = parseInt(this.svgElement.getAttribute('width')!);
+                let transitionHeight = parseInt(this.svgElement.getAttribute('height')!);
+                this.x = this.x - transitionWidth / 2;
+                this.y = this.y - transitionHeight / 2;
                 this.svgElement.setAttribute('x', this.x.toString());
                 this.svgElement.setAttribute('y', this.y.toString());
             }
+
+            this.updatePosition({x: this.x, y: this.y});
             
             
            

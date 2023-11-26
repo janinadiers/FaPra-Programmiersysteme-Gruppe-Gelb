@@ -1,53 +1,53 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Coords } from '../json-petri-net';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 
 
-export class Line {
+export class Line  {
 
     private readonly _id: string;
-    // private _source: Element;
-    // private _target: Element;
+    private _sourcePosition: Coords | undefined;
+    private _targetPosition: Coords | undefined
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
-    private _source$: BehaviorSubject<Element> = new BehaviorSubject<Element>(new Element(''));
-    private _target$: BehaviorSubject<Element> = new BehaviorSubject<Element>(new Element(''));
+    
 
-    constructor(id: string, source: Element, target: Element, coords?: Coords[]) {
+    constructor(id: string, source$: Observable<Coords>, target$: Observable<Coords>, coords?: Coords[]) {
         this._id = id;
-        this._source$ = new BehaviorSubject<Element>(source);
-        this._target$ = new BehaviorSubject<Element>(target);
         this._tokens = 0;      //Standardmäßig keine Marken
         this._coords = coords;  //undefined if not given
-      
+        source$.subscribe((source) => {
+            this._sourcePosition = source;
+            this.updateSource(source);
+            
+        });
+        target$.subscribe((target) => {
+            this._targetPosition = target;
+            this.updateTarget(target);
+        
+        });
     }
+
 
     get id(): string {
         return this._id;
     }
 
-    // get source(): Element {
-    //     return this._source;
-    // }
+    get source(): Coords | undefined {
+        return this._sourcePosition;
+    }
 
     set source(value: Element) {
-        this._source$ = new BehaviorSubject<Element>(value);
+        this._sourcePosition = value;
     }
 
-    get source(): Element {
-        return this._source$.getValue();
-       
-    }
-
-
-
-    get target(): Element {
-        return this._target$.getValue();
+    get target(): Coords | undefined {
+        return this._targetPosition;
     }
 
     set target(value: Element) {
-        this._target$ = new BehaviorSubject<Element>(value);
+        this._targetPosition = value;
     }
 
     get tokens(): number {
@@ -74,6 +74,24 @@ export class Line {
         this._coords = coods;
     }
 
+    private updateSource(updatedPosition: Coords): void {
+        console.log('updateLine', updatedPosition.x, updatedPosition.y);
+        
+        if(this._svgElement) {
+            this._svgElement.setAttribute('points', (`${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`));
+        }
+
+    }
+
+    private updateTarget(updatedPosition: Coords): void {
+        console.log('updateLine', updatedPosition.x, updatedPosition.y);
+        
+        if(this._svgElement) {
+            this._svgElement.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`));
+        }
+
+    }
+
     //Iterate through found coords and return them as string
     private getCoordsString(): string {
         let result = '';
@@ -87,11 +105,11 @@ export class Line {
 
 
     createSVG() {
-        console.log('Creating SVG', this.source, this.target);
         
+        if(!this._sourcePosition || !this._targetPosition) { throw new Error('Source or target not defined');}
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
-        line.setAttribute('points', (`${this.source.x},${this.source.y} ${this.getCoordsString()}${this.target.x},${this.target.y}`))
+        line.setAttribute('points', (`${this._sourcePosition.x},${this._sourcePosition.y} ${this.getCoordsString()}${this._targetPosition.x},${this._targetPosition.y}`))
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
         line.setAttribute('fill', 'transparent')

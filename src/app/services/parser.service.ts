@@ -64,9 +64,9 @@ export class ParserService {
                 //sourceTarget[0] -> SourceID || sourceTarget[1] -> TargetID
                 const sourceTarget = arc.split(','); 
                 if (arc.startsWith('p')) { //Place
-                    lines.push(new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element));
+// ----------- übergangsweise auskommentiert                    lines.push(new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element));
                 } else { //Transition
-                    lines.push(new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element));
+ // ----------- übergangsweise auskommentiert                    lines.push(new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element));
                 }
                 // arcCounter++;
             }

@@ -8,6 +8,7 @@ import { Place } from '../classes/diagram/place';
 import { Transition } from '../classes/diagram/transition';
 import { Line } from '../classes/diagram/line';
 import { Coords } from '../classes/json-petri-net';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -169,7 +170,8 @@ export class PnmlImportService implements ImportService {
     }
 
     private createEdge(id:string, source:Element, target:Element, coords: Coords[]): Line{
-        const line:Line = new Line(id, source, target);
+        
+        const line:Line = new Line(id, new BehaviorSubject(source).asObservable(), new BehaviorSubject(target).asObservable());
         line.coords = coords;
         line.createSVG();
         return line;
