@@ -113,7 +113,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
             console.debug('drawing area not ready yet')
             return;
         }
-        console.log('draw');
         
         this.clearDrawingArea();
 

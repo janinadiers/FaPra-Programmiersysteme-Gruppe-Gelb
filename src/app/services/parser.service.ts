@@ -12,9 +12,6 @@ import { Transition } from '../classes/diagram/transition';
 })
 export class ParserService {
 
-    constructor() {
-    }
-
     parse(text: string): Diagram | undefined {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
