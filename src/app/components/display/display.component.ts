@@ -207,14 +207,14 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
-
+           
             let svgCircle = this.drawCircle(mouseX ,mouseY)
             svgElement.appendChild(svgCircle);
 
         }
 
         else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
-
+           
             let svgRect = this.drawRect(mouseX, mouseY);
             svgElement.appendChild(svgRect);
         }
@@ -274,11 +274,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
         const width = rectObject.width;
         const height = rectObject.height;
         let svgRect = rectObject.createSVG();
-        // Anpassen der Koord. des SVGRects, damit es von der Mitte aufgezogen wird
-        const x = mouseX - width / 2;
-        const y = mouseY - height / 2;
-        svgRect.setAttribute('x', x.toString());
-        svgRect.setAttribute('y', y.toString());
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement = svgRect;
         svgRect.addEventListener('click', () => {

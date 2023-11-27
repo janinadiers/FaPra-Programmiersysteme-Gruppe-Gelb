@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable} from 'rxjs';
 import { Coords } from '../json-petri-net';
+import { Diagram } from './diagram';
 
 export class Element  {
     private readonly _id: string;
@@ -9,13 +10,14 @@ export class Element  {
     private _isDragging = false;
     private _positionChange$: BehaviorSubject<Coords>;
     
+    
 
     constructor(id: string, x: number , y: number) {
         this._id = id;
         this._x = x 
         this._y = y
         this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
- 
+       
     }
 
 
@@ -78,13 +80,20 @@ export class Element  {
         }
     }
 
+   
     private processMouseDown(event: MouseEvent) {
        
         
         if (this._svgElement === undefined) {
             return;
         }
+        
+        if(Diagram.toolbarIsActive){
+            return;
+        }
         this._isDragging = true;
+        
+        
         
     }
 
@@ -101,6 +110,8 @@ export class Element  {
     }
 
     private processMouseMove(event: MouseEvent) {
+        
+        
         if (this._svgElement === undefined) {
             return;
         }
@@ -114,20 +125,24 @@ export class Element  {
             
             this.x = mouseX;
             this.y = mouseY;
-            
-            if(this.svgElement && this.svgElement instanceof SVGCircleElement){
-                this.svgElement.setAttribute('cx', this.x.toString());
-                this.svgElement.setAttribute('cy', this.y.toString());
-            }
-            else if(this.svgElement && this.svgElement instanceof SVGRectElement){
-                let transitionWidth = parseInt(this.svgElement.getAttribute('width')!);
-                let transitionHeight = parseInt(this.svgElement.getAttribute('height')!);
-                
-                this.svgElement.setAttribute('x', (this.x - transitionWidth / 2).toString());
-                this.svgElement.setAttribute('y', (this.y - transitionHeight / 2).toString());
-            }
-   
            
+            this.svgElement?.childNodes.forEach((node) => {
+              
+                if(node instanceof SVGCircleElement){
+                    console.log('circle element');
+                    
+                    this.svgElement?.setAttribute('transform', `translate(${this.x}, ${this.y})`);
+                }
+                else if(node instanceof SVGRectElement){
+                    console.log('rect element');
+                    
+                    let transitionWidth = parseInt(node.getAttribute('width')!);
+                    let transitionHeight = parseInt(node.getAttribute('height')!);
+                    
+                    this.svgElement?.setAttribute('transform', `translate(${this.x - transitionWidth / 2}, ${this.y - transitionHeight / 2})`);
+                }
+            });
+ 
         }
     }
 

@@ -17,6 +17,8 @@ export class Diagram {
     idLineCount: number = 0;
     lightningCount: number = 0;
 
+    static toolbarIsActive = false;
+
 
     constructor(places: Array<Place>, transitions: Array<Transition>, lines?: Array<Line>) {
         this._places = places;

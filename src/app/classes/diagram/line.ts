@@ -13,13 +13,17 @@ export class Line  {
     private _coords?: Coords[];
     
 
-    constructor(id: string, source: Element, target: Element, coords?: Coords[]) {
+    constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
-        this._tokens = 0;      //Standardmäßig keine Marken
+        this._source = source;
+        this._target = target;
+        this._tokens = tokens ?? 0;      //Standardmäßig keine Marken
         this._coords = coords;  //undefined if not given
         this._source = source;
         this._target = target;
-        
+        this._sourcePosition = {x: source.x, y: source.y};
+        this._targetPosition = {x: target.x, y: target.y};
+
         source.getPositionChangeObservable().subscribe((source) => {
             this.updateSource({x: source.x, y: source.y});
             
@@ -70,9 +74,14 @@ export class Line  {
     }
 
     private updateSource(updatedPosition: Coords): void {
+        console.log('updateSource', updatedPosition);
         
         if(this._svgElement) {
-            this._svgElement.setAttribute('points', (`${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`));
+            console.log('svgElement', this._svgElement);
+           console.log(this._svgElement.childNodes[0]);
+            if(this._svgElement.childNodes[0] instanceof SVGElement) {
+                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+            }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
 
@@ -81,9 +90,14 @@ export class Line  {
     }
 
     private updateTarget(updatedPosition: Coords): void {
+        console.log('updateTarget', updatedPosition);
         
         if(this._svgElement) {
-            this._svgElement.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`));
+            console.log('svgElement', this._svgElement);
+            console.log(this._svgElement.childNodes[0]);
+            if (this._svgElement.childNodes[0] instanceof SVGElement) {
+                this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
+            }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
         
@@ -101,18 +115,86 @@ export class Line  {
         return result;
     }
 
+    private calcMidCoords(): Coords {
+        let midCoords: Coords = {x: -50000, y: -50000}; //Placeholder to define Coords variable
+
+        if (this._coords) {
+            //Calc mid coord of the polyline (Sum the distances between each pair of consecutive points in the polyline)
+            let totalLength = 0;
+            let lastX = this._source.x;
+            let lastY = this._source.y;
+            this._coords.forEach(coord => {
+                totalLength += Math.hypot(coord.x - lastX, coord.y - lastY);
+                lastX = coord.x;
+                lastY = coord.y;
+            });
+            totalLength += Math.hypot(this._target.x - lastX, this._target.y - lastY);
+        
+            //Find the midpoint (Traverse the polyline until the accumulated length is half of the total length)
+            let accumulatedLength = 0;
+            lastX = this._source.x;
+            lastY = this._source.y;
+            for (let i = 0; i < this._coords.length; i++) {
+                const coord = this._coords[i];
+                const segmentLength = Math.hypot(coord.x - lastX, coord.y - lastY);
+                if (accumulatedLength + segmentLength >= totalLength / 2) {
+                    const ratio = (totalLength / 2 - accumulatedLength) / segmentLength;
+                    midCoords.x = lastX + ratio * (coord.x - lastX);
+                    midCoords.y = lastY + ratio * (coord.y - lastY);
+                    return midCoords;
+                }
+                accumulatedLength += segmentLength;
+                lastX = coord.x;
+                lastY = coord.y;
+            }
+        }
+        
+        midCoords.x = (this._source.x + this._target.x) / 2;
+        midCoords.y = (this._source.y + this._target.y) / 2;
+
+        return midCoords;
+    }
 
     createSVG() {
-        
-        if(!this._sourcePosition || !this._targetPosition) { throw new Error('Source or target not defined');}
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('id', this._id.toString());
+
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        console.log('coords', this.getCoordsString(), this._sourcePosition?.x, this._sourcePosition?.y, this._targetPosition?.x, this._targetPosition?.y);
+        
         line.setAttribute('id', this._id.toString());
-        line.setAttribute('points', (`${this._sourcePosition.x},${this._sourcePosition.y} ${this.getCoordsString()}${this._targetPosition.x},${this._targetPosition.y}`))
+        line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
         line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', '1');       
-        line.setAttribute('fill', 'transparent')
-        this._svgElement = line;
-        return line;
+        line.setAttribute('stroke-width', '1');
+        line.setAttribute('fill', 'transparent');
+        group.appendChild(line);
+
+        //Get mid coord of Polyline
+        const midCoords = this.calcMidCoords();
+
+        //Create background circle
+        const backgroundCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        backgroundCircle.setAttribute('cx', midCoords.x.toString());
+        backgroundCircle.setAttribute('cy', midCoords.y.toString()); 
+        backgroundCircle.setAttribute('r', '8');  
+        if (this._tokens > 0)
+            backgroundCircle.setAttribute('fill', 'white');
+        else 
+            backgroundCircle.setAttribute('fill', 'transparent');
+        group.appendChild(backgroundCircle);
+
+
+        const token = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        token.setAttribute('x', midCoords.x.toString());
+        token.setAttribute('y', midCoords.y.toString());
+        token.setAttribute('text-anchor', 'middle');
+        token.setAttribute('dy', '.3em');
+        if (this._tokens > 0)
+            token.textContent = this._tokens.toString();
+        group.appendChild(token);
+
+        this._svgElement = group;
+        return group;
     }
 
     // Might be needed for "Markenspiel"
