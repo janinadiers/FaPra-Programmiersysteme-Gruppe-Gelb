@@ -113,15 +113,22 @@ export class DisplayComponent implements OnInit, OnDestroy {
             console.debug('drawing area not ready yet')
             return;
         }
-
+        console.log('draw');
+        
         this.clearDrawingArea();
 
-        const elements = this._svgService.createSvgElements(this._displayService.diagram);
         let groupedElements = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         groupedElements.setAttribute('id', 'groupedSvgDiagram');
-        for (const element of elements) {
-            groupedElements.appendChild(element);
+        if(this._diagram){
+            [...this._diagram.lines, ...this._diagram.places, ...this._diagram.transitions].forEach(element => {
+           
+                groupedElements.appendChild(element.svgElement!);
+           
+            });
+            
         }
+      
+        
         this.drawingArea.nativeElement.appendChild(groupedElements);
     }
 

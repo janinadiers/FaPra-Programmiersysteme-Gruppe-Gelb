@@ -1,6 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Coords } from '../json-petri-net';
-import {Observable} from 'rxjs';
+import {Subscription} from 'rxjs';
 
 
 export class Line  {
@@ -8,6 +8,8 @@ export class Line  {
     private readonly _id: string;
     private _sourcePosition: Coords | undefined;
     private _targetPosition: Coords | undefined;
+    //private _sourceSubscription: Subscription;
+    //private _targetSubscription: Subscription;
     private _source : Element | undefined;
     private _target : Element | undefined;
     private _tokens: number;
@@ -21,18 +23,29 @@ export class Line  {
         this._coords = coords;  //undefined if not given
         this._source = source;
         this._target = target;
+        this._sourcePosition = {x: source.x, y: source.y};
+        this._targetPosition = {x: target.x, y: target.y};
+        
+        
         source.getPositionChangeObservable().subscribe((source) => {
-            this._sourcePosition = source;
-            this.updateSource(source);
+            
+            console.log('Subscription triggered with data:', source);
+            this.updateSource({x: source.x, y: source.y});
             
         });
         target.getPositionChangeObservable().subscribe((target) => {
-            this._targetPosition = target;
-            this.updateTarget(target);
+            console.log('Subscription triggered with data:', target);
+            
+            this.updateTarget({x: target.x, y: target.y});
+           
         
         });
     }
 
+    // public cleanup() {
+    //     this._sourceSubscription.unsubscribe();
+    //     this._targetSubscription.unsubscribe();
+    // }
 
     get id(): string {
         return this._id;
@@ -42,17 +55,17 @@ export class Line  {
         return this._source;
     }
 
-    set source(value: Element) {
-        this._source = value;
-    }
+    // set source(value: Element) {
+    //     this._source = value;
+    // }
 
     get target(): Element| undefined {
         return this._target;
     }
 
-    set target(value: Element) {
-        this._target = value;
-    }
+    // set target(value: Element) {
+    //     this._target = value;
+    // }
 
     get tokens(): number {
         return this._tokens;
@@ -79,20 +92,25 @@ export class Line  {
     }
 
     private updateSource(updatedPosition: Coords): void {
-        console.log('updateLine', updatedPosition.x, updatedPosition.y);
+        console.log('updateSource', updatedPosition.x, updatedPosition.y);
         
         if(this._svgElement) {
             this._svgElement.setAttribute('points', (`${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`));
+            this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
+
+        
 
     }
 
     private updateTarget(updatedPosition: Coords): void {
-        console.log('updateLine', updatedPosition.x, updatedPosition.y);
+        console.log('updateTarget', updatedPosition.x, updatedPosition.y);
         
         if(this._svgElement) {
             this._svgElement.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`));
+            this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
+        
 
     }
 
@@ -109,6 +127,7 @@ export class Line  {
 
 
     createSVG() {
+        console.log('source and target position', this._sourcePosition, this._targetPosition);
         
         if(!this._sourcePosition || !this._targetPosition) { throw new Error('Source or target not defined');}
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');

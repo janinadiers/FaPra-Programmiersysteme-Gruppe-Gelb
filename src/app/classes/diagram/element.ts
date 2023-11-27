@@ -1,31 +1,33 @@
 import { BehaviorSubject, Observable} from 'rxjs';
 import { Coords } from '../json-petri-net';
 
-
-export class Element {
+export class Element  {
     private readonly _id: string;
     private _x: number;
     private _y: number;
     private _svgElement: SVGElement | undefined;
-    private isDragging = false;
-    private positionChange = new BehaviorSubject<Coords>({x: 0, y: 0});
+    private _isDragging = false;
+    private _positionChange$: BehaviorSubject<Coords>;
     
 
-    constructor(id: string, x?: number , y?: number) {
+    constructor(id: string, x: number , y: number) {
         this._id = id;
-        this._x = x ?? 0;
-        this._y = y ?? 0;
-        this.updatePosition({x: this._x, y: this._y});
+        this._x = x 
+        this._y = y
+        this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
+ 
     }
 
-    // Method to update position
+
     updatePosition(newPosition: Coords) {
-        this.positionChange.next(newPosition);
-        // Update SVG element or any other necessary logic
+        
+        this._positionChange$.next(newPosition);  
+        
     }
 
     getPositionChangeObservable(): Observable<Coords> {
-        return this.positionChange.asObservable();
+        
+        return this._positionChange$.asObservable();
     }
 
     get id(): string {
@@ -37,7 +39,10 @@ export class Element {
     }
 
     set x(value: number) {
+        console.log('set x', value);
         this._x = value;
+        this.updatePosition({x: value, y: this._y});
+       
     }
 
     get y(): number {
@@ -45,7 +50,11 @@ export class Element {
     }
 
     set y(value: number) {
+        console.log('set y', value);
+        
         this._y = value;
+        this.updatePosition({x: this._x, y: value});
+       
     }
 
     get svgElement(): SVGElement | undefined {
@@ -73,12 +82,12 @@ export class Element {
     }
 
     private processMouseDown(event: MouseEvent) {
-        console.log('Mouse down');
+       
         
         if (this._svgElement === undefined) {
             return;
         }
-        this.isDragging = true;
+        this._isDragging = true;
         //this._svgElement.setAttribute('fill', 'red');
     }
 
@@ -86,11 +95,11 @@ export class Element {
         if (this._svgElement === undefined) {
             return;
         }
-        console.log('Mouse up');
+       
         
         //this._svgElement.setAttribute('fill', 'black');
-        if (this.isDragging) {
-            this.isDragging = false;
+        if (this._isDragging) {
+            this._isDragging = false;
 
         }
     }
@@ -105,7 +114,7 @@ export class Element {
         // Berechnung der Maus Koordinanten relativ zum SVG Element
         const mouseX = event.clientX - svgContainer!.left;
         const mouseY = event.clientY - svgContainer!.top;
-        if (this.isDragging) {
+        if (this._isDragging) {
             
             this.x = mouseX;
             this.y = mouseY;
@@ -117,15 +126,11 @@ export class Element {
             else if(this.svgElement && this.svgElement instanceof SVGRectElement){
                 let transitionWidth = parseInt(this.svgElement.getAttribute('width')!);
                 let transitionHeight = parseInt(this.svgElement.getAttribute('height')!);
-                this.x = this.x - transitionWidth / 2;
-                this.y = this.y - transitionHeight / 2;
-                this.svgElement.setAttribute('x', this.x.toString());
-                this.svgElement.setAttribute('y', this.y.toString());
+                
+                this.svgElement.setAttribute('x', (this.x - transitionWidth / 2).toString());
+                this.svgElement.setAttribute('y', (this.y - transitionHeight / 2).toString());
             }
-
-            this.updatePosition({x: this.x, y: this.y});
-            
-            
+   
            
         }
     }

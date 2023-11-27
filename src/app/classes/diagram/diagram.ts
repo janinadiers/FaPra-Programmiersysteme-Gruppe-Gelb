@@ -25,6 +25,8 @@ export class Diagram {
         this._transitions = transitions;
         this._lines = lines ?? [];
         this._order = [];
+        // console.log('Diagram constructor', this._places, this._transitions, this._lines);
+        
     }
 
     get places(): Array<Place> {
