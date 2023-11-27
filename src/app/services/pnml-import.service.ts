@@ -8,7 +8,7 @@ import { Place } from '../classes/diagram/place';
 import { Transition } from '../classes/diagram/transition';
 import { Line } from '../classes/diagram/line';
 import { Coords } from '../classes/json-petri-net';
-import { BehaviorSubject } from 'rxjs';
+
 
 @Injectable({
     providedIn: 'root',

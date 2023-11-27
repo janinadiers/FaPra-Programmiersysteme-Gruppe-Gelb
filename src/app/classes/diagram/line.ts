@@ -6,8 +6,8 @@ export class Line  {
     private readonly _id: string;
     private _sourcePosition: Coords | undefined;
     private _targetPosition: Coords | undefined;
-    private _source : Element | undefined;
-    private _target : Element | undefined;
+    private _source : Element;
+    private _target : Element;
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
@@ -19,9 +19,6 @@ export class Line  {
         this._coords = coords;  //undefined if not given
         this._source = source;
         this._target = target;
-        this._sourcePosition = {x: source.x, y: source.y};
-        this._targetPosition = {x: target.x, y: target.y};
-        
         
         source.getPositionChangeObservable().subscribe((source) => {
             this.updateSource({x: source.x, y: source.y});
@@ -38,12 +35,12 @@ export class Line  {
         return this._id;
     }
 
-    get source(): Element | undefined {
+    get source(): Element {
         return this._source;
     }
 
 
-    get target(): Element| undefined {
+    get target(): Element {
         return this._target;
     }
 

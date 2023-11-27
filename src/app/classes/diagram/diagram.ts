@@ -5,7 +5,6 @@ import { Transition } from './transition';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export class Diagram {
-    // private readonly _elements: Array<Element>;
     private readonly _places: Array<Place>;
     private readonly _transitions: Array<Transition>;
     private readonly _lines: Array<Line>;
@@ -25,8 +24,7 @@ export class Diagram {
         this._transitions = transitions;
         this._lines = lines ?? [];
         this._order = [];
-        // console.log('Diagram constructor', this._places, this._transitions, this._lines);
-        
+         
     }
 
     get places(): Array<Place> {

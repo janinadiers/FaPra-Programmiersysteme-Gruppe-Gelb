@@ -25,7 +25,7 @@ export class ParserService {
                 
                 return new Diagram(places, transitions, lines);
             }
-            return
+            return undefined;
             
         } catch (e) {
             console.error('Error while parsing JSON', e, text);
