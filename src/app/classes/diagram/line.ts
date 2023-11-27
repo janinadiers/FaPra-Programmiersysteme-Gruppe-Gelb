@@ -10,6 +10,7 @@ export class Line {
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
+    private _marker: SVGElement | undefined;
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[]) {
         this._id = id;
@@ -76,15 +77,45 @@ export class Line {
 
 
     createSVG() {
-        
+        // Polyline
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
-        line.setAttribute('points', (`${this._source.x},${this._source.y} ${this.getCoordsString()}${this._target.x},${this._target.y}`))
+        line.setAttribute('points', `${this._source.x},${this._source.y} ${this.getCoordsString()} ${this._target.x},${this._target.y}`);
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
-        line.setAttribute('fill', 'transparent')
+        line.setAttribute('fill', 'transparent');
         this._svgElement = line;
+    
+        // Marker
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        marker.setAttribute('id', `arrowhead-${this._id}`);
+        marker.setAttribute('markerWidth', '10');
+        marker.setAttribute('markerHeight', '10');
+        marker.setAttribute('refX', '35');
+        marker.setAttribute('refY', '5');
+        marker.setAttribute('orient', 'auto-start-reverse');
+        marker.setAttribute('markerUnits', 'strokeWidth');
+    
+        // Path Element für Pfeilspitze
+        const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
+        arrowhead.setAttribute('fill', 'black');
+    
+        marker.appendChild(arrowhead);
+
+        this._marker = marker;
+        document.querySelector('svg')?.appendChild(marker);
+
+        const markerId = `url(#arrowhead-${this._id})`;
+        line.setAttribute('marker-end', markerId);
+    
         return line;
+    }
+
+    updateMarker(x: number){
+
+        this._marker?.setAttribute('refX', x.toString());
+
     }
 
     // Might be needed for "Markenspiel"

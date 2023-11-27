@@ -38,31 +38,8 @@ export class Element {
         this._svgElement = svgElement;
     }
 
-
-
     public registerSvg(svg: SVGElement) {
-        
         this._svgElement = svg;
-        this._svgElement.onmousedown = (event) => {
-            this.processMouseDown(event);
-        };
-        this._svgElement.onmouseup = (event) => {
-            this.processMouseUp(event);
-        };
-    }
-
-    private processMouseDown(event: MouseEvent) {
-        if (this._svgElement === undefined) {
-            return;
-        }
-        this._svgElement.setAttribute('fill', 'red');
-    }
-
-    private processMouseUp(event: MouseEvent) {
-        if (this._svgElement === undefined) {
-            return;
-        }
-        this._svgElement.setAttribute('fill', 'black');
     }
 
     public createSVG(name: string): SVGElement {

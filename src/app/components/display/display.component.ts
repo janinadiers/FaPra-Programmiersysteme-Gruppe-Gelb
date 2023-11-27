@@ -312,6 +312,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
                 if(!lineObject){ throw new Error("LineObject is undefined")}
                 lineObject.createSVG();
+                lineObject.updateMarker(26);
                
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
@@ -327,7 +328,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
     }
 
-
+    
     onCircleSelect(circle: SVGElement){
         this._diagram!.selectedCircle = circle;
         if (this._diagram?.selectedRect) {
