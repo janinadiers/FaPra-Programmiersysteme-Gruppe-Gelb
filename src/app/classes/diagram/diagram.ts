@@ -47,17 +47,17 @@ export class Diagram {
     }
 
     pushPlace(place: Place): void {
-        console.log('pushPlace');
+        
         this._places.push(place);
     }
 
     pushTransition(transition: Transition): void {
-        console.log('pushTransition');
+        
         this._transitions.push(transition);
     }
 
     pushLine(line: Line): void {
-        console.log('pushLine');
+       
         this._lines.push(line);
     }
 

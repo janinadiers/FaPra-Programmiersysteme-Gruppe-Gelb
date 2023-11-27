@@ -39,7 +39,6 @@ export class Element  {
     }
 
     set x(value: number) {
-        console.log('set x', value);
         this._x = value;
         this.updatePosition({x: value, y: this._y});
        
@@ -50,8 +49,6 @@ export class Element  {
     }
 
     set y(value: number) {
-        console.log('set y', value);
-        
         this._y = value;
         this.updatePosition({x: this._x, y: value});
        
