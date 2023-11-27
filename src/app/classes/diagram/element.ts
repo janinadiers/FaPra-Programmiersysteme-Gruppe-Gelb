@@ -85,7 +85,7 @@ export class Element  {
             return;
         }
         this._isDragging = true;
-        //this._svgElement.setAttribute('fill', 'red');
+        
     }
 
     private processMouseUp(event: MouseEvent) {
@@ -94,7 +94,6 @@ export class Element  {
         }
        
         
-        //this._svgElement.setAttribute('fill', 'black');
         if (this._isDragging) {
             this._isDragging = false;
 

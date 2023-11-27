@@ -1,8 +1,7 @@
-import {Element} from './element';
+
 import {Line} from './line';
 import { Place } from './place';
 import { Transition } from './transition';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 export class Diagram {
     private readonly _places: Array<Place>;
