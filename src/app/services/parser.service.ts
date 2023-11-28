@@ -19,8 +19,8 @@ export class ParserService {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
 
-            const places = this.parsePlaces(rawData['places']);
-            const transitions = this.parseTransitions(rawData['transitions']);
+            const places = this.parsePlaces(rawData['places'], rawData['marking'] as JsonPetriNet['marking']);
+            const transitions = this.parseTransitions(rawData['transitions'], rawData['labels'] as JsonPetriNet['labels']);
             
             const arcs = rawData['arcs'] as JsonPetriNet['arcs'];
            
@@ -29,9 +29,8 @@ export class ParserService {
             this.setPosition(transitions, rawData['layout']);
 
             //Set Lines from Layout Array
-            const lines = this.setLines(rawData['layout'], places, transitions, arcs)
+            const lines = this.setLines(rawData['layout'], places, transitions, arcs);
             
-
             return new Diagram(places, transitions, lines);
         } catch (e) {
             console.error('Error while parsing JSON', e, text);
@@ -39,20 +38,20 @@ export class ParserService {
         }
     }
 
-    private parsePlaces(placeIds: Array<string> | undefined): Array<Place> {
-        if (placeIds === undefined || !Array.isArray(placeIds)) {
+    private parsePlaces(placeIds: Array<string> | undefined, marking: JsonPetriNet['marking'] | undefined): Array<Place> {
+        if (placeIds === undefined || !Array.isArray(placeIds) || marking === undefined) {
             return [];
         }
         //Create temporary Element-Object without coords
-        return placeIds.map(pid => new Place(pid));
+        return placeIds.map(pid => new Place(pid, undefined, undefined, marking[pid]));
     }
 
-    private parseTransitions(transitionIds: Array<string> | undefined): Array<Transition> {
-        if (transitionIds === undefined || !Array.isArray(transitionIds)) {
+    private parseTransitions(transitionIds: Array<string> | undefined, labels: JsonPetriNet['labels'] | undefined): Array<Transition> {
+        if (transitionIds === undefined || !Array.isArray(transitionIds) || labels === undefined) {
             return [];
         }
         //Create temporary Element-Object without coords
-        return transitionIds.map(tid => new Transition(tid));
+        return transitionIds.map(tid => new Transition(tid, undefined, undefined, labels[tid]));
     }
 
     private setLines(layout: JsonPetriNet['layout'], places: Array<Place>, transitions: Array<Transition>, arcs: JsonPetriNet['arcs']): Array<Line> {
@@ -64,9 +63,9 @@ export class ParserService {
                 //sourceTarget[0] -> SourceID || sourceTarget[1] -> TargetID
                 const sourceTarget = arc.split(','); 
                 if (arc.startsWith('p')) { //Place
-                    lines.push(new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element));
+                    lines.push(new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element, undefined, arcs[arc]));
                 } else { //Transition
-                    lines.push(new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element));
+                    lines.push(new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element, undefined, arcs[arc]));
                 }
                 // arcCounter++;
             }
