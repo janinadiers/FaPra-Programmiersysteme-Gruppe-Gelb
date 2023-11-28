@@ -12,7 +12,7 @@ export class Place extends Element {
         super(id, x, y);
         this._radius = 25; // Default Radius
         this._amountToken = amountToken ?? 0; //Default sind keine Marken gesetzt
-        this._children = []; 
+        this._children = [];
         this._label = id;
     }
 
@@ -56,11 +56,11 @@ export class Place extends Element {
         const circle = super.createSVG('circle');
         circle.setAttribute('id', this._label.toString());
         circle.setAttribute('cx', this.x.toString());
-        circle.setAttribute('cy', this.y.toString()); 
-        circle.setAttribute('r', this._radius.toString());  
-        circle.setAttribute('fill', 'white'); 
-        circle.setAttribute('stroke', 'black'); 
-        circle.setAttribute('stroke-width', '2'); 
+        circle.setAttribute('cy', this.y.toString());
+        circle.setAttribute('r', this._radius.toString());
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', 'black');
+        circle.setAttribute('stroke-width', '2');
         group.appendChild(circle);
 
         //Marker
@@ -72,7 +72,7 @@ export class Place extends Element {
         if (this._amountToken > 0)
             marker.textContent = this._amountToken.toString();
         else
-            marker.textContent = '';
+            marker.textContent = '0';
         group.appendChild(marker);
 
         //Text

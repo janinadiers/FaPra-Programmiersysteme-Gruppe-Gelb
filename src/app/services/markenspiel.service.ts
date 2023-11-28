@@ -39,7 +39,6 @@ export class MarkenspielService {
             let idNumber = +this._diagram.selectedCircle.id.charAt(1);
             this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
 
-
             return this._diagram?.selectedCircle?.id
         }
 
@@ -60,6 +59,8 @@ export class MarkenspielService {
 
             let idNumber = +this._diagram.selectedCircle.id.charAt(1);
             this._diagram.places[idNumber].amountToken++;
+            this._diagram.places[idNumber].svgElement!.children[1].textContent =
+                this._diagram.places[idNumber].amountToken.toString();
 
             return;
         }
@@ -75,6 +76,9 @@ export class MarkenspielService {
             if(this._diagram.places[idNumber].amountToken  < 0) {
                 this._diagram.places[idNumber].amountToken = 0;
             }
+
+            this._diagram.places[idNumber].svgElement!.children[1].textContent =
+                this._diagram.places[idNumber].amountToken.toString();
 
             return;
         }
@@ -96,8 +100,7 @@ export class MarkenspielService {
             // ist in die Display-Component zu OnLineSelect gewandert
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
-            this._diagram.lines[idNumber].svgElement?.setAttribute('stroke','red');
-
+            this._diagram.lines[idNumber].svgElement?.setAttribute('stroke','blue');
 
             return this._diagram?.selectedLine?.id;
         }
@@ -120,6 +123,9 @@ export class MarkenspielService {
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
             this._diagram.lines[idNumber].tokens++;
 
+            this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
+                this._diagram.lines[idNumber].tokens.toString();
+
             return;
         }
 
@@ -135,7 +141,9 @@ export class MarkenspielService {
                 this._diagram.lines[idNumber].tokens = 0;
             }
 
+            this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
+                this._diagram.lines[idNumber].tokens.toString();
+
             return;
         }
-
 }
