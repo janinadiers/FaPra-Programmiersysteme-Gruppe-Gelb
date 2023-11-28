@@ -74,11 +74,8 @@ export class Line  {
     }
 
     private updateSource(updatedPosition: Coords): void {
-        console.log('updateSource', updatedPosition);
         
         if(this._svgElement) {
-            console.log('svgElement', this._svgElement);
-           console.log(this._svgElement.childNodes[0]);
             if(this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
             }
@@ -90,11 +87,8 @@ export class Line  {
     }
 
     private updateTarget(updatedPosition: Coords): void {
-        console.log('updateTarget', updatedPosition);
         
         if(this._svgElement) {
-            console.log('svgElement', this._svgElement);
-            console.log(this._svgElement.childNodes[0]);
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
@@ -159,9 +153,7 @@ export class Line  {
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        console.log('coords', this.getCoordsString(), this._sourcePosition?.x, this._sourcePosition?.y, this._targetPosition?.x, this._targetPosition?.y);
-        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');        
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
         line.setAttribute('stroke', 'black');

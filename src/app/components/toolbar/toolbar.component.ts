@@ -61,6 +61,13 @@ export class ToolbarComponent {
     this.activeButtonService.boltButtonActive();
   }
 
+ 
+
+  onZoomButtonClick (id:string) {
+    this.activeButtonService.zoomButtonClick(id);
+  }
+
+  
   onButtonClick(buttonId: string){
     this.activeButtonService.sendButtonClick(buttonId);
   }

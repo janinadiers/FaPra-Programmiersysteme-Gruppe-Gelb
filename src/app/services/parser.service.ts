@@ -69,24 +69,20 @@ export class ParserService {
     private createLines(layout: JsonPetriNet['layout'], places: Array<Place>, transitions: Array<Transition>, arcs: JsonPetriNet['arcs']): Array<Line> {
         const lines: Array<Line> = [];
         
-        
         if (arcs) {
            
             for (const arc in arcs) {
-                console.log('kjslfajfl', arcs[arc]);
                 
                 //sourceTarget[0] -> SourceID || sourceTarget[1] -> TargetID
                 const sourceTarget = arc.split(','); 
                 if (arc.startsWith('p')) { //Place
                     const line = new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element, undefined, arcs[arc]);
                     line.createSVG();
-                    console.log('line', line);
                     
                     lines.push(line);
                 } else { //Transition
                     const line = new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element, undefined, arcs[arc]);
                     line.createSVG();
-                    console.log('line', line);
                     
                     lines.push(line);
                 }

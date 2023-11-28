@@ -12,6 +12,11 @@ export class ActivebuttonService {
   isRectangleButtonActive: boolean = false;
   isArrowButtonActive: boolean = false;
   isBoltButtonActive: boolean = false;
+
+    //Observable für Delete-Button und Zoom-Button
+
+private buttonClickSubject = new Subject<string>();
+private zoomButtonClickSubject = new Subject<string>();
   
   RectangleButtonActive() {
     this.isCircleButtonActive = false;
@@ -45,15 +50,20 @@ export class ActivebuttonService {
     Diagram.toolbarIsActive = this.isBoltButtonActive;
   }
 
-  //Observable für Delete-Button
 
-private buttonClickSubject = new Subject<string>();
+  zoomButtonClick(buttonId: string) {
+    this.zoomButtonClickSubject.next(buttonId);
+  }
+    
+  zoomButtonClickObservable() {
+    return this.zoomButtonClickSubject.asObservable();
+  }
 
-sendButtonClick(buttonId: string) {
-  this.buttonClickSubject.next(buttonId);
-}
+  sendButtonClick(buttonId: string) {
+    this.buttonClickSubject.next(buttonId);
+  }
 
-getButtonClickObservable() {
-  return this.buttonClickSubject.asObservable();
-}
+  getButtonClickObservable() {
+    return this.buttonClickSubject.asObservable();
+  }
 }

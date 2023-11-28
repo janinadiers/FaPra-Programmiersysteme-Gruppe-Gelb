@@ -10,8 +10,6 @@ export class Element  {
     private _isDragging = false;
     private _positionChange$: BehaviorSubject<Coords>;
     
-    
-
     constructor(id: string, x: number , y: number) {
         this._id = id;
         this._x = x 
@@ -19,7 +17,6 @@ export class Element  {
         this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
        
     }
-
 
     updatePosition(newPosition: Coords) {
         
@@ -72,9 +69,9 @@ export class Element  {
         this._svgElement.onmousedown = (event) => {
             this.processMouseDown(event);
         };
-        this._svgElement.onmouseup = (event) => {
+        window.addEventListener('mouseup', (event) => {
             this.processMouseUp(event);
-        };
+        });
         this._svgElement.onmousemove = (event) => {
             this.processMouseMove(event);
         }
@@ -83,11 +80,12 @@ export class Element  {
    
     private processMouseDown(event: MouseEvent) {
        
-        
+        event.stopPropagation();
         if (this._svgElement === undefined) {
             return;
         }
         
+        // Wenn Toolbar aktiv, dann kein Dragging
         if(Diagram.toolbarIsActive){
             return;
         }
@@ -98,6 +96,7 @@ export class Element  {
     }
 
     private processMouseUp(event: MouseEvent) {
+        event.stopPropagation();
         if (this._svgElement === undefined) {
             return;
         }
@@ -111,7 +110,7 @@ export class Element  {
 
     private processMouseMove(event: MouseEvent) {
         
-        
+        event.stopPropagation();
         if (this._svgElement === undefined) {
             return;
         }
@@ -123,18 +122,16 @@ export class Element  {
         const mouseY = event.clientY - svgContainer!.top;
         if (this._isDragging) {
             
-            this.x = mouseX;
-            this.y = mouseY;
+            this.x = mouseX * Diagram.zoomFactor;
+            this.y = mouseY * Diagram.zoomFactor;
            
             this.svgElement?.childNodes.forEach((node) => {
               
                 if(node instanceof SVGCircleElement){
-                    console.log('circle element');
                     
                     this.svgElement?.setAttribute('transform', `translate(${this.x}, ${this.y})`);
                 }
                 else if(node instanceof SVGRectElement){
-                    console.log('rect element');
                     
                     let transitionWidth = parseInt(node.getAttribute('width')!);
                     let transitionHeight = parseInt(node.getAttribute('height')!);
