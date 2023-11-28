@@ -312,11 +312,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
                 if(!lineObject){ throw new Error("LineObject is undefined")}
                 lineObject.createSVG();
-                lineObject.updateMarker(26);
                
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
-                    if (svgElement.firstChild){
+                   if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
                     }
                 }
