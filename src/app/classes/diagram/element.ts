@@ -61,10 +61,8 @@ export class Element  {
         this._svgElement = svgElement;
     }
 
-
-
     public registerSvg(svg: SVGElement) {
-        
+
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
             event.stopPropagation();
@@ -146,6 +144,4 @@ export class Element  {
     public createSVG(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
-
-
 }

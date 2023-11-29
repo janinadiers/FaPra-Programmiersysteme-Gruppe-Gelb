@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import { Diagram } from './../../classes/diagram/diagram';
 import { DisplayService } from 'src/app/services/display.service';
+import { MarkenspielService } from "../../services/markenspiel.service";
 
 @Component({
   selector: 'app-toolbar',
@@ -12,10 +13,12 @@ export class ToolbarComponent {
 
   private _diagram: Diagram | undefined;
 
-  constructor(private activeButtonService: ActivebuttonService, 
-              private _displayService: DisplayService) { 
+  constructor(private activeButtonService: ActivebuttonService,
+              private _displayService: DisplayService,
+              public markenspielService: MarkenspielService
+  ) {
   this._displayService.diagram$.subscribe(diagram => {
-  this._diagram = diagram; 
+  this._diagram = diagram;
   });
   }
 
@@ -29,15 +32,15 @@ export class ToolbarComponent {
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
     this.rectActiveColor = !this.rectActiveColor;
-    this.activeButtonService.RectangleButtonActive(); 
+    this.activeButtonService.RectangleButtonActive();
   }
-  
+
   toggleCircleButton() {
     this.rectActiveColor = false;
     this.arrowActiveColor = false;
     this.boltActiveColor = false;
     this.circleActiveColor = !this.circleActiveColor;
-    this.activeButtonService.circleButtonActive(); 
+    this.activeButtonService.circleButtonActive();
   }
 
   toggleArrowButton () {
@@ -71,5 +74,5 @@ export class ToolbarComponent {
   onButtonClick(buttonId: string){
     this.activeButtonService.sendButtonClick(buttonId);
   }
-  
+
 }

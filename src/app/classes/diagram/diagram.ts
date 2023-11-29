@@ -11,7 +11,8 @@ export class Diagram {
 
     selectedCircle: SVGElement | undefined = undefined;
     selectedRect: SVGElement | undefined = undefined;
-    
+    selectedLine: SVGElement | undefined = undefined;
+
     idCircleCount: number = 0;
     idRectCount: number = 0;
     idLineCount: number = 0;
@@ -98,7 +99,7 @@ export class Diagram {
         this._lines.splice(0, this._lines.length);
     }
 
-    createCircleObject(x: number, y:number){
+      createCircleObject(x: number, y:number){
 
         // ID String für jeden Kreis um 1 erhöhen (p0, p1,..)
         let idString: string = "p" + this.idCircleCount;
@@ -111,7 +112,7 @@ export class Diagram {
 
 
       createRectObject (x: number, y: number){
-    
+
         // ID String für jedes Rechteck um 1 erhöhen (t0, t1,..)
         let idString: string = "t" + this.idRectCount;
         this.idRectCount++;
@@ -137,8 +138,9 @@ export class Diagram {
       resetSelectedElements() {
         this.selectedCircle = undefined;
         this.selectedRect = undefined;
+        this.selectedLine = undefined;
       }
-    
+
       resetCounterVar() {
         this.idCircleCount = 0;
         this.idRectCount = 0;
