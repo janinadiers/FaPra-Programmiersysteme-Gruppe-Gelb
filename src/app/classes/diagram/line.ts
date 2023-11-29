@@ -134,7 +134,7 @@ export class Line {
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
         backgroundCircle.setAttribute('cy', midCoords.y.toString());
         backgroundCircle.setAttribute('r', '8');
-        if (this._tokens > 0)
+        if (this._tokens > 1)
             backgroundCircle.setAttribute('fill', 'white');
         else
             backgroundCircle.setAttribute('fill', 'transparent');
