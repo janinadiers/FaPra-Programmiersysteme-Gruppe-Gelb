@@ -17,7 +17,7 @@ export class JsonExport implements ExportService{
             places: [],
             transitions: [],
             arcs: {},
-            actions: [],
+            actions: [], //TODO: missing
             labels: {},
             marking: {},
             layout: {}
@@ -34,7 +34,10 @@ export class JsonExport implements ExportService{
 
         this._displayService.diagram.transitions.forEach(transition => {
             petriNet.transitions.push(transition.id);
-            
+
+            if (transition.label.length > 0)
+                petriNet.labels![transition.id] = transition.label;
+
             petriNet.layout![transition.id] = { x: transition.x, y: transition.y }
         });
 

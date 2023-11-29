@@ -39,12 +39,31 @@ export class Element {
     }
 
     public registerSvg(svg: SVGElement) {
+
         this._svgElement = svg;
+        this._svgElement.onmousedown = (event) => {
+            this.processMouseDown(event);
+        };
+        this._svgElement.onmouseup = (event) => {
+            this.processMouseUp(event);
+        };
+    }
+
+    private processMouseDown(event: MouseEvent) {
+        if (this._svgElement === undefined) {
+            return;
+        }
+        this._svgElement.setAttribute('stroke', 'red');
+    }
+
+    private processMouseUp(event: MouseEvent) {
+        if (this._svgElement === undefined) {
+            return;
+        }
+        this._svgElement.setAttribute('stroke', 'black');
     }
 
     public createSVG(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
-
-
 }

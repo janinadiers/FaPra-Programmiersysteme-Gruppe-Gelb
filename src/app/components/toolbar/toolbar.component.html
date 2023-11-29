@@ -1,44 +1,97 @@
 <mat-toolbar class ="toolbar">
-    
-    <button  mat-icon-button 
-        class="hover-class" 
+
+    <button  mat-icon-button
+        class="hover-class"
         [class.active]="circleActiveColor"
-        (click)="toggleCircleButton()"> 
-        <mat-icon>panorama_fish_eye</mat-icon> 
+        (click)="toggleCircleButton()">
+        <mat-icon>panorama_fish_eye</mat-icon>
     </button>
-    
-    <button mat-icon-button 
+
+    <button mat-icon-button
         class="hover-class"
         [class.active]="rectActiveColor"
         (click)="toggleRectangleButton()">
         <mat-icon>crop_portrait</mat-icon>
     </button>
-      
-    <button  mat-icon-button 
+
+    <button  mat-icon-button
         class="hover-class"
         [class.active]="arrowActiveColor"
-        (click)="toggleArrowButton()"> 
-        <mat-icon>north_east</mat-icon> 
+        (click)="toggleArrowButton()">
+        <mat-icon>north_east</mat-icon>
     </button>
 
-    <button  mat-icon-button 
+    <button  mat-icon-button
         class="hover-class"
         [class.active]="boltActiveColor"
-        (click)="toggleBoltButton()"> 
-        <mat-icon>bolt</mat-icon> 
+        (click)="toggleBoltButton()">
+        <mat-icon>bolt</mat-icon>
     </button>
-     
-    <button  mat-icon-button 
-        class="hover-class"
-        (click)="onButtonClick('deleteLast')"> 
-        <mat-icon>delete</mat-icon> 
-    </button>
-    
-    <button  mat-icon-button 
-        class="hover-class"
-        (click)="onButtonClick('clear')"> 
-        <mat-icon>clear</mat-icon> 
-    </button>
-      
-</mat-toolbar>
 
+    <button  mat-icon-button
+        class="hover-class"
+        (click)="onButtonClick('deleteLast')">
+        <mat-icon>delete</mat-icon>
+    </button>
+
+    <button  mat-icon-button
+        class="hover-class"
+        (click)="onButtonClick('clear')">
+        <mat-icon>clear</mat-icon>
+    </button>
+
+    <span style="color: red">
+    <mat-card-content>
+        Marken: &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getCircleId()}} &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+         {{markenspielService.getCircleToken()}} &nbsp;
+    </mat-card-content>
+    </span>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.addCircleToken()">
+        +
+
+    </button>
+
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.removeCircleToken()">
+        -
+    </button>
+
+    <span style="color:blue">
+    <mat-card-content>
+        Gewichte: &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getLineId()}} &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{markenspielService.getLineToken()}} &nbsp;
+    </mat-card-content>
+    </span>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.addLineToken()">
+        +
+    </button>
+
+    <button mat-button
+            class ="hover-class"
+            (click) = "markenspielService.removeLineToken()">
+        -
+    </button>
+
+</mat-toolbar>
