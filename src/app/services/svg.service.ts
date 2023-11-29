@@ -21,11 +21,11 @@ export class SvgService {
         });
         
         diagram.places.forEach(place => {
-            result.push(new Place(place.id, place.x, place.y).createSVG());
+            result.push(new Place(place.id, place.x, place.y, place.amountToken).createSVG());
         });
 
         diagram.transitions.forEach(transition => {
-            result.push(new Transition(transition.id, transition.x, transition.y).createSVG());
+            result.push(new Transition(transition.id, transition.x, transition.y, transition.label).createSVG());
         });
         
         return result;
