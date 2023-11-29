@@ -183,8 +183,7 @@ export class Line  {
     
         marker.appendChild(arrowhead);
 
-    
-        document.querySelector('svg')?.appendChild(marker);
+        group.appendChild(marker);
 
         const markerId = `url(#arrowhead-${this._id})`;
         line.setAttribute('marker-end', markerId);
