@@ -1,5 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Coords } from '../json-petri-net';
+import { Transition } from './transition';
 
 export class Line  {
 
@@ -11,7 +12,6 @@ export class Line  {
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
-    
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
@@ -157,9 +157,38 @@ export class Line  {
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
         line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', '1');
+        line.setAttribute('stroke-width', '1');       
         line.setAttribute('fill', 'transparent');
+        this._svgElement = line;
+
         group.appendChild(line);
+
+        let refX: number;
+        refX = this.updateMarker();
+    
+        // Marker
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        marker.setAttribute('id', `arrowhead-${this._id}`);
+        marker.setAttribute('markerWidth', '10');
+        marker.setAttribute('markerHeight', '10');
+        marker.setAttribute('refX', refX.toString());
+        marker.setAttribute('refY', '5');
+        marker.setAttribute('orient', 'auto-start-reverse');
+        marker.setAttribute('markerUnits', 'strokeWidth');
+    
+        // Path Element für Pfeilspitze
+        const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
+        arrowhead.setAttribute('fill', 'black');
+    
+        marker.appendChild(arrowhead);
+
+    
+        document.querySelector('svg')?.appendChild(marker);
+
+        const markerId = `url(#arrowhead-${this._id})`;
+        line.setAttribute('marker-end', markerId);
+
 
         //Get mid coord of Polyline
         const midCoords = this.calcMidCoords();
@@ -187,6 +216,54 @@ export class Line  {
         this._svgElement = group;
         return group;
     }
+
+
+    private updateMarker(): number{
+ 
+        if (!(this._target instanceof Transition)){
+            let x: number = 35;
+            return x;
+        }
+
+        else{
+            const x1 = this._source.x;
+            const y1 = this._source.y;
+            const x2 = this._target.x;
+            const y2 = this._target.y;
+            const width = this._target.width;
+            const leftSide = this._target.x - (width/2);
+            const rightSide = this._target.x + (width/2);
+
+            // Berechne m die Steigung der Geraden 
+            const m = (y2 - y1) / (x2 - x1);
+            // Berechne den y-Achsenabschnitt b
+            const b = y1 - m * x1;
+
+            if (x1 <= (leftSide)) {
+                const x3 = leftSide;
+                const y3 = m * x3 + b;
+                return (this.calculateDistance(x2, y2, x3, y3) + 10);
+                
+            } 
+            else if (x1 >= (rightSide)) {
+                const x3 = rightSide;
+                const y3 = m * x3 + b;
+                return (this.calculateDistance(x2, y2, x3, y3) + 10);
+            } 
+            else {
+                let y: number = 30;
+                return y;
+            }
+        }   
+    }
+
+
+    calculateDistance(x2: number, y2: number, x3: number, y3: number): number {
+        const distance: number = Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2 - y3, 2));
+        return distance;
+
+    }
+
 
     // Might be needed for "Markenspiel"
     // public registerSvg(svg: SVGElement) {

@@ -358,7 +358,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
-                    if (svgElement.firstChild){
+                   if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
                     }
                 }
