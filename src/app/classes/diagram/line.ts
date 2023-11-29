@@ -15,7 +15,7 @@ export class Line {
         this._id = id;
         this._source = source;
         this._target = target;
-        this._tokens = tokens ?? 0;      //Standardmäßig keine Marken
+        this._tokens = tokens ?? 1;      // sobald eine Linie existiert, hat sie das Gewicht 1
         this._coords = coords;  //undefined if not given
     }
 

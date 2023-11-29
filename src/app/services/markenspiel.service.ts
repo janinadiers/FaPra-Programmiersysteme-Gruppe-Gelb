@@ -137,8 +137,8 @@ export class MarkenspielService {
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
             this._diagram.lines[idNumber].tokens--;
 
-            if(this._diagram.lines[idNumber].tokens  < 0) {
-                this._diagram.lines[idNumber].tokens = 0;
+            if(this._diagram.lines[idNumber].tokens  < 1) {
+                this._diagram.lines[idNumber].tokens = 1;
             }
 
             this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
