@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { Diagram } from '../classes/diagram/diagram';
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +12,26 @@ export class ActivebuttonService {
   isRectangleButtonActive: boolean = false;
   isArrowButtonActive: boolean = false;
   isBoltButtonActive: boolean = false;
+
+    //Observable für Delete-Button und Zoom-Button
+
+private buttonClickSubject = new Subject<string>();
+private zoomButtonClickSubject = new Subject<string>();
   
   RectangleButtonActive() {
     this.isCircleButtonActive = false;
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = false;
     this.isRectangleButtonActive = !this.isRectangleButtonActive;
+    Diagram.toolbarIsActive = this.isRectangleButtonActive;
   }
   
   circleButtonActive() {
     this.isRectangleButtonActive = false;
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = false;
-    this.isCircleButtonActive = !this.isCircleButtonActive;  
+    this.isCircleButtonActive = !this.isCircleButtonActive; 
+    Diagram.toolbarIsActive = this.isCircleButtonActive; 
   }
 
   arrowButtonActive() {
@@ -31,6 +39,7 @@ export class ActivebuttonService {
     this.isRectangleButtonActive = false;
     this.isBoltButtonActive = false;
     this.isArrowButtonActive = !this.isArrowButtonActive;
+    Diagram.toolbarIsActive = this.isArrowButtonActive;
   }
 
   boltButtonActive() {
@@ -38,17 +47,23 @@ export class ActivebuttonService {
     this.isRectangleButtonActive = false;
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = !this.isBoltButtonActive;
+    Diagram.toolbarIsActive = this.isBoltButtonActive;
   }
 
-  //Observable für Delete-Button
 
-private buttonClickSubject = new Subject<string>();
+  zoomButtonClick(buttonId: string) {
+    this.zoomButtonClickSubject.next(buttonId);
+  }
+    
+  zoomButtonClickObservable() {
+    return this.zoomButtonClickSubject.asObservable();
+  }
 
-sendButtonClick(buttonId: string) {
-  this.buttonClickSubject.next(buttonId);
-}
+  sendButtonClick(buttonId: string) {
+    this.buttonClickSubject.next(buttonId);
+  }
 
-getButtonClickObservable() {
-  return this.buttonClickSubject.asObservable();
-}
+  getButtonClickObservable() {
+    return this.buttonClickSubject.asObservable();
+  }
 }

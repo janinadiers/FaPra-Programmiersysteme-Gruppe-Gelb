@@ -1,7 +1,10 @@
 .toolbar {
 
     background-color: white;
+    display: flex;
+    justify-content: space-between;
 }
+
 
 .hover-class:hover {
 
@@ -13,3 +16,4 @@
     color: white; 
 
  }
+
