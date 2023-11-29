@@ -38,10 +38,8 @@ export class Element {
         this._svgElement = svgElement;
     }
 
-
-
     public registerSvg(svg: SVGElement) {
-        
+
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
             this.processMouseDown(event);
@@ -55,19 +53,17 @@ export class Element {
         if (this._svgElement === undefined) {
             return;
         }
-        this._svgElement.setAttribute('fill', 'red');
+        this._svgElement.setAttribute('stroke', 'red');
     }
 
     private processMouseUp(event: MouseEvent) {
         if (this._svgElement === undefined) {
             return;
         }
-        this._svgElement.setAttribute('fill', 'black');
+        this._svgElement.setAttribute('stroke', 'black');
     }
 
     public createSVG(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
-
-
 }

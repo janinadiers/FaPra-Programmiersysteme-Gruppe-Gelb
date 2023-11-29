@@ -15,7 +15,7 @@ export class Line {
         this._id = id;
         this._source = source;
         this._target = target;
-        this._tokens = tokens ?? 0;      //Standardmäßig keine Marken
+        this._tokens = tokens ?? 1;      // sobald eine Linie existiert, hat sie das Gewicht 1
         this._coords = coords;  //undefined if not given
     }
 
@@ -70,7 +70,7 @@ export class Line {
             this._coords.forEach(coord => {
                 result += coord.x + ',' + coord.y + ' ';
             });
-        } 
+        }
         return result;
     }
 
@@ -88,7 +88,7 @@ export class Line {
                 lastY = coord.y;
             });
             totalLength += Math.hypot(this._target.x - lastX, this._target.y - lastY);
-        
+
             //Find the midpoint (Traverse the polyline until the accumulated length is half of the total length)
             let accumulatedLength = 0;
             lastX = this._source.x;
@@ -107,7 +107,7 @@ export class Line {
                 lastY = coord.y;
             }
         }
-        
+
         midCoords.x = (this._source.x + this._target.x) / 2;
         midCoords.y = (this._source.y + this._target.y) / 2;
 
@@ -132,11 +132,11 @@ export class Line {
         //Create background circle
         const backgroundCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
-        backgroundCircle.setAttribute('cy', midCoords.y.toString()); 
-        backgroundCircle.setAttribute('r', '8');  
+        backgroundCircle.setAttribute('cy', midCoords.y.toString());
+        backgroundCircle.setAttribute('r', '8');
         if (this._tokens > 0)
             backgroundCircle.setAttribute('fill', 'white');
-        else 
+        else
             backgroundCircle.setAttribute('fill', 'transparent');
         group.appendChild(backgroundCircle);
 
