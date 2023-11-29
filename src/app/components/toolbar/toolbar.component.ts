@@ -1,9 +1,12 @@
-import {Component} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
 import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DisplayService} from "../../services/display.service";
 import {ExportService} from "../../services/export.service";
 import {DownloadService} from "../../services/helper/download-service";
 import {Diagram} from '../../classes/diagram/diagram';
+import {PnmlImportService} from "../../services/pnml-import.service";
+import {ParserService} from "../../services/parser.service";
+import {FileReaderService} from "../../services/file-reader.service";
 
 @Component({
     selector: 'app-toolbar',
@@ -26,14 +29,22 @@ export class ToolbarComponent {
     private readonly SVG_FILE: string = 'petriNetz.svg'
     private readonly SVG_TYPE: string = 'image/svg+xml';
 
+    @ViewChild('hiddenInput') input: ElementRef = new ElementRef(null);
+    @Output('fileContent') fileContent: EventEmitter<{fileContent:string, fileExtension:string}>;
+
     constructor(private _activeButtonService: ActivebuttonService,
                 private _exportService: ExportService,
                 private _displayService: DisplayService,
-                private _downloadService: DownloadService
+                private _downloadService: DownloadService,
+                private _pnmlImportService: PnmlImportService,
+                private _parserService: ParserService,
+                private _fileReaderService: FileReaderService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
         });
+
+        this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
     }
 
     rectActiveColor: boolean = false;
@@ -104,5 +115,41 @@ export class ToolbarComponent {
     exportSvg(): void {
         const svgString = this._exportService.exportAsSVG();
         this._downloadService.downloadFile(svgString, this.SVG_FILE, this.SVG_TYPE)
+    }
+
+    importFromFile(e: Event) {
+        const selectedFile = e.target as HTMLInputElement;
+        if (selectedFile.files && selectedFile.files.length > 0) {
+            var fileExtension = selectedFile.files[0].name.match(/\.pnml$/) ? 'pnml' : '';
+            if (fileExtension.length == 0)
+                fileExtension = selectedFile.files[0].name.match(/\.json$/) ? 'json' : '';
+            this._fileReaderService
+                .readFile(selectedFile.files[0])
+                .subscribe((content) => {
+                    this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
+                    this.processSourceChange({fileContent: content, fileExtension: fileExtension});
+                });
+        }
+    }
+
+    prepareImportFromFile(e: MouseEvent) {
+        this.input?.nativeElement.click();
+    }
+
+    public processSourceChange(newSource: {fileContent: string, fileExtension: string}) {
+        let result = undefined;
+
+        if (newSource.fileExtension === 'pnml') {
+            result = this._pnmlImportService.import(newSource.fileContent);
+        } else if (newSource.fileExtension === 'json') {
+            result = this._parserService.parse(newSource.fileContent);
+        } else {
+            alert("Please choose either .pnml or .json");
+        }
+
+        if (result !== undefined) {
+
+            this._displayService.display(result);
+        }
     }
 }

@@ -58,8 +58,8 @@
     </mat-menu>
 
     <mat-menu #import="matMenu">
-        <button mat-menu-item>PNML</button>
-        <button mat-menu-item>JSON</button>
+        <button mat-menu-item (click)="prepareImportFromFile($event)">PNML</button>
+        <button mat-menu-item (click)="prepareImportFromFile($event)">JSON</button>
     </mat-menu>
 
     <mat-menu #export="matMenu">
@@ -68,6 +68,14 @@
         <button mat-menu-item (click)="exportPng()">PNG</button>
         <button mat-menu-item (click)="exportSvg()">SVG</button>
     </mat-menu>
+
+    <input
+        #hiddenInput
+        (change)="importFromFile($event)"
+        type="file"
+        id="fileInput"
+        style="display: none"
+    />
 
 </mat-toolbar>
 
