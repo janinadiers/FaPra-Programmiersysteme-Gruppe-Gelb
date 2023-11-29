@@ -140,13 +140,12 @@ export class Line {
             backgroundCircle.setAttribute('fill', 'transparent');
         group.appendChild(backgroundCircle);
 
-
         const token = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         token.setAttribute('x', midCoords.x.toString());
         token.setAttribute('y', midCoords.y.toString());
         token.setAttribute('text-anchor', 'middle');
         token.setAttribute('dy', '.3em');
-        if (this._tokens > 0)
+        if (this._tokens > 1)
             token.textContent = this._tokens.toString();
         group.appendChild(token);
 
