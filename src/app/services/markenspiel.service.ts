@@ -123,7 +123,7 @@ export class MarkenspielService {
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
             this._diagram.lines[idNumber].tokens++;
 
-            this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
+            this._diagram.lines[idNumber].svgElement!.childNodes[3].textContent =
                 this._diagram.lines[idNumber].tokens.toString();
 
             return;
@@ -141,7 +141,7 @@ export class MarkenspielService {
                 this._diagram.lines[idNumber].tokens = 1;
             }
 
-            this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
+            this._diagram.lines[idNumber].svgElement!.childNodes[3].textContent =
                 this._diagram.lines[idNumber].tokens.toString();
 
             return;
