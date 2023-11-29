@@ -19,10 +19,13 @@ export class Diagram {
 
     static toolbarIsActive = false;
     static zoomFactor = 1;
+    static viewBox:{x: number, y: number, width: number, height: number} = {x: 0, y: 0, width: 0, height: 0};
     private _canvasElement: SVGElement | undefined;
 
     private _isDragging = false;
     private startPoint: {x: number, y: number} = {x: 0, y: 0};
+
+  
 
 
     constructor(places: Array<Place>, transitions: Array<Transition>, lines?: Array<Line>) {
@@ -40,10 +43,13 @@ export class Diagram {
         this._canvasElement = canvas;
         this._canvasElement?.addEventListener('mousedown', (event) => {
           this.processMouseDown(event);
+         
         });
         // Der EventListener ist auf dem window registriert, damit auch dann ein MouseUp Event ausgelöst wird, wenn die Maus außerhalb des Canvas losgelassen wird
-        window.addEventListener('mouseup', () => {
+        window.addEventListener('mouseup', (event) => {
+          
           this.processMouseUp();
+         
         });
         this._canvasElement?.addEventListener('mousemove', (event) => {
           this.processMouseMove(event);
@@ -152,35 +158,36 @@ export class Diagram {
 
         this._isDragging = true;
         const svgContainer = this._canvasElement?.getBoundingClientRect();
-        const viewBox = this._canvasElement?.getAttribute('viewBox');
        
         this.startPoint = {
-          x: event.clientX - svgContainer!.left + parseInt(viewBox!.split(' ')[0]),
-          y: event.clientY - svgContainer!.top + parseInt(viewBox!.split(' ')[1])
+          x: (event.clientX - svgContainer!.left) * Diagram.zoomFactor + Diagram.viewBox.x,
+          y: (event.clientY - svgContainer!.top) * Diagram.zoomFactor + Diagram.viewBox.y
       }; 
         
     }
 
     private processMouseUp() {
-        
+       
         if (this._isDragging) {
             this._isDragging = false;
 
         }
+       
+
+        
     }
 
     private processMouseMove(event: MouseEvent) {
-      
+       
         if (this._isDragging) {
-
           const svgContainer = this._canvasElement?.getBoundingClientRect();
-          const mouseX = ( event.clientX - svgContainer!.left ) - this.startPoint.x;
-          const mouseY = ( event.clientY - svgContainer!.top ) - this.startPoint.y;
+          const x = (( event.clientX - svgContainer!.left ) * Diagram.zoomFactor)- this.startPoint.x;
+          const y = ((event.clientY - svgContainer!.top ) * Diagram.zoomFactor)- this.startPoint.y;
             
-          let x = mouseX * Diagram.zoomFactor;
-          let y = mouseY * Diagram.zoomFactor;
-           
-          this._canvasElement?.setAttribute('viewBox', `${-x} ${-y} ${svgContainer!.width * Diagram.zoomFactor} ${svgContainer!.height * Diagram.zoomFactor}`)
+          Diagram.viewBox.x = -x;
+          Diagram.viewBox.y = -y;
+          
+          this._canvasElement?.setAttribute('viewBox', `${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}`)
          
           
           

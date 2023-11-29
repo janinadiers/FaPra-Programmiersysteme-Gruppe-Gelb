@@ -82,9 +82,14 @@ export class DisplayComponent implements OnInit, OnDestroy {
           
           // die viewBox des svg Elements wird an den Zoomfaktor angepasst (Je größer die viewBox, desto kleiner das Diagramm)
           // die viewBox ist eine Art zusätzlicher innerer Canvas der die Größe des Diagramms bestimmt unabhängig von der Größe des äußeren Canvas
-          return `0 0 ${rect.width * Diagram.zoomFactor} ${rect.height * Diagram.zoomFactor}`;
+          Diagram.viewBox.width = rect.width * Diagram.zoomFactor;
+          Diagram.viewBox.height = rect.height * Diagram.zoomFactor;
+         
+           
+          return `${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}`;
         }
-        return '0 0 0 0'; // Default viewBox if canvas is not available
+        // Default viewBox if canvas is not available
+        return '0 0 0 0';
     }
 
     public processDropEvent(e: DragEvent) {

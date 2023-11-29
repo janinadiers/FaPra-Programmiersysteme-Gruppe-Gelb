@@ -67,20 +67,22 @@ export class Element  {
         
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
-            this.processMouseDown(event);
+            event.stopPropagation();
+            this.processMouseDown();
         };
         window.addEventListener('mouseup', (event) => {
-            this.processMouseUp(event);
+            event.stopPropagation();
+            this.processMouseUp();
         });
-        this._svgElement.onmousemove = (event) => {
+        window.addEventListener('mousemove', (event) => {
+            event.stopPropagation();
             this.processMouseMove(event);
-        }
+        })
     }
 
    
-    private processMouseDown(event: MouseEvent) {
+    private processMouseDown() {
        
-        event.stopPropagation();
         if (this._svgElement === undefined) {
             return;
         }
@@ -95,8 +97,8 @@ export class Element  {
         
     }
 
-    private processMouseUp(event: MouseEvent) {
-        event.stopPropagation();
+    private processMouseUp() {
+        
         if (this._svgElement === undefined) {
             return;
         }
@@ -110,20 +112,18 @@ export class Element  {
 
     private processMouseMove(event: MouseEvent) {
         
-        event.stopPropagation();
         if (this._svgElement === undefined) {
             return;
         }
 
-        const svgElement = document.getElementById('canvas');
-        const svgContainer = svgElement?.getBoundingClientRect();
-        // Berechnung der Maus Koordinanten relativ zum SVG Element
-        const mouseX = event.clientX - svgContainer!.left;
-        const mouseY = event.clientY - svgContainer!.top;
+        
         if (this._isDragging) {
-            
-            this.x = mouseX * Diagram.zoomFactor;
-            this.y = mouseY * Diagram.zoomFactor;
+
+            const svgElement = document.getElementById('canvas');
+            const svgContainer = svgElement?.getBoundingClientRect();
+            // Berechnung der Maus Koordinanten relativ zum SVG Element
+            this.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
+            this.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
            
             this.svgElement?.childNodes.forEach((node) => {
               
