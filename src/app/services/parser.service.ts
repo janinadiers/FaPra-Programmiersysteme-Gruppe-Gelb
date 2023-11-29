@@ -76,15 +76,9 @@ export class ParserService {
                 //sourceTarget[0] -> SourceID || sourceTarget[1] -> TargetID
                 const sourceTarget = arc.split(','); 
                 if (arc.startsWith('p')) { //Place
-                    const line = new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element, undefined, arcs[arc]);
-                    line.createSVG();
-                    
-                    lines.push(line);
+                    lines.push(new Line(arc, places.find(pid => pid.id === sourceTarget[0]) as Element, transitions.find(tid => tid.id === sourceTarget[1]) as Element, undefined, arcs[arc]));
                 } else { //Transition
-                    const line = new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element, undefined, arcs[arc]);
-                    line.createSVG();
-                    
-                    lines.push(line);
+                    lines.push(new Line(arc, transitions.find(tid => tid.id === sourceTarget[0]) as Element, places.find(pid => pid.id === sourceTarget[1]) as Element, undefined, arcs[arc]));
                 }
                 
             }
@@ -108,6 +102,9 @@ export class ParserService {
                     }
                 }
             }
+            lines.forEach(line => {
+                line.createSVG();
+            });
         }
         return lines;
     }
