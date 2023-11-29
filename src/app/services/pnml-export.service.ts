@@ -37,7 +37,7 @@ export class PnmlExport implements ExportService{
 
             }
             graphics += '</graphics>\n';
-            pnmlString += `\n<arc id="${line.id}" source="${line.source.id}" target="${line.target.id}">\n${graphics}\n<inscription><text>${line.tokens}</text></inscription>\n</arc>`;
+            pnmlString += `\n<arc id="${line.id}" source="${line.source?.id}" target="${line.target?.id}">\n${graphics}\n<inscription><text>${line.tokens}</text></inscription>\n</arc>`;
 
         }
         pnmlString += '\n</page>\n</net>\n</pnml>';

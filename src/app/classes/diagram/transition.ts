@@ -9,7 +9,7 @@ export class Transition extends Element {
     private _children: Array<Place>;
     private _label: string;
 
-    constructor(id: string, x?: number, y?: number, label?: string) {
+    constructor(id: string, x: number, y: number, label?: string) {
         super(id, x, y);
         this._isActive = false; //Standardmäßig nicht aktiviert
         this._width = 20;
@@ -61,14 +61,12 @@ export class Transition extends Element {
     override createSVG(){
         const group = super.createSVG('g');
         group.setAttribute('id', this.id);
-
+        group.setAttribute('transform', `translate(${this.x - this.width / 2}, ${this.y - this.height / 2})`);
         //Transition
         const rect = super.createSVG('rect');
         rect.setAttribute('id', this.id.toString());
-        rect.setAttribute('x', (this.x - this._width / 2).toString());
-        rect.setAttribute('y', (this.y - this.height / 2).toString());
-        rect.setAttribute('width', this._width.toString());
-        rect.setAttribute('height', this._height.toString());
+        rect.setAttribute('width', this.width.toString());
+        rect.setAttribute('height', this.height.toString());
         rect.setAttribute('fill', 'black');
         rect.setAttribute('stroke', 'black');
         rect.setAttribute('stroke-width', '2');
@@ -85,10 +83,10 @@ export class Transition extends Element {
 
         //Text
         const text = super.createSVG('text');
-        text.setAttribute('x', this.x.toString());
-        text.setAttribute('y', (this.y + 40).toString());
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('alignment-baseline', 'central');
+        text.setAttribute('dy', `${this.height + 25}`);
+        text.setAttribute('dx', `${this.width / 2}`);
         text.textContent = this._label;
         group.appendChild(text);
 

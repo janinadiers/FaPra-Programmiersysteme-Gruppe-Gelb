@@ -2,16 +2,16 @@ import { Element } from 'src/app/classes/diagram/element';
 import { Coords } from '../json-petri-net';
 import { Transition } from './transition';
 
-
-export class Line {
+export class Line  {
 
     private readonly _id: string;
-    private _source: Element;
-    private _target: Element;
+    private _sourcePosition: Coords | undefined;
+    private _targetPosition: Coords | undefined;
+    private _source : Element;
+    private _target : Element;
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
-    private _marker: SVGElement | undefined;
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
@@ -19,6 +19,20 @@ export class Line {
         this._target = target;
         this._tokens = tokens ?? 1;      // sobald eine Linie existiert, hat sie das Gewicht 1
         this._coords = coords;  //undefined if not given
+        this._source = source;
+        this._target = target;
+        this._sourcePosition = {x: source.x, y: source.y};
+        this._targetPosition = {x: target.x, y: target.y};
+
+        source.getPositionChangeObservable().subscribe((source) => {
+            this.updateSource({x: source.x, y: source.y});
+            
+        });
+        target.getPositionChangeObservable().subscribe((target) => {
+            this.updateTarget({x: target.x, y: target.y});
+           
+        
+        });
     }
 
     get id(): string {
@@ -29,17 +43,11 @@ export class Line {
         return this._source;
     }
 
-    set source(value: Element) {
-        this._source = value;
-    }
 
     get target(): Element {
         return this._target;
     }
 
-    set target(value: Element) {
-        this._target = value;
-    }
 
     get tokens(): number {
         return this._tokens;
@@ -63,6 +71,31 @@ export class Line {
 
     set coords(coods: Coords[]) {
         this._coords = coods;
+    }
+
+    private updateSource(updatedPosition: Coords): void {
+        
+        if(this._svgElement) {
+            if(this._svgElement.childNodes[0] instanceof SVGElement) {
+                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+            }
+            this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
+        }
+
+        
+
+    }
+
+    private updateTarget(updatedPosition: Coords): void {
+        
+        if(this._svgElement) {
+            if (this._svgElement.childNodes[0] instanceof SVGElement) {
+                this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
+            }
+            this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
+        }
+        
+
     }
 
     //Iterate through found coords and return them as string
@@ -120,9 +153,9 @@ export class Line {
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');        
         line.setAttribute('id', this._id.toString());
-        line.setAttribute('points', `${this._source.x},${this._source.y} ${this.getCoordsString()} ${this._target.x},${this._target.y}`);
+        line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
         line.setAttribute('stroke', 'black');
         line.setAttribute('stroke-width', '1');       
         line.setAttribute('fill', 'transparent');
@@ -150,7 +183,7 @@ export class Line {
     
         marker.appendChild(arrowhead);
 
-        this._marker = marker;
+    
         document.querySelector('svg')?.appendChild(marker);
 
         const markerId = `url(#arrowhead-${this._id})`;

@@ -1,7 +1,7 @@
 <mat-toolbar class ="toolbar">
-
-    <button  mat-icon-button
-        class="hover-class"
+    <div>
+    <button  mat-icon-button 
+        class="hover-class" 
         [class.active]="circleActiveColor"
         (click)="toggleCircleButton()">
         <mat-icon>panorama_fish_eye</mat-icon>
@@ -27,20 +27,20 @@
         (click)="toggleBoltButton()">
         <mat-icon>bolt</mat-icon>
     </button>
-
-    <button  mat-icon-button
+     
+    <button  mat-icon-button 
         class="hover-class"
-        (click)="onButtonClick('deleteLast')">
-        <mat-icon>delete</mat-icon>
+        (click)="onButtonClick('deleteLast')"> 
+        <mat-icon>delete</mat-icon> 
     </button>
-
-    <button  mat-icon-button
+    
+    <button  mat-icon-button 
         class="hover-class"
-        (click)="onButtonClick('clear')">
-        <mat-icon>clear</mat-icon>
+        (click)="onButtonClick('clear')"> 
+        <mat-icon>clear</mat-icon> 
     </button>
-
-    <span style="color: red">
+</div>
+<span style="color: red">
     <mat-card-content>
         Marken: &nbsp;
     </mat-card-content>
@@ -94,4 +94,16 @@
         -
     </button>
 
+<div class="zoom-button-wrapper">
+    <button mat-icon-button class="hover-class"
+    (click)="onZoomButtonClick('zoom-in')">
+        <mat-icon>zoom_in</mat-icon>
+    </button>
+    <button mat-icon-button class="hover-class"
+    (click)="onZoomButtonClick('zoom-out')">
+        <mat-icon>zoom_out</mat-icon>
+    </button>
+</div>
+
+   
 </mat-toolbar>

@@ -9,6 +9,7 @@ import { Transition } from '../classes/diagram/transition';
 import { Line } from '../classes/diagram/line';
 import { Coords } from '../classes/json-petri-net';
 
+
 @Injectable({
     providedIn: 'root',
 })
@@ -169,6 +170,7 @@ export class PnmlImportService implements ImportService {
     }
 
     private createEdge(id:string, source:Element, target:Element, coords: Coords[]): Line{
+        
         const line:Line = new Line(id, source, target);
         line.coords = coords;
         line.createSVG();
