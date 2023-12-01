@@ -106,6 +106,14 @@ export class Line  {
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
 
+        // Markierungen für die Gewichte an die Kante hängen
+        let tokenCircleCx = this.calcMidCoords().x.toString();
+        let tokenCircleCy = this.calcMidCoords().y.toString();
+
+        this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
+        this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
+        this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
+        this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
 
     }
 

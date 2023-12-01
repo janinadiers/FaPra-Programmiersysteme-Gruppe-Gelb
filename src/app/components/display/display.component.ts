@@ -385,11 +385,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'transparent');
             element.svgElement!.querySelector('text')!.setAttribute('stroke','black');
+
         });
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
         });
-
 
         return;
     }
