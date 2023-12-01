@@ -77,9 +77,20 @@ export class Line  {
 
         if(this._svgElement) {
             if(this._svgElement.childNodes[0] instanceof SVGElement) {
-                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
+                    ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
+                        ${this._targetPosition?.y}`);
             }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
+
+            // Markierungen für die Gewichte an die Kante hängen
+            let tokenCircleCx = this.calcMidCoords().x.toString();
+            let tokenCircleCy = this.calcMidCoords().y.toString();
+
+            this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
+            this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
+            this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
+            this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
         }
 
 
@@ -109,7 +120,7 @@ export class Line  {
         return result;
     }
 
-    private calcMidCoords(): Coords {
+    public calcMidCoords(): Coords {
         let midCoords: Coords = {x: -50000, y: -50000}; //Placeholder to define Coords variable
 
         if (this._coords) {

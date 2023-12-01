@@ -133,6 +133,7 @@ export class Element  {
 
                     this.svgElement?.setAttribute('transform', `translate(${this.x - transitionWidth / 2}, ${this.y - transitionHeight / 2})`);
                 }
+
             });
 
         }

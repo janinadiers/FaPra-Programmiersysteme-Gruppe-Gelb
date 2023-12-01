@@ -104,6 +104,22 @@ export class MarkenspielService {
 
             this._diagram!.lines[idNumber].svgElement!.querySelector('text')!.
                 setAttribute('stroke', 'blue');
+
+            // Markierung für die Gewichte der ausgewählten Kante an die Linie anhängen, damit sie mit verschoben werden kann
+            let tokenCircleCx = this._diagram!.lines[idNumber].calcMidCoords().x;
+            let tokenCircleCy = this._diagram!.lines[idNumber].calcMidCoords().y;
+            // Hintergrundkreise der Tokens an die Linie anhängen, sodass sie mit verschoben werden
+            this._diagram!.lines[idNumber].svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx.toString());
+            this._diagram!.lines[idNumber].svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy.toString());
+            // Textfelder für die Tokens an die Linie anhängen, damit die bewegt werden können
+            this._diagram!.lines[idNumber].svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx.toString());
+            this._diagram!.lines[idNumber].svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy.toString());
+
+
+
+
+
+
             if(this._diagram.lines[idNumber].tokens > 1){
                 this._diagram!.lines[idNumber].svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'white');

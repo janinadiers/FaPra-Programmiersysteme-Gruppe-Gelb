@@ -384,11 +384,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'transparent');
+            element.svgElement!.querySelector('text')!.setAttribute('stroke','black');
         });
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
         });
-        // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
 
 
         return;
