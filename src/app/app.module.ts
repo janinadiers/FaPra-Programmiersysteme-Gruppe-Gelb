@@ -14,7 +14,6 @@ import { ExampleFileComponent } from './components/example-file/example-file.com
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ExampleButtonComponent } from './components/example-button/example-button.component';
-import { ImportButtonComponent } from './components/import-button/import-button.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import {MatMenuModule} from "@angular/material/menu";
@@ -31,7 +30,6 @@ import {MatCardModule} from "@angular/material/card";
         ExampleFileComponent,
         ExampleButtonComponent,
         ToolbarComponent,
-        ImportButtonComponent,
         ImportMenuComponent,
         ExportMenuComponent,
     ],
