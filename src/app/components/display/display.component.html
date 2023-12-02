@@ -1,4 +1,4 @@
-<svg id= "canvas" #drawingArea class="canvas"
+<svg id= "canvas" #drawingArea class="canvas" [attr.viewBox]="viewBox"
      (drop)="processDropEvent($event)"
      (dragover)="prevent($event)"
      (click)="onCanvasClick($event)"

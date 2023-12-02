@@ -18,6 +18,9 @@ import { ImportButtonComponent } from './components/import-button/import-button.
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import {MatMenuModule} from "@angular/material/menu";
+import { ImportMenuComponent } from './import-menu/import-menu.component';
+import { ExportMenuComponent } from './export-menu/export-menu.component';
+import {MatCardModule} from "@angular/material/card";
 
 
 @NgModule({
@@ -29,6 +32,8 @@ import {MatMenuModule} from "@angular/material/menu";
         ExampleButtonComponent,
         ToolbarComponent,
         ImportButtonComponent,
+        ImportMenuComponent,
+        ExportMenuComponent,
     ],
     imports: [
         BrowserModule,
@@ -41,7 +46,8 @@ import {MatMenuModule} from "@angular/material/menu";
         ReactiveFormsModule,
         HttpClientModule,
         MatToolbarModule,
-        MatMenuModule
+        MatMenuModule,
+        MatCardModule,
     ],
     providers: [
         {

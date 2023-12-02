@@ -9,13 +9,13 @@ export class Transition extends Element {
     private _children: Array<Place>;
     private _label: string;
 
-    constructor(id: string, x?: number, y?: number) {
+    constructor(id: string, x: number, y: number, label?: string) {
         super(id, x, y);
         this._isActive = false; //Standardmäßig nicht aktiviert
         this._width = 20;
         this._height = 40;
         this._children = [];
-        this._label = id;
+        this._label = label ?? '';
     }
 
     get isActive(): boolean {
@@ -59,17 +59,40 @@ export class Transition extends Element {
     }
 
     override createSVG(){
+        const group = super.createSVG('g');
+        group.setAttribute('id', this.id);
+        group.setAttribute('transform', `translate(${this.x - this.width / 2}, ${this.y - this.height / 2})`);
+        //Transition
         const rect = super.createSVG('rect');
         rect.setAttribute('id', this.id.toString());
-        rect.setAttribute('x', (this.x - this._width / 2).toString());
-        rect.setAttribute('y', (this.y - this.height / 2).toString());
-        rect.setAttribute('width', this._width.toString());
-        rect.setAttribute('height', this._height.toString());
+        rect.setAttribute('width', this.width.toString());
+        rect.setAttribute('height', this.height.toString());
         rect.setAttribute('fill', 'black');
         rect.setAttribute('stroke', 'black');
         rect.setAttribute('stroke-width', '2');
-        super.registerSvg(rect);
-        return rect;
+        group.appendChild(rect);
+
+        //Marker
+        // const marker = super.createSVG('text');
+        // marker.setAttribute('x', this.x.toString());
+        // marker.setAttribute('y', this.y.toString());
+        // marker.setAttribute('text-anchor', 'middle');
+        // marker.setAttribute('dy', '.3em');
+        // marker.textContent = this._amountToken.toString();
+        // group.appendChild(marker);
+
+        //Text
+        const text = super.createSVG('text');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('alignment-baseline', 'central');
+        text.setAttribute('dy', `${this.height + 25}`);
+        text.setAttribute('dx', `${this.width / 2}`);
+        text.textContent = this._label;
+        group.appendChild(text);
+
+
+        super.registerSvg(group);
+        return group;
     }
 
 

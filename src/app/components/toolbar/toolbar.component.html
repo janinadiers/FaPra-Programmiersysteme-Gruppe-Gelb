@@ -1,81 +1,129 @@
-<mat-toolbar class ="toolbar">
+<mat-toolbar class="toolbar">
+    <div>
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="circleActiveColor"
+                (click)="toggleCircleButton()">
+            <mat-icon>panorama_fish_eye</mat-icon>
+        </button>
 
-    <button  mat-icon-button
-        class="hover-class"
-        [class.active]="circleActiveColor"
-        (click)="toggleCircleButton()">
-        <mat-icon>panorama_fish_eye</mat-icon>
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="rectActiveColor"
+                (click)="toggleRectangleButton()">
+            <mat-icon>crop_portrait</mat-icon>
+        </button>
+
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="arrowActiveColor"
+                (click)="toggleArrowButton()">
+            <mat-icon>north_east</mat-icon>
+        </button>
+
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="boltActiveColor"
+                (click)="toggleBoltButton()">
+            <mat-icon>bolt</mat-icon>
+        </button>
+
+        <button mat-icon-button
+                class="hover-class"
+                (click)="onButtonClick('deleteLast')">
+            <mat-icon>delete</mat-icon>
+        </button>
+
+        <button mat-icon-button
+                class="hover-class"
+                (click)="onButtonClick('clear')">
+            <mat-icon>clear</mat-icon>
+        </button>
+
+        <button mat-button [matMenuTriggerFor]="importExportMenu">
+            <mat-icon>import_export</mat-icon>
+        </button>
+
+        <mat-menu #importExportMenu="matMenu">
+            <button mat-menu-item [matMenuTriggerFor]="importMenu">Import</button>
+            <button mat-menu-item [matMenuTriggerFor]="exportMenu">Export</button>
+        </mat-menu>
+
+        <mat-menu #importMenu="matMenu">
+            <app-import-menu (importSelected)="prepareImportFromFile($event)"></app-import-menu>
+        </mat-menu>
+
+        <mat-menu #exportMenu="matMenu">
+            <app-export-menu (exportSelected)="export($event)"></app-export-menu>
+        </mat-menu>
+
+        <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
+
+    </div>
+    <span style="color: red">
+    <mat-card-content>
+        Marken: &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{_markenspielService.getCircleId()}} &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+         {{_markenspielService.getCircleToken()}} &nbsp;
+    </mat-card-content>
+    </span>
+
+    <button mat-button
+            class="hover-class"
+            (click)="_markenspielService.addCircleToken()">
+        +
+
     </button>
 
-    <button mat-icon-button
-        class="hover-class"
-        [class.active]="rectActiveColor"
-        (click)="toggleRectangleButton()">
-        <mat-icon>crop_portrait</mat-icon>
+
+    <button mat-button
+            class="hover-class"
+            (click)="_markenspielService.removeCircleToken()">
+        -
     </button>
 
-    <button  mat-icon-button
-        class="hover-class"
-        [class.active]="arrowActiveColor"
-        (click)="toggleArrowButton()">
-        <mat-icon>north_east</mat-icon>
+    <span style="color:blue">
+    <mat-card-content>
+        Gewichte: &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{_markenspielService.getLineId()}} &nbsp;
+    </mat-card-content>
+
+    <mat-card-content>
+        {{_markenspielService.getLineToken()}} &nbsp;
+    </mat-card-content>
+    </span>
+
+    <button mat-button
+            class="hover-class"
+            (click)="_markenspielService.addLineToken()">
+        +
     </button>
 
-    <button  mat-icon-button
-        class="hover-class"
-        [class.active]="boltActiveColor"
-        (click)="toggleBoltButton()">
-        <mat-icon>bolt</mat-icon>
+    <button mat-button
+            class="hover-class"
+            (click)="_markenspielService.removeLineToken()">
+        -
     </button>
 
-    <button  mat-icon-button
-        class="hover-class"
-        (click)="onButtonClick('deleteLast')">
-        <mat-icon>delete</mat-icon>
-    </button>
+    <div class="zoom-button-wrapper">
+        <button mat-icon-button class="hover-class"
+                (click)="onZoomButtonClick('zoom-in')">
+            <mat-icon>zoom_in</mat-icon>
+        </button>
+        <button mat-icon-button class="hover-class"
+                (click)="onZoomButtonClick('zoom-out')">
+            <mat-icon>zoom_out</mat-icon>
+        </button>
+    </div>
 
-    <button  mat-icon-button
-        class="hover-class"
-        (click)="onButtonClick('clear')">
-        <mat-icon>clear</mat-icon>
-    </button>
-
-    <!--<button mat-button [matMenuTriggerFor]="menu">
-        <mat-icon>import_export</mat-icon>
-    </button>
-
-    <mat-menu #menu="matMenu">
-        <button mat-menu-item>Item 1</button>
-        <button mat-menu-item>Item 2</button>
-    </mat-menu>-->
-
-    <button mat-button [matMenuTriggerFor]="import_export">
-        <mat-icon>import_export</mat-icon>
-    </button>
-    <mat-menu #import_export="matMenu">
-        <button mat-menu-item [matMenuTriggerFor]="import">Import</button>
-        <button mat-menu-item [matMenuTriggerFor]="export">Export</button>
-    </mat-menu>
-
-    <mat-menu #import="matMenu">
-        <button mat-menu-item (click)="prepareImportFromFile($event)">PNML</button>
-        <button mat-menu-item (click)="prepareImportFromFile($event)">JSON</button>
-    </mat-menu>
-
-    <mat-menu #export="matMenu">
-        <button mat-menu-item (click)="exportPnml()">PNML</button>
-        <button mat-menu-item (click)="exportJson()">JSON</button>
-        <button mat-menu-item (click)="exportPng()">PNG</button>
-        <button mat-menu-item (click)="exportSvg()">SVG</button>
-    </mat-menu>
-
-    <input
-        #hiddenInput
-        (change)="importFromFile($event)"
-        type="file"
-        id="fileInput"
-        style="display: none"
-    />
 
 </mat-toolbar>
-
