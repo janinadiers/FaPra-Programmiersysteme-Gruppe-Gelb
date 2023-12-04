@@ -222,12 +222,8 @@ export class Line  {
 
     private updateMarker(): number{
  
-        if (!(this._target instanceof Transition)){
-            let x: number = 35;
-            return x;
-        }
-
-        else{
+        if (this._target instanceof Transition){
+            
             const x1 = this._source.x;
             const y1 = this._source.y;
             const x2 = this._target.x;
@@ -256,11 +252,14 @@ export class Line  {
                 let distance = this.calculateDistance(x2, y2, intersectionpointsX[i], intersectionpointsY[i]);
                 return distance + 10;
                 }
-
             }
 
-            return 35;
+            return 35;    
         }   
+
+        else{
+            return 35;
+        }
     }
 
 
