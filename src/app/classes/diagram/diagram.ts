@@ -101,8 +101,7 @@ export class Diagram {
 
       createCircleObject(x: number, y:number){
 
-        // ID String für jeden Kreis um 1 erhöhen (p0, p1,..)
-        let idString: string = "p" + this.idCircleCount;
+        let idString: string = "p" + this._places.length;
         this.idCircleCount++;
         let circleObject = new Place(idString, x, y)
         this.pushPlace(circleObject);
@@ -113,8 +112,7 @@ export class Diagram {
 
       createRectObject (x: number, y: number){
 
-        // ID String für jedes Rechteck um 1 erhöhen (t0, t1,..)
-        let idString: string = "t" + this.idRectCount;
+        let idString: string = "t" + this._transitions.length;
         this.idRectCount++;
         let rectObject = new Transition(idString, x, y)
         // Objekt im Array abspeichern
@@ -126,7 +124,7 @@ export class Diagram {
       createLineObject (source: Transition | Place, target: Transition| Place){
     
         // ID String für jeden Pfeil/Linie um 1 erhöhen (a0, a1,..)
-        let idString: string = "a" + this.idLineCount;
+        let idString: string = "a" + this.lines.length;
         this.idLineCount++;
         let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
