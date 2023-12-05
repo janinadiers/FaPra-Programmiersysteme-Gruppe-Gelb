@@ -129,26 +129,18 @@ export class ToolbarComponent {
         }
     }
 
-    /**
-     * ToDo: Not happy with this
-     * @param fileType
-     */
     prepareImportFromFile(fileType: string): void {
         // Implement your logic for importing based on fileType
         console.log(`Preparing to import ${fileType}`);
         this.input?.nativeElement.click();
     }
 
-    /**
-     * ToDo: Not happy with this
-     * @param event
-     */
     importFromFile(e: Event): void {
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
-            var fileExtension = selectedFile.files[0].name.match(/\.pnml$/) ? 'pnml' : '';
+            var fileExtension = selectedFile.files[0].name.toLowerCase().match(/\.pnml$/) ? 'pnml' : '';
             if (fileExtension.length == 0)
-                fileExtension = selectedFile.files[0].name.match(/\.json$/) ? 'json' : '';
+                fileExtension = selectedFile.files[0].name.toLowerCase().match(/\.json$/) ? 'json' : '';
             this._fileReaderService
                 .readFile(selectedFile.files[0])
                 .subscribe((content) => {

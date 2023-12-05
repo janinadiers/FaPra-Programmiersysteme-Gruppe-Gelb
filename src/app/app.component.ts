@@ -24,14 +24,15 @@ export class AppComponent {
     }
 
     public processSourceChange(newSource: {fileContent: string, fileExtension: string}) {
-        this.textareaFc.setValue(newSource);
+        this.textareaFc.setValue(newSource.fileContent);
         let result = undefined;
+        const fileExtensionLowerCase = newSource.fileExtension.toLowerCase();
 
-        if (newSource.fileExtension === 'pnml') {
+        if (fileExtensionLowerCase === 'pnml') {
             result = this._pnmlImportService.import(newSource.fileContent);
 
 
-        } else if (newSource.fileExtension === 'json') {
+        } else if (fileExtensionLowerCase === 'json') {
             result = this._parserService.parse(newSource.fileContent);
         } else {
             alert("Please choose either .pnml or .json");
