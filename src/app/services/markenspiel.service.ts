@@ -37,7 +37,7 @@ export class MarkenspielService {
             // ist in die Display-Component zu onCircleSelect gewandert
 
             let idNumber = +this._diagram.selectedCircle.id.charAt(1);
-            this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
+            this._diagram.places[idNumber-1].svgElement?.setAttribute('stroke','red');
 
             return this._diagram?.selectedCircle?.id
         }
@@ -49,7 +49,7 @@ export class MarkenspielService {
 
             let idNumber = +this._diagram.selectedCircle?.id.charAt(1);
 
-            return this._diagram?.places[idNumber].amountToken.toString();
+            return this._diagram?.places[idNumber-1].amountToken.toString();
         }
 
         public addCircleToken() {
@@ -58,9 +58,9 @@ export class MarkenspielService {
             }
 
             let idNumber = +this._diagram.selectedCircle.id.charAt(1);
-            this._diagram.places[idNumber].amountToken++;
-            this._diagram.places[idNumber].svgElement!.children[1].textContent =
-                this._diagram.places[idNumber].amountToken.toString();
+            this._diagram.places[idNumber-1].amountToken++;
+            this._diagram.places[idNumber-1].svgElement!.children[1].textContent =
+                this._diagram.places[idNumber-1].amountToken.toString();
 
             return;
         }
@@ -71,14 +71,14 @@ export class MarkenspielService {
             }
 
             let idNumber = +this._diagram?.selectedCircle?.id.charAt(1);
-            this._diagram.places[idNumber].amountToken--;
+            this._diagram.places[idNumber-1].amountToken--;
 
-            if(this._diagram.places[idNumber].amountToken  < 0) {
-                this._diagram.places[idNumber].amountToken = 0;
+            if(this._diagram.places[idNumber-1].amountToken  < 0) {
+                this._diagram.places[idNumber-1].amountToken = 0;
             }
 
-            this._diagram.places[idNumber].svgElement!.children[1].textContent =
-                this._diagram.places[idNumber].amountToken.toString();
+            this._diagram.places[idNumber-1].svgElement!.children[1].textContent =
+                this._diagram.places[idNumber-1].amountToken.toString();
 
             return;
         }
@@ -100,7 +100,7 @@ export class MarkenspielService {
             // ist in die Display-Component zu OnLineSelect gewandert
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
-            this._diagram.lines[idNumber].svgElement?.setAttribute('stroke','blue');
+            this._diagram.lines[idNumber-1].svgElement?.setAttribute('stroke','blue');
 
             return this._diagram?.selectedLine?.id;
         }
@@ -112,7 +112,7 @@ export class MarkenspielService {
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
 
-            return this._diagram.lines[idNumber].tokens;
+            return this._diagram.lines[idNumber-1].tokens;
         }
 
         public addLineToken() {
@@ -121,10 +121,10 @@ export class MarkenspielService {
             }
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
-            this._diagram.lines[idNumber].tokens++;
+            this._diagram.lines[idNumber-1].tokens++;
 
-            this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
-                this._diagram.lines[idNumber].tokens.toString();
+            this._diagram.lines[idNumber-1].svgElement!.childNodes[2].textContent =
+                this._diagram.lines[idNumber-1].tokens.toString();
 
             return;
         }
@@ -135,14 +135,14 @@ export class MarkenspielService {
             }
 
             let idNumber = +this._diagram.selectedLine.id.charAt(1);
-            this._diagram.lines[idNumber].tokens--;
+            this._diagram.lines[idNumber-1].tokens--;
 
-            if(this._diagram.lines[idNumber].tokens  < 1) {
-                this._diagram.lines[idNumber].tokens = 1;
+            if(this._diagram.lines[idNumber-1].tokens  < 1) {
+                this._diagram.lines[idNumber-1].tokens = 1;
             }
 
-            this._diagram.lines[idNumber].svgElement!.childNodes[2].textContent =
-                this._diagram.lines[idNumber].tokens.toString();
+            this._diagram.lines[idNumber-1].svgElement!.childNodes[2].textContent =
+                this._diagram.lines[idNumber-1].tokens.toString();
 
             return;
         }

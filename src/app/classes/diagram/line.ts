@@ -246,7 +246,10 @@ export class Line  {
             for (let  i = 0; i < 4; i++) {
 
                 const withinRectangle =
-                intersectionpointsX[i] >= leftX && intersectionpointsX[i] <= rightX && intersectionpointsY[i] >= lowerY && intersectionpointsY[i] <= upperY;
+                intersectionpointsX[i] >= leftX && 
+                intersectionpointsX[i] <= rightX && 
+                intersectionpointsY[i] >= lowerY && 
+                intersectionpointsY[i] <= upperY;
                 
                 if (withinRectangle) {
                 let distance = this.calculateDistance(x2, y2, intersectionpointsX[i], intersectionpointsY[i]);

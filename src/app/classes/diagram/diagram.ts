@@ -13,9 +13,6 @@ export class Diagram {
     selectedRect: SVGElement | undefined = undefined;
     selectedLine: SVGElement | undefined = undefined;
 
-    idCircleCount: number = 0;
-    idRectCount: number = 0;
-    idLineCount: number = 0;
     lightningCount: number = 0;
 
     static toolbarIsActive = false;
@@ -101,9 +98,9 @@ export class Diagram {
 
       createCircleObject(x: number, y:number){
 
-        let idString: string = "p" + this._places.length;
-        this.idCircleCount++;
-        let circleObject = new Place(idString, x, y)
+        let idString: string = "p" + (this._places.length + 1);
+        let circleObject = new Place(idString, x, y);
+        // Objekt im Array abspeichern
         this.pushPlace(circleObject);
         this.pushID(idString);
         return circleObject;
@@ -112,9 +109,8 @@ export class Diagram {
 
       createRectObject (x: number, y: number){
 
-        let idString: string = "t" + this._transitions.length;
-        this.idRectCount++;
-        let rectObject = new Transition(idString, x, y)
+        let idString: string = "t" + (this._transitions.length + 1);
+        let rectObject = new Transition(idString, x, y);
         // Objekt im Array abspeichern
         this.pushTransition(rectObject);
         this.pushID(idString);
@@ -123,9 +119,7 @@ export class Diagram {
 
       createLineObject (source: Transition | Place, target: Transition| Place){
     
-        // ID String für jeden Pfeil/Linie um 1 erhöhen (a0, a1,..)
-        let idString: string = "a" + this.lines.length;
-        this.idLineCount++;
+        let idString: string = "a" + (this.lines.length + 1);
         let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
@@ -140,9 +134,6 @@ export class Diagram {
       }
 
       resetCounterVar() {
-        this.idCircleCount = 0;
-        this.idRectCount = 0;
-        this.idLineCount = 0;
         this.lightningCount = 0;
       }
 
