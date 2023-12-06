@@ -197,7 +197,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 let lastSvgShape = lastCircleObject?.svgElement;
                 if (lastCircleObject && lastSvgShape) {
                 drawingArea.removeChild(lastSvgShape);
-                this._diagram.idCircleCount--;
                 }
             }
             else if (lastID?.startsWith("t")) {
@@ -205,7 +204,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 let lastSvgShape = lastRectObject?.svgElement;
                 if (lastRectObject && lastSvgShape) {
                     drawingArea.removeChild(lastSvgShape);
-                    this._diagram.idRectCount--;
                 }
             }
             else if (lastID?.startsWith("a")){
@@ -214,7 +212,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 let lastSvgLine = lastLineObject?.svgElement;
                 if(lastLineObject && lastSvgLine){
                     drawingArea.removeChild(lastSvgLine);
-                    this._diagram.idLineCount--;
                 }
             }
             this._diagram.resetSelectedElements();
@@ -225,6 +222,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onCanvasClick(event: MouseEvent) {
 
+        console.log(this._diagram);
+       
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 

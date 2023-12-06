@@ -12,6 +12,7 @@ export class Line  {
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
+    private _marker: SVGElement | undefined;
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
@@ -19,19 +20,21 @@ export class Line  {
         this._target = target;
         this._tokens = tokens ?? 1;      // sobald eine Linie existiert, hat sie das Gewicht 1
         this._coords = coords;  //undefined if not given
-        this._source = source;
-        this._target = target;
         this._sourcePosition = {x: source.x, y: source.y};
         this._targetPosition = {x: target.x, y: target.y};
 
         source.getPositionChangeObservable().subscribe((source) => {
             this.updateSource({x: source.x, y: source.y});
-
+            // Update des Schnittpunkts von Linie und Transition
+            let refX: number = this.updateMarker();
+            this._marker?.setAttribute('refX', refX.toString());
+            
         });
         target.getPositionChangeObservable().subscribe((target) => {
             this.updateTarget({x: target.x, y: target.y});
-
-
+            // Update des Schnittpunkts von Linie und Transition
+            let refX: number = this.updateMarker();
+            this._marker?.setAttribute('refX', refX.toString());
         });
     }
 
@@ -206,6 +209,7 @@ export class Line  {
         arrowhead.setAttribute('fill', 'black');
 
         marker.appendChild(arrowhead);
+        this._marker = marker;
 
         group.appendChild(marker);
 
@@ -241,41 +245,47 @@ export class Line  {
 
 
     private updateMarker(): number{
-
-        if (!(this._target instanceof Transition)){
-            let x: number = 35;
-            return x;
-        }
-
-        else{
+ 
+        if (this._target instanceof Transition){
+            
             const x1 = this._source.x;
             const y1 = this._source.y;
             const x2 = this._target.x;
             const y2 = this._target.y;
             const width = this._target.width;
-            const leftSide = this._target.x - (width/2);
-            const rightSide = this._target.x + (width/2);
-
-            // Berechne m die Steigung der Geraden
+            const height = this._target.height;
+            
+            const leftX= this._target.x - (width/2);
+            const rightX = this._target.x + (width/2);
+            const upperY = this._target.y + (height/2);
+            const lowerY = this._target.y - (height/2);
+            // Berechne m die Steigung der Geraden 
             const m = (y2 - y1) / (x2 - x1);
             // Berechne den y-Achsenabschnitt b
             const b = y1 - m * x1;
 
-            if (x1 <= (leftSide)) {
-                const x3 = leftSide;
-                const y3 = m * x3 + b;
-                return (this.calculateDistance(x2, y2, x3, y3) + 10);
+            const intersectionpointsX: Array<number>= [(upperY - b) / m,  (lowerY - b) / m, leftX, rightX ];
+            const intersectionpointsY: Array<number> = [upperY, lowerY, m * leftX + b,  m * rightX + b ];
+            
+            for (let  i = 0; i < 4; i++) {
 
+                const withinRectangle =
+                intersectionpointsX[i] >= leftX && 
+                intersectionpointsX[i] <= rightX && 
+                intersectionpointsY[i] >= lowerY && 
+                intersectionpointsY[i] <= upperY;
+                
+                if (withinRectangle) {
+                let distance = this.calculateDistance(x2, y2, intersectionpointsX[i], intersectionpointsY[i]);
+                return distance + 10;
+                }
             }
-            else if (x1 >= (rightSide)) {
-                const x3 = rightSide;
-                const y3 = m * x3 + b;
-                return (this.calculateDistance(x2, y2, x3, y3) + 10);
-            }
-            else {
-                let y: number = 30;
-                return y;
-            }
+
+            return 35;    
+        }   
+
+        else{
+            return 35;
         }
     }
 

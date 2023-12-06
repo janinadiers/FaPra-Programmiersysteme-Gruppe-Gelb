@@ -36,7 +36,7 @@ export class MarkenspielService {
             }); */
             // ist in die Display-Component zu onCircleSelect gewandert
 
-            let idNumber = +this._diagram.selectedCircle.id.charAt(1);
+            let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1;
             this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
 
             return this._diagram?.selectedCircle?.id
@@ -47,7 +47,7 @@ export class MarkenspielService {
                 return;
             }
 
-            let idNumber = +this._diagram.selectedCircle?.id.charAt(1);
+            let idNumber = +this._diagram.selectedCircle?.id.charAt(1) -1;
 
             return this._diagram?.places[idNumber].amountToken.toString();
         }
@@ -57,7 +57,7 @@ export class MarkenspielService {
                 return;
             }
 
-            let idNumber = +this._diagram.selectedCircle.id.charAt(1);
+            let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1;
             this._diagram.places[idNumber].amountToken++;
             this._diagram.places[idNumber].svgElement!.children[1].textContent =
                 this._diagram.places[idNumber].amountToken.toString();
@@ -70,7 +70,7 @@ export class MarkenspielService {
                 return;
             }
 
-            let idNumber = +this._diagram?.selectedCircle?.id.charAt(1);
+            let idNumber = +this._diagram?.selectedCircle?.id.charAt(1)-1;
             this._diagram.places[idNumber].amountToken--;
 
             if(this._diagram.places[idNumber].amountToken  < 0) {
@@ -99,7 +99,7 @@ export class MarkenspielService {
             }); */
             // ist in die Display-Component zu OnLineSelect gewandert
 
-            let idNumber = +this._diagram.selectedLine.id.charAt(1);
+            let idNumber = +this._diagram.selectedLine.id.charAt(1) -1;
             // this._diagram.lines[idNumber].svgElement?.setAttribute('stroke','transparent');
 
             this._diagram!.lines[idNumber].svgElement!.querySelector('text')!.
@@ -136,7 +136,7 @@ export class MarkenspielService {
                 return;
             }
 
-            let idNumber = +this._diagram.selectedLine.id.charAt(1);
+            let idNumber = +this._diagram.selectedLine.id.charAt(1) -1;
 
             return this._diagram.lines[idNumber].tokens;
         }
@@ -146,7 +146,7 @@ export class MarkenspielService {
                 return;
             }
 
-            let idNumber = +this._diagram.selectedLine.id.charAt(1);
+            let idNumber = +this._diagram.selectedLine.id.charAt(1) -1;
             this._diagram.lines[idNumber].tokens++;
 
             this._diagram.lines[idNumber].svgElement!.childNodes[3].textContent =
@@ -160,7 +160,7 @@ export class MarkenspielService {
                 return;
             }
 
-            let idNumber = +this._diagram.selectedLine.id.charAt(1);
+            let idNumber = +this._diagram.selectedLine.id.charAt(1) -1;
             this._diagram.lines[idNumber].tokens--;
 
             if(this._diagram.lines[idNumber].tokens  < 1) {
