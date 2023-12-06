@@ -26,12 +26,12 @@ export class Line  {
 
         source.getPositionChangeObservable().subscribe((source) => {
             this.updateSource({x: source.x, y: source.y});
-            
+
         });
         target.getPositionChangeObservable().subscribe((target) => {
             this.updateTarget({x: target.x, y: target.y});
-           
-        
+
+
         });
     }
 
@@ -74,28 +74,52 @@ export class Line  {
     }
 
     private updateSource(updatedPosition: Coords): void {
-        
+
         if(this._svgElement) {
             if(this._svgElement.childNodes[0] instanceof SVGElement) {
-                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
+                    ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
+                        ${this._targetPosition?.y}`);
             }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
+
+            // Markierungen für die Gewichte an die Kante hängen
+            let tokenCircleCx = this.calcMidCoords().x.toString();
+            let tokenCircleCy = this.calcMidCoords().y.toString();
+
+            if(!this.svgElement){
+                return;
+            }
+            this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
+            this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
+            this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
+            this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
         }
 
-        
+
 
     }
 
     private updateTarget(updatedPosition: Coords): void {
-        
+
         if(this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
-        
 
+        // Markierungen für die Gewichte an die Kante hängen
+        let tokenCircleCx = this.calcMidCoords().x.toString();
+        let tokenCircleCy = this.calcMidCoords().y.toString();
+
+        if(!this.svgElement) {
+            return;
+        }
+        this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
+        this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
+        this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
+        this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
     }
 
     //Iterate through found coords and return them as string
@@ -109,7 +133,7 @@ export class Line  {
         return result;
     }
 
-    private calcMidCoords(): Coords {
+    public calcMidCoords(): Coords {
         let midCoords: Coords = {x: -50000, y: -50000}; //Placeholder to define Coords variable
 
         if (this._coords) {
@@ -153,11 +177,11 @@ export class Line  {
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
         line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', '1');       
+        line.setAttribute('stroke-width', '1');
         line.setAttribute('fill', 'transparent');
         this._svgElement = line;
 
@@ -165,7 +189,7 @@ export class Line  {
 
         let refX: number;
         refX = this.updateMarker();
-    
+
         // Marker
         const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
         marker.setAttribute('id', `arrowhead-${this._id}`);
@@ -175,19 +199,18 @@ export class Line  {
         marker.setAttribute('refY', '5');
         marker.setAttribute('orient', 'auto-start-reverse');
         marker.setAttribute('markerUnits', 'strokeWidth');
-    
+
         // Path Element für Pfeilspitze
         const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
         arrowhead.setAttribute('fill', 'black');
-    
+
         marker.appendChild(arrowhead);
 
         group.appendChild(marker);
 
         const markerId = `url(#arrowhead-${this._id})`;
         line.setAttribute('marker-end', markerId);
-
 
         //Get mid coord of Polyline
         const midCoords = this.calcMidCoords();
@@ -218,7 +241,7 @@ export class Line  {
 
 
     private updateMarker(): number{
- 
+
         if (!(this._target instanceof Transition)){
             let x: number = 35;
             return x;
@@ -233,7 +256,7 @@ export class Line  {
             const leftSide = this._target.x - (width/2);
             const rightSide = this._target.x + (width/2);
 
-            // Berechne m die Steigung der Geraden 
+            // Berechne m die Steigung der Geraden
             const m = (y2 - y1) / (x2 - x1);
             // Berechne den y-Achsenabschnitt b
             const b = y1 - m * x1;
@@ -242,18 +265,18 @@ export class Line  {
                 const x3 = leftSide;
                 const y3 = m * x3 + b;
                 return (this.calculateDistance(x2, y2, x3, y3) + 10);
-                
-            } 
+
+            }
             else if (x1 >= (rightSide)) {
                 const x3 = rightSide;
                 const y3 = m * x3 + b;
                 return (this.calculateDistance(x2, y2, x3, y3) + 10);
-            } 
+            }
             else {
                 let y: number = 30;
                 return y;
             }
-        }   
+        }
     }
 
 
