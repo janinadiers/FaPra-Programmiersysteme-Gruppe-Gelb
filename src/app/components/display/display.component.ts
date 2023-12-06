@@ -22,7 +22,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     private subscriptionOfToolbar: Subscription = new Subscription;
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
-    
+
     constructor(
                 private _displayService: DisplayService,
                 private _fileReaderService: FileReaderService,
@@ -32,29 +32,29 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
-        
+
         this._diagram = diagram;
-        
+
         this.draw();
-        
+
         });
 
         this.activeButtonService.zoomButtonClickObservable().subscribe(buttonId => {
-          
+
             if(buttonId === "zoom-in"){
-                Diagram.zoomFactor = Diagram.zoomFactor - 0.1;   
+                Diagram.zoomFactor = Diagram.zoomFactor - 0.1;
             }
 
             else if(buttonId === "zoom-out"){
-               Diagram.zoomFactor = Diagram.zoomFactor + 0.1;   
+               Diagram.zoomFactor = Diagram.zoomFactor + 0.1;
             }
         });
     }
 
     ngOnInit() {
-        
+
         this._diagram!.canvasElement = document.getElementById('canvas') as unknown as SVGElement;
-        this.subscriptionOfToolbar = 
+        this.subscriptionOfToolbar =
         this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
         if (buttonId === "clear"){
             let clearElements: boolean = true;
@@ -73,19 +73,19 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     get viewBox(): string {
-        
+
         const canvas= document.getElementById('canvas');
-       
+
         if (canvas) {
-            
+
           const rect = canvas.getBoundingClientRect();
-          
+
           // die viewBox des svg Elements wird an den Zoomfaktor angepasst (Je größer die viewBox, desto kleiner das Diagramm)
           // die viewBox ist eine Art zusätzlicher innerer Canvas der die Größe des Diagramms bestimmt unabhängig von der Größe des äußeren Canvas
           Diagram.viewBox.width = rect.width * Diagram.zoomFactor;
           Diagram.viewBox.height = rect.height * Diagram.zoomFactor;
-         
-           
+
+
           return `${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}`;
         }
         // Default viewBox if canvas is not available
@@ -145,20 +145,20 @@ export class DisplayComponent implements OnInit, OnDestroy {
             console.debug('drawing area not ready yet')
             return;
         }
-        
+
         this.clearDrawingArea();
 
         let groupedElements = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         groupedElements.setAttribute('id', 'groupedSvgDiagram');
         if(this._diagram){
             [...this._diagram.lines, ...this._diagram.places, ...this._diagram.transitions].forEach(element => {
-           
+
                 groupedElements.appendChild(element.svgElement!);
-           
+
             });
-            
+
         }
-        
+
         this.drawingArea.nativeElement.appendChild(groupedElements);
     }
 
@@ -225,28 +225,28 @@ export class DisplayComponent implements OnInit, OnDestroy {
         console.log(this._diagram);
        
         // Koordinaten des Klick Events relativ zum SVG Element
-        const svgElement = document.getElementById('canvas');  
-          
+        const svgElement = document.getElementById('canvas');
+
         if (!svgElement) {
             return;
         }
         // Position des SVG Elements relativ zum Viewport
         const svgContainer = svgElement.getBoundingClientRect();
-        // Berechnung der Maus Koordinanten relativ zum SVG Element 
+        // Berechnung der Maus Koordinanten relativ zum SVG Element
         // und Anpassung an den Zoomfaktor, da es sonst zu einem Offset beim Klicken kommt
         const mouseX = (event.clientX - svgContainer.left) * Diagram.zoomFactor;
         const mouseY = (event.clientY - svgContainer.top) * Diagram.zoomFactor;
-      
+
         // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
-           
+
             let svgCircle = this.drawCircle(mouseX ,mouseY)
             svgElement.appendChild(svgCircle);
 
         }
 
         else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
-           
+
             let svgRect = this.drawRect(mouseX, mouseY);
             svgElement.appendChild(svgRect);
         }
@@ -281,8 +281,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
                 this._diagram.lightningCount--;
             }
-        } 
-       
+        }
+
     }
 
     drawCircle(mouseX:number, mouseY:number){
@@ -382,14 +382,13 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
         this._diagram?.lines.forEach((element) => {
-            element.svgElement?.setAttribute('stroke', 'black');
-            element.svgElement?.setAttribute('stroke-width', '2');
+            element.svgElement?.setAttribute('stroke', 'transparent');
+            element.svgElement!.querySelector('text')!.setAttribute('stroke','black');
+
         });
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
         });
-        // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
-
 
         return;
     }
@@ -402,12 +401,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
         });
-        this._diagram?.lines.forEach((element) => {
-            element.svgElement?.setAttribute('stroke', 'black');
-            element.svgElement?.setAttribute('stroke-width', '2');
-        });
         // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
-
 
         if (this._diagram?.selectedRect) {
             let circleIsTarget: boolean = true;

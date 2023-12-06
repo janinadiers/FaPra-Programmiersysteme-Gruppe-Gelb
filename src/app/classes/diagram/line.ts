@@ -77,28 +77,52 @@ export class Line  {
     }
 
     private updateSource(updatedPosition: Coords): void {
-        
+
         if(this._svgElement) {
             if(this._svgElement.childNodes[0] instanceof SVGElement) {
-                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
+                    ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
+                        ${this._targetPosition?.y}`);
             }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
+
+            // Markierungen für die Gewichte an die Kante hängen
+            let tokenCircleCx = this.calcMidCoords().x.toString();
+            let tokenCircleCy = this.calcMidCoords().y.toString();
+
+            if(!this.svgElement){
+                return;
+            }
+            this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
+            this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
+            this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
+            this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
         }
 
-        
+
 
     }
 
     private updateTarget(updatedPosition: Coords): void {
-        
+
         if(this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
         }
-        
 
+        // Markierungen für die Gewichte an die Kante hängen
+        let tokenCircleCx = this.calcMidCoords().x.toString();
+        let tokenCircleCy = this.calcMidCoords().y.toString();
+
+        if(!this.svgElement) {
+            return;
+        }
+        this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
+        this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
+        this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
+        this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
     }
 
     //Iterate through found coords and return them as string
@@ -112,7 +136,7 @@ export class Line  {
         return result;
     }
 
-    private calcMidCoords(): Coords {
+    public calcMidCoords(): Coords {
         let midCoords: Coords = {x: -50000, y: -50000}; //Placeholder to define Coords variable
 
         if (this._coords) {
@@ -156,11 +180,11 @@ export class Line  {
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
         line.setAttribute('stroke', 'black');
-        line.setAttribute('stroke-width', '1');       
+        line.setAttribute('stroke-width', '1');
         line.setAttribute('fill', 'transparent');
         this._svgElement = line;
 
@@ -168,7 +192,7 @@ export class Line  {
 
         let refX: number;
         refX = this.updateMarker();
-    
+
         // Marker
         const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
         marker.setAttribute('id', `arrowhead-${this._id}`);
@@ -178,12 +202,12 @@ export class Line  {
         marker.setAttribute('refY', '5');
         marker.setAttribute('orient', 'auto-start-reverse');
         marker.setAttribute('markerUnits', 'strokeWidth');
-    
+
         // Path Element für Pfeilspitze
         const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
         arrowhead.setAttribute('fill', 'black');
-    
+
         marker.appendChild(arrowhead);
         this._marker = marker;
 

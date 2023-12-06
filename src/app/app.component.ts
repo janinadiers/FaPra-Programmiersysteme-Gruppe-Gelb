@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
-import { PnmlImportService } from './services/pnml-import.service';
+import { PnmlImportService } from './services/import/pnml-import.service';
 import { DisplayService } from './services/display.service';
 
 
@@ -11,7 +11,7 @@ import { DisplayService } from './services/display.service';
     styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-    
+
     public textareaFc: FormControl;
 
     constructor(
@@ -24,14 +24,15 @@ export class AppComponent {
     }
 
     public processSourceChange(newSource: {fileContent: string, fileExtension: string}) {
-        this.textareaFc.setValue(newSource);
+        this.textareaFc.setValue(newSource.fileContent);
         let result = undefined;
-        
-        if (newSource.fileExtension === 'pnml') {
+        const fileExtensionLowerCase = newSource.fileExtension.toLowerCase();
+
+        if (fileExtensionLowerCase === 'pnml') {
             result = this._pnmlImportService.import(newSource.fileContent);
-            
-            
-        } else if (newSource.fileExtension === 'json') {
+
+
+        } else if (fileExtensionLowerCase === 'json') {
             result = this._parserService.parse(newSource.fileContent);
         } else {
             alert("Please choose either .pnml or .json");

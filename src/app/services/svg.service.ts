@@ -4,13 +4,26 @@ import {Element} from '../classes/diagram/element';
 import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
 import {Line} from "../classes/diagram/line";
+import {DisplayService} from "./display.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class SvgService {
 
-  
+    constructor(private _displayService: DisplayService) {}
+
+    private getPlaces(): Array<Place> {
+        return this._displayService.diagram!.places;
+    }
+
+    private getTransitions(): Array<Transition> {
+        return this._displayService.diagram!.transitions;
+    }
+
+    private getLines(): Array<Line> {
+        return this._displayService.diagram!.lines;
+    }
 
     public createSvgElements(diagram: Diagram): Array<SVGElement> {
 
@@ -19,7 +32,7 @@ export class SvgService {
         diagram.lines.forEach(line => {
             result.push(line.createSVG());
         });
-        
+
         diagram.places.forEach(place => {
             result.push(new Place(place.id, place.x, place.y, place.amountToken).createSVG());
         });
@@ -27,34 +40,31 @@ export class SvgService {
         diagram.transitions.forEach(transition => {
             result.push(new Transition(transition.id, transition.x, transition.y, transition.label).createSVG());
         });
-        
+
         return result;
     }
 
-    private createSvgCircleForElement(element: Element): SVGElement {
+    public createSvgCircleForElement(element: Element): SVGElement {
         // Umformung muss geschehen, da sonst Informationen verloren gehen
         const place = new Place(element.id, element.x, element.y);
         return place.createSVG();
     }
 
-    private createSvgRectangleForElement(element: Element): SVGElement {
+    public createSvgRectangleForElement(element: Element): SVGElement {
         // Umformung muss geschehen, da sonst Informationen verloren gehen
         const transition = new Transition(element.id, element.x, element.y);
         return transition.createSVG();
     }
 
-    private createSvgLineForElement(line: Line): SVGElement {
+    public createSvgLineForElement(line: Line): SVGElement {
         line.createSVG();
         return line.svgElement!;
     }
 
-    public exportToSvg(diagram: Diagram): string {
-        const places = diagram.places;
-        const transitions = diagram.transitions;
-        const lines = diagram.lines;
-
+    export(): string {
         // Prüfen, dass das SVG nicht abgeschnitten wird, sondern die Größe sich u. U. nach den Element-Koordinaten richtet
-        const { maxX, maxY } = this.calculateMaxCoordinates([...places, ...transitions]);
+        const {maxX, maxY} = this
+            .calculateMaxCoordinates([...this.getPlaces(), ...this.getTransitions()]);
 
         const circleRadius = 25;
 
@@ -64,20 +74,20 @@ export class SvgService {
 
         let svgElement = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`;
 
-        lines.forEach((line) => {
-            if(line) {
+        this.getLines().forEach((line) => {
+            if (line) {
                 svgElement += this.createSvgLineForElement(line).outerHTML;
             }
         });
 
-        places.forEach((place) => {
-            if(place) {
+        this.getPlaces().forEach((place) => {
+            if (place) {
                 svgElement += this.createSvgCircleForElement(place).outerHTML;
             }
         });
 
-        transitions.forEach((transition) => {
-            if(transition) {
+        this.getTransitions().forEach((transition) => {
+            if (transition) {
                 svgElement += this.createSvgRectangleForElement(transition).outerHTML;
             }
         });
@@ -93,17 +103,17 @@ export class SvgService {
         let maxY = 0;
 
         elements.forEach(element => {
-            if(element) {
+            if (element) {
                 // Überprüfen, ob das Element die maximalen x- und y-Koordinaten überschreitet
-                if(element.x > maxX) {
+                if (element.x > maxX) {
                     maxX = element.x;
                 }
-                if(element.y > maxY) {
+                if (element.y > maxY) {
                     maxY = element.y;
                 }
             }
         });
 
-        return { maxX, maxY };
+        return {maxX, maxY};
     }
 }
