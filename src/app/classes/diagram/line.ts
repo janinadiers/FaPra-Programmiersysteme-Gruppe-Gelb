@@ -87,6 +87,9 @@ export class Line  {
             let tokenCircleCx = this.calcMidCoords().x.toString();
             let tokenCircleCy = this.calcMidCoords().y.toString();
 
+            if(!this.svgElement){
+                return;
+            }
             this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
             this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
             this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
@@ -110,11 +113,13 @@ export class Line  {
         let tokenCircleCx = this.calcMidCoords().x.toString();
         let tokenCircleCy = this.calcMidCoords().y.toString();
 
+        if(!this.svgElement) {
+            return;
+        }
         this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
         this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
         this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
-
     }
 
     //Iterate through found coords and return them as string
