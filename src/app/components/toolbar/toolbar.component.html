@@ -1,70 +1,90 @@
-<mat-toolbar class ="toolbar">
+<mat-toolbar class="toolbar">
     <div>
-    <button  mat-icon-button 
-        class="hover-class" 
-        [class.active]="circleActiveColor"
-        (click)="toggleCircleButton()">
-        <mat-icon>panorama_fish_eye</mat-icon>
-    </button>
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="circleActiveColor"
+                (click)="toggleCircleButton()">
+            <mat-icon>panorama_fish_eye</mat-icon>
+        </button>
 
-    <button mat-icon-button
-        class="hover-class"
-        [class.active]="rectActiveColor"
-        (click)="toggleRectangleButton()">
-        <mat-icon>crop_portrait</mat-icon>
-    </button>
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="rectActiveColor"
+                (click)="toggleRectangleButton()">
+            <mat-icon>crop_portrait</mat-icon>
+        </button>
 
-    <button  mat-icon-button
-        class="hover-class"
-        [class.active]="arrowActiveColor"
-        (click)="toggleArrowButton()">
-        <mat-icon>north_east</mat-icon>
-    </button>
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="arrowActiveColor"
+                (click)="toggleArrowButton()">
+            <mat-icon>north_east</mat-icon>
+        </button>
 
-    <button  mat-icon-button
-        class="hover-class"
-        [class.active]="boltActiveColor"
-        (click)="toggleBoltButton()">
-        <mat-icon>bolt</mat-icon>
-    </button>
-     
-    <button  mat-icon-button 
-        class="hover-class"
-        (click)="onButtonClick('deleteLast')"> 
-        <mat-icon>delete</mat-icon> 
-    </button>
-    
-    <button  mat-icon-button 
-        class="hover-class"
-        (click)="onButtonClick('clear')"> 
-        <mat-icon>clear</mat-icon> 
-    </button>
-</div>
-<span style="color: red">
+        <button mat-icon-button
+                class="hover-class"
+                [class.active]="boltActiveColor"
+                (click)="toggleBoltButton()">
+            <mat-icon>bolt</mat-icon>
+        </button>
+
+        <button mat-icon-button
+                class="hover-class"
+                (click)="onButtonClick('deleteLast')">
+            <mat-icon>delete</mat-icon>
+        </button>
+
+        <button mat-icon-button
+                class="hover-class"
+                (click)="onButtonClick('clear')">
+            <mat-icon>clear</mat-icon>
+        </button>
+
+        <button mat-icon-button [matMenuTriggerFor]="importExportMenu">
+            <mat-icon>import_export</mat-icon>
+        </button>
+
+        <mat-menu #importExportMenu="matMenu">
+            <button mat-menu-item [matMenuTriggerFor]="importMenu">Import</button>
+            <button mat-menu-item [matMenuTriggerFor]="exportMenu">Export</button>
+        </mat-menu>
+
+        <mat-menu #importMenu="matMenu">
+            <app-import-menu (importSelected)="prepareImportFromFile($event)"></app-import-menu>
+        </mat-menu>
+
+        <mat-menu #exportMenu="matMenu">
+            <app-export-menu (exportSelected)="export($event)"></app-export-menu>
+        </mat-menu>
+
+        <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
+
+    </div>
+    <span style="color: red">
     <mat-card-content>
         Marken: &nbsp;
     </mat-card-content>
 
     <mat-card-content>
-        {{markenspielService.getCircleId()}} &nbsp;
+        {{_markenspielService.getCircleId()}} &nbsp;
     </mat-card-content>
 
     <mat-card-content>
-         {{markenspielService.getCircleToken()}} &nbsp;
+         {{_markenspielService.getCircleToken()}} &nbsp;
     </mat-card-content>
     </span>
 
     <button mat-button
-            class ="hover-class"
-            (click) = "markenspielService.addCircleToken()">
+            class="hover-class"
+            (click)="_markenspielService.addCircleToken()">
         +
 
     </button>
 
 
     <button mat-button
-            class ="hover-class"
-            (click) = "markenspielService.removeCircleToken()">
+            class="hover-class"
+            (click)="_markenspielService.removeCircleToken()">
         -
     </button>
 
@@ -74,36 +94,36 @@
     </mat-card-content>
 
     <mat-card-content>
-        {{markenspielService.getLineId()}} &nbsp;
+        {{_markenspielService.getLineId()}} &nbsp;
     </mat-card-content>
 
     <mat-card-content>
-        {{markenspielService.getLineToken()}} &nbsp;
+        {{_markenspielService.getLineToken()}} &nbsp;
     </mat-card-content>
     </span>
 
     <button mat-button
-            class ="hover-class"
-            (click) = "markenspielService.addLineToken()">
+            class="hover-class"
+            (click)="_markenspielService.addLineToken()">
         +
     </button>
 
     <button mat-button
-            class ="hover-class"
-            (click) = "markenspielService.removeLineToken()">
+            class="hover-class"
+            (click)="_markenspielService.removeLineToken()">
         -
     </button>
 
-<div class="zoom-button-wrapper">
-    <button mat-icon-button class="hover-class"
-    (click)="onZoomButtonClick('zoom-in')">
-        <mat-icon>zoom_in</mat-icon>
-    </button>
-    <button mat-icon-button class="hover-class"
-    (click)="onZoomButtonClick('zoom-out')">
-        <mat-icon>zoom_out</mat-icon>
-    </button>
-</div>
+    <div class="zoom-button-wrapper">
+        <button mat-icon-button class="hover-class"
+                (click)="onZoomButtonClick('zoom-in')">
+            <mat-icon>zoom_in</mat-icon>
+        </button>
+        <button mat-icon-button class="hover-class"
+                (click)="onZoomButtonClick('zoom-out')">
+            <mat-icon>zoom_out</mat-icon>
+        </button>
+    </div>
 
-   
+
 </mat-toolbar>

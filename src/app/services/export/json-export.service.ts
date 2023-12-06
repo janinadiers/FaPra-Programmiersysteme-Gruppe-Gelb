@@ -1,17 +1,31 @@
-import { ExportService } from '../classes/export-service';
-import { DisplayService } from './display.service';
-import { Injectable } from '@angular/core';
-import { Coords, JsonPetriNet } from '../classes/json-petri-net';
-import {DownloadService} from "./helper/download-service";
+import {Injectable} from '@angular/core';
+import {DisplayService} from "../display.service";
+import {Place} from "../../classes/diagram/place";
+import {Transition} from "../../classes/diagram/transition";
+import {Line} from "../../classes/diagram/line";
+import {Coords, JsonPetriNet} from "../../classes/json-petri-net";
 
 @Injectable({
-    providedIn: 'root',
+    providedIn: 'root'
 })
-export class JsonExport implements ExportService{
-    constructor(private _displayService: DisplayService,
-                private downloadService: DownloadService) {}
+export class JsonExportService {
 
-    export(): void {
+    constructor(private _displayService: DisplayService) {
+    }
+
+    private getPlaces(): Array<Place> {
+        return this._displayService.diagram!.places;
+    }
+
+    private getTransitions(): Array<Transition> {
+        return this._displayService.diagram!.transitions;
+    }
+
+    private getLines(): Array<Line> {
+        return this._displayService.diagram!.lines;
+    }
+
+    export(): string {
         //usage of given Json interface for PetriNet
         const petriNet: JsonPetriNet = {
             places: [],
@@ -21,7 +35,7 @@ export class JsonExport implements ExportService{
             labels: {},
             marking: {},
             layout: {}
-          };
+        };
 
         this._displayService.diagram.places.forEach(place => {
             petriNet.places.push(place.id);
@@ -53,8 +67,6 @@ export class JsonExport implements ExportService{
             }
         });
 
-        var jsonString = JSON.stringify(petriNet);
-
-        this.downloadService.downloadFile(jsonString, 'petriNetz.json', 'application/json');
+        return JSON.stringify(petriNet);
     }
 }

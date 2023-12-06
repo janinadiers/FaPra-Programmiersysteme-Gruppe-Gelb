@@ -14,13 +14,11 @@ import { ExampleFileComponent } from './components/example-file/example-file.com
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ExampleButtonComponent } from './components/example-button/example-button.component';
-import { ImportButtonComponent } from './components/import-button/import-button.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { PngExportButtonComponent } from './components/png-export-button/png-export-button.component';
-import { ExportButtonComponent} from "./components/export-button/export-button.component";
-import { ExportSvgButtonComponent } from './components/export-svg-button/export-svg-button.component';
-import { ExportJsonButtonComponent } from './components/export-button-json/export-button-json.component';
+import {MatMenuModule} from "@angular/material/menu";
+import { ImportMenuComponent } from './import-menu/import-menu.component';
+import { ExportMenuComponent } from './export-menu/export-menu.component';
 import {MatCardModule} from "@angular/material/card";
 
 
@@ -32,11 +30,8 @@ import {MatCardModule} from "@angular/material/card";
         ExampleFileComponent,
         ExampleButtonComponent,
         ToolbarComponent,
-        ExportSvgButtonComponent,
-        ImportButtonComponent,
-        PngExportButtonComponent,
-        ExportButtonComponent,
-        ExportJsonButtonComponent,
+        ImportMenuComponent,
+        ExportMenuComponent,
     ],
     imports: [
         BrowserModule,
@@ -49,6 +44,7 @@ import {MatCardModule} from "@angular/material/card";
         ReactiveFormsModule,
         HttpClientModule,
         MatToolbarModule,
+        MatMenuModule,
         MatCardModule,
     ],
     providers: [
