@@ -3,6 +3,29 @@
     background-color: white;
     display: flex;
     justify-content: space-between;
+    width: 100%;
+}
+
+.left-toolbar {
+
+    display: flex;
+    width: 100%;
+}
+
+.right-toolbar {
+
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.drawing-tools{
+    border-right: 2px solid rgba(0, 0, 0, 0.7);
+    padding-right: 1rem;
+}
+
+.delete-tools{
+    padding-left: 1rem;
 }
 
 

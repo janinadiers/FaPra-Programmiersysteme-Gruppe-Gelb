@@ -1,129 +1,95 @@
 <mat-toolbar class="toolbar">
-    <div>
-        <button mat-icon-button
+    <div class="left-toolbar">
+        <div class="drawing-tools">
+            <button mat-icon-button
+                    class="hover-class"
+                    [class.active]="circleActiveColor"
+                    (click)="toggleCircleButton()">
+                <mat-icon>panorama_fish_eye</mat-icon>
+            </button>
+
+            <button mat-icon-button
+                    class="hover-class"
+                    [class.active]="rectActiveColor"
+                    (click)="toggleRectangleButton()">
+                <mat-icon>crop_portrait</mat-icon>
+            </button>
+
+            <button mat-icon-button
+                    class="hover-class"
+                    [class.active]="arrowActiveColor"
+                    (click)="toggleArrowButton()">
+                <mat-icon>north_east</mat-icon>
+            </button>
+
+            <button mat-icon-button
+                    class="hover-class"
+                    [class.active]="boltActiveColor"
+                    (click)="toggleBoltButton()">
+                <mat-icon>bolt</mat-icon>
+            </button>
+
+            <button mat-icon-button
                 class="hover-class"
-                [class.active]="circleActiveColor"
-                (click)="toggleCircleButton()">
-            <mat-icon>panorama_fish_eye</mat-icon>
-        </button>
+                (click)="_markenspielService.addCircleToken()">
+                <mat-icon>add_circle</mat-icon>
 
-        <button mat-icon-button
-                class="hover-class"
-                [class.active]="rectActiveColor"
-                (click)="toggleRectangleButton()">
-            <mat-icon>crop_portrait</mat-icon>
-        </button>
-
-        <button mat-icon-button
-                class="hover-class"
-                [class.active]="arrowActiveColor"
-                (click)="toggleArrowButton()">
-            <mat-icon>north_east</mat-icon>
-        </button>
-
-        <button mat-icon-button
-                class="hover-class"
-                [class.active]="boltActiveColor"
-                (click)="toggleBoltButton()">
-            <mat-icon>bolt</mat-icon>
-        </button>
-
-        <button mat-icon-button
-                class="hover-class"
-                (click)="onButtonClick('deleteLast')">
-            <mat-icon>delete</mat-icon>
-        </button>
-
-        <button mat-icon-button
-                class="hover-class"
-                (click)="onButtonClick('clear')">
-            <mat-icon>clear</mat-icon>
-        </button>
-
-        <button mat-icon-button [matMenuTriggerFor]="importExportMenu">
-            <mat-icon>import_export</mat-icon>
-        </button>
-
-        <mat-menu #importExportMenu="matMenu">
-            <button mat-menu-item [matMenuTriggerFor]="importMenu">Import</button>
-            <button mat-menu-item [matMenuTriggerFor]="exportMenu">Export</button>
-        </mat-menu>
-
-        <mat-menu #importMenu="matMenu">
-            <app-import-menu (importSelected)="prepareImportFromFile($event)"></app-import-menu>
-        </mat-menu>
-
-        <mat-menu #exportMenu="matMenu">
-            <app-export-menu (exportSelected)="export($event)"></app-export-menu>
-        </mat-menu>
-
-        <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
-
-    </div>
-    <span style="color: red">
-    <mat-card-content>
-        Marken: &nbsp;
-    </mat-card-content>
-
-    <mat-card-content>
-        {{_markenspielService.getCircleId()}} &nbsp;
-    </mat-card-content>
-
-    <mat-card-content>
-         {{_markenspielService.getCircleToken()}} &nbsp;
-    </mat-card-content>
-    </span>
-
-    <button mat-button
-            class="hover-class"
-            (click)="_markenspielService.addCircleToken()">
-        +
-
-    </button>
+             </button>
 
 
-    <button mat-button
-            class="hover-class"
-            (click)="_markenspielService.removeCircleToken()">
-        -
-    </button>
+            <button mat-icon-button
+                    class="hover-class"
+                    (click)="_markenspielService.removeCircleToken()">
+                <mat-icon>remove_circle</mat-icon>
+            </button>
+        </div>
+            <div class="delete-tools">
+                <button mat-icon-button
+                    class="hover-class"
+                    (click)="onButtonClick('deleteLast')">
+                <mat-icon>delete</mat-icon>
+                </button>
 
-    <span style="color:blue">
-    <mat-card-content>
-        Gewichte: &nbsp;
-    </mat-card-content>
-
-    <mat-card-content>
-        {{_markenspielService.getLineId()}} &nbsp;
-    </mat-card-content>
-
-    <mat-card-content>
-        {{_markenspielService.getLineToken()}} &nbsp;
-    </mat-card-content>
-    </span>
-
-    <button mat-button
-            class="hover-class"
-            (click)="_markenspielService.addLineToken()">
-        +
-    </button>
-
-    <button mat-button
-            class="hover-class"
-            (click)="_markenspielService.removeLineToken()">
-        -
-    </button>
-
-    <div class="zoom-button-wrapper">
-        <button mat-icon-button class="hover-class"
-                (click)="onZoomButtonClick('zoom-in')">
-            <mat-icon>zoom_in</mat-icon>
-        </button>
-        <button mat-icon-button class="hover-class"
-                (click)="onZoomButtonClick('zoom-out')">
-            <mat-icon>zoom_out</mat-icon>
-        </button>
+                <button mat-icon-button
+                        class="hover-class"
+                        (click)="onButtonClick('clear')">
+                    <mat-icon>clear</mat-icon>
+                </button>
+            </div>
+        
     </div>
 
+        <div class="right-toolbar">
+            <button mat-icon-button [matMenuTriggerFor]="importExportMenu">
+                <mat-icon>import_export</mat-icon>
+            </button>
+
+            <mat-menu #importExportMenu="matMenu">
+                <button mat-menu-item [matMenuTriggerFor]="importMenu">Import</button>
+                <button mat-menu-item [matMenuTriggerFor]="exportMenu">Export</button>
+            </mat-menu>
+
+            <mat-menu #importMenu="matMenu">
+                <app-import-menu (importSelected)="prepareImportFromFile($event)"></app-import-menu>
+            </mat-menu>
+
+            <mat-menu #exportMenu="matMenu">
+                <app-export-menu (exportSelected)="export($event)"></app-export-menu>
+            </mat-menu>
+
+            <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
+            <div class="zoom-button-wrapper">
+                <button mat-icon-button class="hover-class"
+                        (click)="onZoomButtonClick('zoom-in')">
+                    <mat-icon>zoom_in</mat-icon>
+                </button>
+                <button mat-icon-button class="hover-class"
+                        (click)="onZoomButtonClick('zoom-out')">
+                    <mat-icon>zoom_out</mat-icon>
+                </button>
+            </div>
+        </div>
+    
+   
 
 </mat-toolbar>
