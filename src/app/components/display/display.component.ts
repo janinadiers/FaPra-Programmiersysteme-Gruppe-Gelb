@@ -432,7 +432,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
   handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
-        this.changeTokenButtonColor('black');
         if(this.activeButtonService.isBoltButtonActive){
 
             this._diagram?.resetSelectedElements();

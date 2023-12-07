@@ -44,10 +44,8 @@ export class SvgService {
         return result;
     }
 
-    public createSvgCircleForElement(element: Element): SVGElement {
-        // Umformung muss geschehen, da sonst Informationen verloren gehen
-        const place = new Place(element.id, element.x, element.y);
-        return place.createSVG();
+    public createSvgCircleForElement(element: Place): SVGElement {
+        return element.createSVG();
     }
 
     public createSvgRectangleForElement(element: Element): SVGElement {
@@ -94,6 +92,8 @@ export class SvgService {
 
 
         svgElement += `</svg>`;
+        console.log(svgElement);
+        
 
         return svgElement;
     }

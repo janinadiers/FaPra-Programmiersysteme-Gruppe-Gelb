@@ -68,8 +68,12 @@ export class Place extends Element {
         const marker = super.createSVG('text');
         marker.setAttribute('text-anchor', 'middle');
         marker.setAttribute('dy', '.3em');
-        if (this._amountToken > 0)
+        if (this._amountToken > 0){
             marker.textContent = this._amountToken.toString();
+            console.log(this._amountToken.toString());
+            
+        }
+            
         
         group.appendChild(marker);
 
