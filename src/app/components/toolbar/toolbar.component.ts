@@ -65,11 +65,8 @@ export class ToolbarComponent {
         this.boltActiveColor = false;
         this.rectActiveColor = !this.rectActiveColor;
         this._activeButtonService.RectangleButtonActive();
-        this.deselectAll();
-        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
-        removeTokenButton!.style.color = 'black';
-        addTokenButton!.style.color = 'black';
+        this.deselectPlacesAndLines();
+        this.deselectAddAndRemoveTokenButtons();
         
     }
 
@@ -79,11 +76,8 @@ export class ToolbarComponent {
         this.boltActiveColor = false;
         this.circleActiveColor = !this.circleActiveColor;
         this._activeButtonService.circleButtonActive();
-        this.deselectAll();
-        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
-        removeTokenButton!.style.color = 'black';
-        addTokenButton!.style.color = 'black';
+        this.deselectPlacesAndLines();
+        this.deselectAddAndRemoveTokenButtons();
     }
 
     toggleArrowButton() {
@@ -94,11 +88,8 @@ export class ToolbarComponent {
         // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
         this._diagram?.resetSelectedElements();
         this._activeButtonService.arrowButtonActive();
-        this.deselectAll();
-        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
-        removeTokenButton!.style.color = 'black';
-        addTokenButton!.style.color = 'black';
+        this.deselectPlacesAndLines();
+        this.deselectAddAndRemoveTokenButtons();
     }
 
     toggleBoltButton() {
@@ -110,16 +101,13 @@ export class ToolbarComponent {
         this._diagram?.resetSelectedElements();
         this._diagram!.lightningCount = 0;
         this._activeButtonService.boltButtonActive();
-        this.deselectAll();
-        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
-        removeTokenButton!.style.color = 'black';
-        addTokenButton!.style.color = 'black';
+        this.deselectPlacesAndLines();
+        this.deselectAddAndRemoveTokenButtons();
     }
 
     onAlgorithmSelect() {
-        var selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        var selectedAlgorithm = selectElement?.value;   
+        const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
+        //const selectedAlgorithm = selectElement?.value;   
         
     }
 
@@ -137,15 +125,8 @@ export class ToolbarComponent {
         }
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.addLineToken();
-            this._diagram?.lines.forEach((element) => {
-                element.svgElement!.children[2].setAttribute('stroke', 'transparent');
-            });
-            
-            
+             
         }
-
-       
-
         
     }
 
@@ -161,8 +142,7 @@ export class ToolbarComponent {
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.removeLineToken();
         }
-        
-        
+          
     }
 
     onButtonClick(buttonId: string) {
@@ -224,7 +204,7 @@ export class ToolbarComponent {
         this._activeButtonService.zoomButtonClick(id);
     }
 
-    deselectAll() {
+    deselectPlacesAndLines() {
         this._diagram?.places.forEach((element) => {
             element.svgElement?.children[0].setAttribute('stroke', 'black');
             element.svgElement?.children[2].setAttribute('stroke', 'black');
@@ -235,6 +215,13 @@ export class ToolbarComponent {
             element.svgElement!.children[2].setAttribute('stroke', 'transparent');
         });
         
+    }
+
+    deselectAddAndRemoveTokenButtons(){
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
+        removeTokenButton!.style.color = 'black';
+        addTokenButton!.style.color = 'black';
     }
 
     toggleSimulation() {
