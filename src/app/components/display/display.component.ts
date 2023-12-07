@@ -221,9 +221,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
 
     onCanvasClick(event: MouseEvent) {
-
-        console.log(this._diagram);
-       
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
@@ -239,20 +236,23 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
-
+            
+            this.changeTokenButtonColor('black');
             let svgCircle = this.drawCircle(mouseX ,mouseY)
             svgElement.appendChild(svgCircle);
 
         }
-
+        
+        
         else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
-
+            
+            this.changeTokenButtonColor('black');
             let svgRect = this.drawRect(mouseX, mouseY);
             svgElement.appendChild(svgRect);
         }
         //Blitz-Tool
         else if (event.button === 0 && this.activeButtonService.isBoltButtonActive){
-
+            this.changeTokenButtonColor('black');
             if(this._diagram?.lightningCount === 0){
 
                 let targetIsCircle: boolean = true;
@@ -268,7 +268,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
             }
 
             else if (this._diagram?.lightningCount === 1){
-
+              
                 let targetIsCircle: boolean = false;
                 let svgRect = this.drawRect(mouseX, mouseY);
                 svgElement.appendChild(svgRect);
@@ -286,7 +286,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     drawCircle(mouseX:number, mouseY:number){
-
+        
         // Aufruf der Funktion zu Erzeugung eines Objekts
         let circleObject = this._diagram?.createCircleObject(mouseX, mouseY);
         if(!circleObject){ throw new Error("CircleObject is undefined") }
@@ -294,7 +294,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement = svgCircle;
         svgCircle.addEventListener('click', () => {
+            
             this.onCircleSelect(svgCircle);
+            
         });
         return svgCircle;
     }
@@ -378,16 +380,25 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onLineSelect(line: SVGElement) {
+        
         this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
-
+        this.changeTokenButtonColor('blue');
+        
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'transparent');
             element.svgElement!.querySelector('text')!.setAttribute('stroke','black');
+            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
 
         });
+        
+        line.children[2].setAttribute('stroke', 'blue');
+        line.children[2].setAttribute('stroke-width', '2');
+
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
+            element.svgElement?.children[0].setAttribute('stroke', 'black');
+            element.svgElement?.children[2].setAttribute('stroke', 'black');
         });
 
         return;
@@ -395,12 +406,30 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
 
     onCircleSelect(circle: SVGElement){
+        
         this._diagram!.selectedCircle = circle;
-
+        
+        if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
         // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
+            element.svgElement?.children[0].setAttribute('stroke', 'black');
+            element.svgElement?.children[2].setAttribute('stroke', 'black');
         });
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+
+        });
+
+       
+        this.changeTokenButtonColor('red');
+        circle.children[0].setAttribute('stroke', 'red');
+        circle.children[2].setAttribute('stroke', 'red');
+        circle.children[0].setAttribute('stroke-width', '2');
+            
+        
+        
+        
         // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
 
         if (this._diagram?.selectedRect) {
@@ -413,6 +442,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onRectSelect(rect: SVGElement){
         this._diagram!.selectedRect= rect;
+       
         if (this._diagram?.selectedCircle) {
             let circleIsTarget: boolean = false;
             this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
@@ -423,12 +453,24 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
   handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
-
+        this.changeTokenButtonColor('black');
         if(this.activeButtonService.isBoltButtonActive){
 
             this._diagram?.resetSelectedElements();
             this._diagram!.lightningCount = 0;
         }
     }
+
+    changeTokenButtonColor(color:string){
+    
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
+        removeTokenButton!.style.color = color;
+        addTokenButton!.style.color = color;
+        
+       
+    }
+
+    
 
 }

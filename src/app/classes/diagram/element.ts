@@ -86,23 +86,31 @@ export class Element  {
         }
 
         // Wenn Toolbar aktiv, dann kein Dragging
-        if(Diagram.toolbarIsActive){
+        if(Diagram.drawingIsActive){
             return;
         }
         this._isDragging = true;
+       
+        
     }
 
     private processMouseUp() {
-
+            
         if (this._svgElement === undefined) {
             return;
         }
-
-
+        
         if (this._isDragging) {
+            
             this._isDragging = false;
+           
+            
 
         }
+        else{
+            Diagram.algorithmIsActive = false;
+        }
+        
     }
 
     private processMouseMove(event: MouseEvent) {
@@ -111,9 +119,8 @@ export class Element  {
             return;
         }
 
-
         if (this._isDragging) {
-
+            Diagram.algorithmIsActive = true;
             const svgElement = document.getElementById('canvas');
             const svgContainer = svgElement?.getBoundingClientRect();
             // Berechnung der Maus Koordinanten relativ zum SVG Element

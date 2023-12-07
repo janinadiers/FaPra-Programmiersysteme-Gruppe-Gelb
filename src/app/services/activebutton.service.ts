@@ -23,7 +23,7 @@ private zoomButtonClickSubject = new Subject<string>();
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = false;
     this.isRectangleButtonActive = !this.isRectangleButtonActive;
-    Diagram.toolbarIsActive = this.isRectangleButtonActive;
+    Diagram.drawingIsActive = this.isRectangleButtonActive;
   }
   
   circleButtonActive() {
@@ -31,7 +31,7 @@ private zoomButtonClickSubject = new Subject<string>();
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = false;
     this.isCircleButtonActive = !this.isCircleButtonActive; 
-    Diagram.toolbarIsActive = this.isCircleButtonActive; 
+    Diagram.drawingIsActive = this.isCircleButtonActive; 
   }
 
   arrowButtonActive() {
@@ -39,7 +39,7 @@ private zoomButtonClickSubject = new Subject<string>();
     this.isRectangleButtonActive = false;
     this.isBoltButtonActive = false;
     this.isArrowButtonActive = !this.isArrowButtonActive;
-    Diagram.toolbarIsActive = this.isArrowButtonActive;
+    Diagram.drawingIsActive = this.isArrowButtonActive;
   }
 
   boltButtonActive() {
@@ -47,7 +47,7 @@ private zoomButtonClickSubject = new Subject<string>();
     this.isRectangleButtonActive = false;
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = !this.isBoltButtonActive;
-    Diagram.toolbarIsActive = this.isBoltButtonActive;
+    Diagram.drawingIsActive = this.isBoltButtonActive;
   }
 
 

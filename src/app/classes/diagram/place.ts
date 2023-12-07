@@ -70,8 +70,7 @@ export class Place extends Element {
         marker.setAttribute('dy', '.3em');
         if (this._amountToken > 0)
             marker.textContent = this._amountToken.toString();
-        else
-            marker.textContent = '0';
+        
         group.appendChild(marker);
 
         //Text
@@ -81,6 +80,7 @@ export class Place extends Element {
         text.setAttribute('dy', `${(this._radius ) + 25}`);
         text.textContent = this._label.toString();
         group.appendChild(text);
+        group.style.cursor = 'pointer';
 
         super.registerSvg(group);
         return group;

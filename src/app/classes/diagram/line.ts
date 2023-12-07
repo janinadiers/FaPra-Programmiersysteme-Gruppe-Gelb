@@ -224,6 +224,10 @@ export class Line  {
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
         backgroundCircle.setAttribute('cy', midCoords.y.toString());
         backgroundCircle.setAttribute('r', '8');
+        backgroundCircle.style.cursor = 'pointer';
+
+
+        
         if (this._tokens > 1)
             backgroundCircle.setAttribute('fill', 'white');
         else
@@ -238,6 +242,22 @@ export class Line  {
         if (this._tokens > 1)
             token.textContent = this._tokens.toString();
         group.appendChild(token);
+
+        backgroundCircle.addEventListener('mouseover', () => {
+            
+            backgroundCircle.setAttribute('fill', 'blue');
+            token.setAttribute('fill', 'white');
+            token.setAttribute('stroke', 'white');
+        });
+
+        backgroundCircle.addEventListener('mouseout', () => {
+            token.setAttribute('fill', 'black');
+            token.setAttribute('stroke', 'black');
+            if (this._tokens > 1)
+                backgroundCircle.setAttribute('fill', 'white');
+            else
+                backgroundCircle.setAttribute('fill', 'transparent');
+        })
 
         this._svgElement = group;
         return group;

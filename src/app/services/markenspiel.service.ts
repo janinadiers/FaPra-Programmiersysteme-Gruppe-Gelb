@@ -35,9 +35,11 @@ export class MarkenspielService {
                 element.svgElement?.setAttribute('stroke-width', '2');
             }); */
             // ist in die Display-Component zu onCircleSelect gewandert
-
-            let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1;
-            this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
+           
+                let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1;
+                this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
+        
+            
 
             return this._diagram?.selectedCircle?.id
         }
@@ -77,8 +79,14 @@ export class MarkenspielService {
                 this._diagram.places[idNumber].amountToken = 0;
             }
 
-            this._diagram.places[idNumber].svgElement!.children[1].textContent =
+            if(this._diagram.places[idNumber].amountToken  > 0){
+                this._diagram.places[idNumber].svgElement!.children[1].textContent =
                 this._diagram.places[idNumber].amountToken.toString();
+            }  
+            else {
+                this._diagram.places[idNumber].svgElement!.children[1].textContent = "";
+            }
+            
 
             return;
         }

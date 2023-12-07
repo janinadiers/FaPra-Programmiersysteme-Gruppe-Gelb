@@ -57,6 +57,7 @@ export class ToolbarComponent {
     circleActiveColor: boolean = false;
     arrowActiveColor: boolean = false;
     boltActiveColor: boolean = false;
+    simulationActive: boolean = false;
 
     toggleRectangleButton() {
         this.circleActiveColor = false;
@@ -64,6 +65,12 @@ export class ToolbarComponent {
         this.boltActiveColor = false;
         this.rectActiveColor = !this.rectActiveColor;
         this._activeButtonService.RectangleButtonActive();
+        this.deselectAll();
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
+        removeTokenButton!.style.color = 'black';
+        addTokenButton!.style.color = 'black';
+        
     }
 
     toggleCircleButton() {
@@ -72,6 +79,11 @@ export class ToolbarComponent {
         this.boltActiveColor = false;
         this.circleActiveColor = !this.circleActiveColor;
         this._activeButtonService.circleButtonActive();
+        this.deselectAll();
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
+        removeTokenButton!.style.color = 'black';
+        addTokenButton!.style.color = 'black';
     }
 
     toggleArrowButton() {
@@ -82,6 +94,11 @@ export class ToolbarComponent {
         // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
         this._diagram?.resetSelectedElements();
         this._activeButtonService.arrowButtonActive();
+        this.deselectAll();
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
+        removeTokenButton!.style.color = 'black';
+        addTokenButton!.style.color = 'black';
     }
 
     toggleBoltButton() {
@@ -93,6 +110,59 @@ export class ToolbarComponent {
         this._diagram?.resetSelectedElements();
         this._diagram!.lightningCount = 0;
         this._activeButtonService.boltButtonActive();
+        this.deselectAll();
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
+        removeTokenButton!.style.color = 'black';
+        addTokenButton!.style.color = 'black';
+    }
+
+    onAlgorithmSelect() {
+        var selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
+        var selectedAlgorithm = selectElement?.value;   
+        
+    }
+
+    addToken(){
+       
+        if(Diagram.drawingIsActive){
+            return
+        }
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        
+        if(addTokenButton.style.color == 'red'){
+            this._markenspielService.addCircleToken();
+            
+            
+        }
+        else if(addTokenButton.style.color == 'blue'){
+            this._markenspielService.addLineToken();
+            this._diagram?.lines.forEach((element) => {
+                element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+            });
+            
+            
+        }
+
+       
+
+        
+    }
+
+    removeToken(){
+      
+        if(Diagram.drawingIsActive){
+            return
+        }
+        let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
+        if(addTokenButton.style.color == 'red'){
+            this._markenspielService.removeCircleToken();
+        }
+        else if(addTokenButton.style.color == 'blue'){
+            this._markenspielService.removeLineToken();
+        }
+        
+        
     }
 
     onButtonClick(buttonId: string) {
@@ -152,5 +222,30 @@ export class ToolbarComponent {
 
     onZoomButtonClick(id: string) {
         this._activeButtonService.zoomButtonClick(id);
+    }
+
+    deselectAll() {
+        this._diagram?.places.forEach((element) => {
+            element.svgElement?.children[0].setAttribute('stroke', 'black');
+            element.svgElement?.children[2].setAttribute('stroke', 'black');
+            
+           
+        });
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+        });
+        
+    }
+
+    toggleSimulation() {
+        let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
+
+        this.simulationActive = !this.simulationActive;
+        if(this.simulationActive){
+            simulationButton.style.color = 'green';
+        }
+        else{
+            simulationButton.style.color = 'black';
+        }
     }
 }

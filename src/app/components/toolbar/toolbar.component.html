@@ -1,6 +1,11 @@
 <mat-toolbar class="toolbar">
     <div class="left-toolbar">
-        <div class="drawing-tools">
+        
+        <button mat-icon-button class="play" (click)="toggleSimulation()">
+            <mat-icon>play_circle</mat-icon>
+        </button>
+
+        <div class="vertical-line"></div>
             <button mat-icon-button
                     class="hover-class"
                     [class.active]="circleActiveColor"
@@ -30,41 +35,51 @@
             </button>
 
             <button mat-icon-button
-                class="hover-class"
-                (click)="_markenspielService.addCircleToken()">
+                class="add-token tooltip"
+                (click)="addToken()">
+                <span class="tooltiptext">add tokens</span>
                 <mat-icon>add_circle</mat-icon>
-
              </button>
 
 
             <button mat-icon-button
-                    class="hover-class"
-                    (click)="_markenspielService.removeCircleToken()">
+                    class="remove-token tooltip"
+                    (click)="removeToken()">
+                <span class="tooltiptext">remove tokens</span>
                 <mat-icon>remove_circle</mat-icon>
             </button>
-        </div>
-            <div class="delete-tools">
+            <div class="vertical-line"></div>
+            
                 <button mat-icon-button
-                    class="hover-class"
+                    class="hover-class tooltip"
                     (click)="onButtonClick('deleteLast')">
+                    <span class="tooltiptext">delete last</span>
                 <mat-icon>delete</mat-icon>
                 </button>
 
                 <button mat-icon-button
-                        class="hover-class"
+                        class="hover-class tooltip"
                         (click)="onButtonClick('clear')">
+                    <span class="tooltiptext">clear all</span>
                     <mat-icon>clear</mat-icon>
                 </button>
-            </div>
+            
         
     </div>
-
+        <div class="center-toolbar">
+            <label for="algorithm-select">Algorithmus: </label>
+            <select name="algorithm" id="algorithm-select" (change)="onAlgorithmSelect()">
+                <option value="free">Free</option>
+                <option value="spring-embedder">Spring Embedder</option>
+                <option value="sugiyama">Sugiyama</option>
+            </select>
+        </div>
         <div class="right-toolbar">
-            <button mat-icon-button [matMenuTriggerFor]="importExportMenu">
+            <button class="hover-class" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <mat-icon>import_export</mat-icon>
             </button>
 
-            <mat-menu #importExportMenu="matMenu">
+            <mat-menu class="hover-class" #importExportMenu="matMenu">
                 <button mat-menu-item [matMenuTriggerFor]="importMenu">Import</button>
                 <button mat-menu-item [matMenuTriggerFor]="exportMenu">Export</button>
             </mat-menu>

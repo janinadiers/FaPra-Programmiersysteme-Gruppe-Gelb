@@ -15,7 +15,8 @@ export class Diagram {
 
     lightningCount: number = 0;
 
-    static toolbarIsActive = false;
+    static drawingIsActive = false;
+    static algorithmIsActive:boolean;
     static zoomFactor = 1;
     static viewBox:{x: number, y: number, width: number, height: number} = {x: 0, y: 0, width: 0, height: 0};
     private _canvasElement: SVGElement | undefined;
@@ -131,6 +132,7 @@ export class Diagram {
         this.selectedCircle = undefined;
         this.selectedRect = undefined;
         this.selectedLine = undefined;
+
       }
 
       resetCounterVar() {
@@ -143,7 +145,7 @@ export class Diagram {
 
       private processMouseDown(event: MouseEvent) {
         
-        if(Diagram.toolbarIsActive){
+        if(Diagram.drawingIsActive){
             return;
         }
 
