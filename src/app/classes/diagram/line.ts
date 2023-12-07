@@ -224,7 +224,6 @@ export class Line  {
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
         backgroundCircle.setAttribute('cy', midCoords.y.toString());
         backgroundCircle.setAttribute('r', '8');
-        backgroundCircle.style.cursor = 'pointer';
 
         if (this._tokens > 1)
             backgroundCircle.setAttribute('fill', 'white');
@@ -242,7 +241,7 @@ export class Line  {
         group.appendChild(token);
 
         this.addHoverEventForBackgroundCircle(backgroundCircle, token);
-        
+
         this._svgElement = group;
         return group;
     }

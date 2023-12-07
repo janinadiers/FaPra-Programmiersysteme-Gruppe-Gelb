@@ -294,7 +294,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement = svgCircle;
         svgCircle.addEventListener('click', () => {
-            
             this.onCircleSelect(svgCircle);
             
         });
@@ -382,24 +381,15 @@ export class DisplayComponent implements OnInit, OnDestroy {
     onLineSelect(line: SVGElement) {
         
         this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
+
+        if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
+
         this.changeTokenButtonColor('blue');
         
-        // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
-        this._diagram?.lines.forEach((element) => {
-            element.svgElement?.setAttribute('stroke', 'transparent');
-            element.svgElement!.querySelector('text')!.setAttribute('stroke','black');
-            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
-
-        });
-        
+        // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
+        this.deselectPlacesAndLines();
         line.children[2].setAttribute('stroke', 'blue');
         line.children[2].setAttribute('stroke-width', '2');
-
-        this._diagram?.places.forEach((element) => {
-            element.svgElement?.setAttribute('stroke', 'black');
-            element.svgElement?.children[0].setAttribute('stroke', 'black');
-            element.svgElement?.children[2].setAttribute('stroke', 'black');
-        });
 
         return;
     }
@@ -410,25 +400,14 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram!.selectedCircle = circle;
         
         if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
-        // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
-        this._diagram?.places.forEach((element) => {
-            element.svgElement?.setAttribute('stroke', 'black');
-            element.svgElement?.children[0].setAttribute('stroke', 'black');
-            element.svgElement?.children[2].setAttribute('stroke', 'black');
-        });
-        this._diagram?.lines.forEach((element) => {
-            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
 
-        });
-
-       
         this.changeTokenButtonColor('red');
+
+        // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
+        this.deselectPlacesAndLines();
         circle.children[0].setAttribute('stroke', 'red');
         circle.children[2].setAttribute('stroke', 'red');
         circle.children[0].setAttribute('stroke-width', '2');
-            
-        
-        
         
         // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
 
@@ -467,10 +446,20 @@ export class DisplayComponent implements OnInit, OnDestroy {
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = color;
         addTokenButton!.style.color = color;
-        
-       
+         
     }
 
-    
+    deselectPlacesAndLines(){
+        this._diagram?.places.forEach((element) => {
+            element.svgElement?.children[0].setAttribute('stroke', 'black');
+            element.svgElement?.children[2].setAttribute('stroke', 'black');
+            
+           
+        });
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+        });
+    }
+
 
 }

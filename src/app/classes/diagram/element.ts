@@ -65,6 +65,7 @@ export class Element  {
 
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
+            Diagram.algorithmIsActive = false;
             event.stopPropagation();
             this.processMouseDown();
         };
@@ -102,14 +103,10 @@ export class Element  {
         
         if (this._isDragging) {
             
-            this._isDragging = false;
-           
-            
+            this._isDragging = false;       
 
         }
-        else{
-            Diagram.algorithmIsActive = false;
-        }
+        
         
     }
 

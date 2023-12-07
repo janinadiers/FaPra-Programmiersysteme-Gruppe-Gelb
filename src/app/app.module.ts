@@ -20,7 +20,6 @@ import {MatMenuModule} from "@angular/material/menu";
 import { ImportMenuComponent } from './import-menu/import-menu.component';
 import { ExportMenuComponent } from './export-menu/export-menu.component';
 import {MatCardModule} from "@angular/material/card";
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 
 
@@ -48,7 +47,6 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
         MatToolbarModule,
         MatMenuModule,
         MatCardModule,
-        MatButtonToggleModule,
     ],
     providers: [
         {

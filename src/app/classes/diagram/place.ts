@@ -80,7 +80,6 @@ export class Place extends Element {
         text.setAttribute('dy', `${(this._radius ) + 25}`);
         text.textContent = this._label.toString();
         group.appendChild(text);
-        group.style.cursor = 'pointer';
 
         super.registerSvg(group);
         return group;
