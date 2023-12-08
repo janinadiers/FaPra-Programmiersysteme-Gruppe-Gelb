@@ -92,8 +92,8 @@
 
   .vertical-line {
     height: 30px;
-    width: 2px;
-    background-color: black; 
+    width: 1px;
+    background-color: rgb(211, 211, 211); 
     border-radius: 6rem;
     margin: 1rem;
 
