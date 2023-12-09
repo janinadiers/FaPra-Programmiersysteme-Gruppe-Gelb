@@ -219,11 +219,32 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
     }
 
-
     onCanvasClick(event: MouseEvent) {
 
-        console.log(this._diagram);
-       
+        // console.log(this._diagram);
+
+        // Event-Listener für Places, Transitions und Lines hinzufügen
+        this._diagram?.places.forEach((element) => {
+            element.svgElement?.addEventListener(('click'), () => {
+                if(!element.svgElement) {return};
+                this.onCircleSelect(element!.svgElement);
+            });
+        });
+
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement?.addEventListener(('click'), () => {
+                if(!element.svgElement) {return};
+                this.onLineSelect(element!.svgElement);
+            });
+        });
+
+        this._diagram?.transitions.forEach((element) => {
+            element.svgElement?.addEventListener(('click'), () => {
+                if(!element.svgElement) {return;}
+                this.onRectSelect(element!.svgElement);
+            });
+        });
+
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
@@ -401,7 +422,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram?.places.forEach((element) => {
             element.svgElement?.setAttribute('stroke', 'black');
         });
-        // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
 
         if (this._diagram?.selectedRect) {
             let circleIsTarget: boolean = true;
