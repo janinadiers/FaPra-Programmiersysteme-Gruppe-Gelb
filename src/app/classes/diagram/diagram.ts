@@ -10,7 +10,7 @@ import { Injectable } from "@angular/core";
 
 export class Diagram {
 
-    private readonly _places: Array<Place> = [];
+    private readonly _places: Array<Place>;
     private readonly _transitions: Array<Transition>;
     private readonly _lines: Array<Line>;
     private readonly _order: Array<string>;
@@ -132,7 +132,7 @@ export class Diagram {
         // Objekt im Array abspeichern
         this.pushPlace(circleObject);
         this.pushID(idString);
-        
+
         return circleObject;
     }
 
