@@ -379,10 +379,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onLineSelect(line: SVGElement) {
+        console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
 
-        if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
+        if(Diagram.drawingIsActive){return}
 
         this.changeTokenButtonColor('blue');
         
@@ -396,6 +397,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
 
     onCircleSelect(circle: SVGElement){
+        console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedCircle = circle;
         

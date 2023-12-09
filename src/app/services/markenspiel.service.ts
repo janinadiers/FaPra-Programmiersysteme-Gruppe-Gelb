@@ -173,6 +173,9 @@ export class MarkenspielService {
 
             if(this._diagram.lines[idNumber].tokens  < 1) {
                 this._diagram.lines[idNumber].tokens = 1;
+                this._diagram!.lines[idNumber].svgElement!.querySelector('circle')!.
+                setAttribute('fill', 'transparent');
+                
             }
 
             if(this._diagram.lines[idNumber].tokens  > 1) {
