@@ -231,8 +231,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
         const svgContainer = svgElement.getBoundingClientRect();
         // Berechnung der Maus Koordinanten relativ zum SVG Element
         // und Anpassung an den Zoomfaktor, da es sonst zu einem Offset beim Klicken kommt
-        const mouseX = (event.clientX - svgContainer.left) * Diagram.zoomFactor;
-        const mouseY = (event.clientY - svgContainer.top) * Diagram.zoomFactor;
+        const mouseX = (event.clientX - svgContainer.left) * Diagram.zoomFactor + Diagram.viewBox.x;
+        const mouseY = (event.clientY - svgContainer.top) * Diagram.zoomFactor + Diagram.viewBox.y;
 
         // Check ob linker Mouse Button geklickt und Button aktiviert
        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
