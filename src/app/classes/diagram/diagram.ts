@@ -1,15 +1,14 @@
 
-import {Line} from './line';
+import { Line } from './line';
 import { Place } from './place';
 import { Transition } from './transition';
-import {ElementRef, Injectable, ViewChild} from "@angular/core";
+import { Injectable } from "@angular/core";
 
 @Injectable({
     providedIn: 'root'
 })
 
 export class Diagram {
-    @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     private readonly _places: Array<Place> = [];
     private readonly _transitions: Array<Transition>;
@@ -133,8 +132,7 @@ export class Diagram {
         // Objekt im Array abspeichern
         this.pushPlace(circleObject);
         this.pushID(idString);
-
-        console.log("diagram: "+this._places);
+        
         return circleObject;
     }
 
