@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {SvgService} from "./svg.service";
 import {Diagram} from "../classes/diagram/diagram";
 import {DisplayService} from "./display.service";
@@ -39,7 +39,8 @@ export class MarkenspielService {
             // ist in die Display-Component zu onCircleSelect gewandert
 
             let idString = this._diagram.selectedCircle.id;
-            this._diagram.placeMap.get(idString)!.svgElement!.setAttribute('stroke','red');
+            //this._diagram.placeMap.get(idString)!.svgElement!.setAttribute('stroke','red');
+            this._diagram.selectedCircle.setAttribute('stroke','red');
 
             // alter Code:
             // let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1; // Achtung: funktioniert nicht mehr bei p11...
@@ -53,8 +54,9 @@ export class MarkenspielService {
                 return;
             }
             let idString = this._diagram.selectedCircle?.id;
+            let placeObject = this._diagram.places.find(place => place.id === idString);
 
-            return this._diagram.placeMap.get(idString)!.amountToken.toString();
+            return placeObject?.amountToken;
         }
 
         public addCircleToken() {
@@ -63,9 +65,9 @@ export class MarkenspielService {
             }
             let idString = this._diagram.selectedCircle.id;
 
-            this._diagram.placeMap.get(idString)!.amountToken++;
-            this._diagram.placeMap.get(idString)!.svgElement!.children[1].textContent =
-                this._diagram.placeMap.get(idString)!.amountToken.toString();
+            this._diagram.places.find(place => place.id === idString)!.amountToken++;
+            this._diagram.places.find(place => place.id === idString)!.svgElement!.children[1].textContent =
+                this._diagram.places.find(place => place.id === idString)!.amountToken.toString();
 
             return;
         }
@@ -76,14 +78,14 @@ export class MarkenspielService {
             }
             let idString = this._diagram.selectedCircle.id;
 
-            this._diagram!.placeMap!.get(idString)!.amountToken--;
+            this._diagram.places.find(place => place.id === idString)!.amountToken--;
 
-            if(this._diagram.placeMap.get(idString)!.amountToken  < 0) {
-                this._diagram.placeMap.get(idString)!.amountToken = 0;
+            if(this._diagram.places.find(place => place.id === idString)!.amountToken  < 0) {
+                this._diagram.places.find(place => place.id === idString)!.amountToken = 0;
             }
 
-            this._diagram.placeMap.get(idString)!.svgElement!.children[1].textContent =
-                this._diagram.placeMap.get(idString)!.amountToken.toString();
+            this._diagram.places.find(place => place.id === idString)!.svgElement!.children[1].textContent =
+                this._diagram.places.find(place => place.id === idString)!.amountToken.toString();
 
             return;
         }
@@ -106,24 +108,24 @@ export class MarkenspielService {
 
             let idString = this._diagram.selectedLine.id;
 
-            this._diagram.lineMap.get(idString)!.svgElement!.querySelector('text')!.
+            this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.
                 setAttribute('stroke', 'blue');
 
             // Markierung für die Gewichte der ausgewählten Kante an die Linie anhängen, damit sie mit verschoben werden kann
-            let tokenCircleCx = this._diagram.lineMap.get(idString)!.calcMidCoords().x;
-            let tokenCircleCy = this._diagram.lineMap.get(idString)!.calcMidCoords().y;
+            let tokenCircleCx = this._diagram.lines.find(line => line.id === idString)!.calcMidCoords().x;
+            let tokenCircleCy = this._diagram.lines.find(line => line.id === idString)!.calcMidCoords().y;
             // Hintergrundkreise der Tokens an die Linie anhängen, sodass sie mit verschoben werden
-            this._diagram.lineMap.get(idString)!.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx.toString());
-            this._diagram.lineMap.get(idString)!.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy.toString());
+            this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx.toString());
+            this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy.toString());
             // Textfelder für die Tokens an die Linie anhängen, damit die bewegt werden können
-            this._diagram!.lineMap.get(idString)!.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx.toString());
-            this._diagram!.lineMap.get(idString)!.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy.toString());
+            this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx.toString());
+            this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy.toString());
 
-            if(this._diagram.lineMap.get(idString)!.tokens > 1){
-                this._diagram!.lineMap.get(idString)!.svgElement!.querySelector('circle')!.
+            if(this._diagram.lines.find(line => line.id === idString)!.tokens > 1){
+                this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'white');
             } else {
-                this._diagram!.lineMap.get(idString)!.svgElement!.querySelector('circle')!.
+                this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'transparent');
             }
 
@@ -136,7 +138,7 @@ export class MarkenspielService {
             }
             let idString = this._diagram.selectedLine.id;
 
-            return this._diagram.lineMap.get(idString)!.tokens;
+            return this._diagram.lines.find(line => line.id === idString)!.tokens;
         }
 
         public addLineToken() {
@@ -144,10 +146,10 @@ export class MarkenspielService {
                 return;
             }
             let idString = this._diagram.selectedLine.id;
-            this._diagram.lineMap.get(idString)!.tokens++;
+            this._diagram.lines.find(line => line.id === idString)!.tokens++;
 
-            this._diagram.lineMap.get(idString)!.svgElement!.childNodes[3].textContent =
-                this._diagram.lineMap.get(idString)!.tokens.toString();
+            this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent =
+                this._diagram.lines.find(line => line.id === idString)!.tokens.toString();
 
             return;
         }
@@ -158,17 +160,17 @@ export class MarkenspielService {
             }
             let idString = this._diagram.selectedLine.id;
 
-            this._diagram.lineMap.get(idString)!.tokens--;
+            this._diagram.lines.find(line => line.id === idString)!.tokens--;
 
-            if(this._diagram.lineMap.get(idString)!.tokens  < 1) {
-                this._diagram.lineMap.get(idString)!.tokens = 1;
+            if(this._diagram.lines.find(line => line.id === idString)!.tokens  < 1) {
+                this._diagram.lines.find(line => line.id === idString)!.tokens = 1;
             }
 
-            if(this._diagram.lineMap.get(idString)!.tokens  > 1) {
-                this._diagram.lineMap.get(idString)!.svgElement!.childNodes[3].textContent =
-                    this._diagram.lineMap.get(idString)!.tokens.toString();
+            if(this._diagram.lines.find(line => line.id === idString)!.tokens  > 1) {
+                this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent =
+                    this._diagram.lines.find(line => line.id === idString)!.tokens.toString();
             } else {
-                this._diagram.lineMap.get(idString)!.svgElement!.childNodes[3].textContent = "";
+                this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent = "";
             }
 
             return;

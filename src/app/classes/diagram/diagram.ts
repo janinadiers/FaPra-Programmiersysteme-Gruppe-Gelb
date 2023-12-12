@@ -15,10 +15,6 @@ export class Diagram {
     private readonly _lines: Array<Line>;
     private readonly _order: Array<string>;
 
-    private readonly _placeMap = new Map <string, Place>;
-    private readonly _lineMap = new Map <string, Line>;
-    private readonly _transitionMap = new Map <string, Transition>;
-
     selectedCircle: SVGElement | undefined = undefined;
     selectedRect: SVGElement | undefined = undefined;
     selectedLine: SVGElement | undefined = undefined;
@@ -38,21 +34,6 @@ export class Diagram {
         this._transitions = transitions;
         this._lines = lines ?? [];
         this._order = [];
-
-        // Maps, mit denen die Elemente anhand des IdStrings abgerufen werden können
-        places.forEach((element) => {
-            this._placeMap.set(element.id,element);
-        });
-
-        transitions.forEach((element) => {
-            this._transitionMap.set(element.id,element);
-        });
-
-        if(lines) {
-            lines.forEach((element) => {
-                this._lineMap.set(element.id,element);
-            });
-        }
     }
 
     set canvasElement(canvas: SVGElement | undefined) {
@@ -88,30 +69,15 @@ export class Diagram {
         return this._order;
     }
 
-    get placeMap() {
-        return this._placeMap;
-    }
-
-    get lineMap() {
-        return this._lineMap;
-    }
-
-    get transitionMap() {
-        return this._transitionMap;
-    }
-
     pushPlace(place: Place): void {
-        this._placeMap.set(place.id,place);
         this._places.push(place);
     }
 
     pushTransition(transition: Transition): void {
-        this._transitionMap.set(transition.id,transition);
         this._transitions.push(transition);
     }
 
     pushLine(line: Line): void {
-        this._lineMap.set(line.id,line);
         this._lines.push(line);
     }
 
