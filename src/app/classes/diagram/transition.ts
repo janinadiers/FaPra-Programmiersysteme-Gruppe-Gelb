@@ -59,6 +59,10 @@ export class Transition extends Element {
     }
 
     override createSVG(){
+        if (this.svgElement) {
+            return this.svgElement;
+        }
+
         const group = super.createSVG('g');
         group.setAttribute('id', this.id);
         group.setAttribute('transform', `translate(${this.x - this.width / 2}, ${this.y - this.height / 2})`);
