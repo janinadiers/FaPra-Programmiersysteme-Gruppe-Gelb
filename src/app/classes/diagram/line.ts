@@ -227,6 +227,7 @@ export class Line {
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
         backgroundCircle.setAttribute('cy', midCoords.y.toString());
         backgroundCircle.setAttribute('r', '8');
+
         if (this._tokens > 1)
             backgroundCircle.setAttribute('fill', 'white');
         else
@@ -241,6 +242,8 @@ export class Line {
         if (this._tokens > 1)
             token.textContent = this._tokens.toString();
         group.appendChild(token);
+
+        this.addHoverEventForBackgroundCircle(backgroundCircle, token);
 
         this._svgElement = group;
         return group;
@@ -295,6 +298,24 @@ export class Line {
         const distance: number = Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2 - y3, 2));
         return distance;
 
+    }
+
+    addHoverEventForBackgroundCircle(backgroundCircle: SVGElement, token: SVGElement) {
+        backgroundCircle.addEventListener('mouseover', () => {
+            
+            backgroundCircle.setAttribute('fill', 'blue');
+            token.setAttribute('fill', 'white');
+            token.setAttribute('stroke', 'white');
+        });
+
+        backgroundCircle.addEventListener('mouseout', () => {
+            token.setAttribute('fill', 'black');
+            token.setAttribute('stroke', 'black');
+            if (this._tokens > 1)
+                backgroundCircle.setAttribute('fill', 'white');
+            else
+                backgroundCircle.setAttribute('fill', 'transparent');
+        })
     }
 
 

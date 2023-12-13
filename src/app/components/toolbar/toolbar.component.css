@@ -3,6 +3,39 @@
     background-color: white;
     display: flex;
     justify-content: space-between;
+    width: 100%;
+    padding: 0;
+    font-family: "Courier New", sans-serif;
+}
+
+.left-toolbar {
+
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.right-toolbar {
+
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.center-toolbar {
+
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+.center-toolbar > label {
+  margin: 0 1rem;
+}
+
+.center-toolbar > option {
+  font-family: "Courier New", sans-serif;
 }
 
 
@@ -16,4 +49,54 @@
     color: white; 
 
  }
+
+ .tooltip {
+    position: relative;
+    display: inline-block;
+   
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: small;
+  }
+  
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .vertical-line {
+    height: 30px;
+    width: 1px;
+    background-color: rgb(211, 211, 211); 
+    border-radius: 6rem;
+    margin: 1rem;
+
+}
+
 
