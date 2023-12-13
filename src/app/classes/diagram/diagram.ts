@@ -1,9 +1,15 @@
 
-import {Line} from './line';
+import { Line } from './line';
 import { Place } from './place';
 import { Transition } from './transition';
+import { Injectable } from "@angular/core";
+
+@Injectable({
+    providedIn: 'root'
+})
 
 export class Diagram {
+
     private readonly _places: Array<Place>;
     private readonly _transitions: Array<Transition>;
     private readonly _lines: Array<Line>;
@@ -24,31 +30,24 @@ export class Diagram {
     private _isDragging = false;
     private startPoint: {x: number, y: number} = {x: 0, y: 0};
 
-  
-
-
     constructor(places: Array<Place>, transitions: Array<Transition>, lines?: Array<Line>) {
         this._places = places;
         this._transitions = transitions;
         this._lines = lines ?? [];
-        this._order = [];   
-        
+        this._order = [];
     }
 
     set canvasElement(canvas: SVGElement | undefined) {
-
-      if(!canvas) {return}
+        if(!canvas) {return}
 
         this._canvasElement = canvas;
         this._canvasElement?.addEventListener('mousedown', (event) => {
           this.processMouseDown(event);
-         
+
         });
         // Der EventListener ist auf dem window registriert, damit auch dann ein MouseUp Event ausgelöst wird, wenn die Maus außerhalb des Canvas losgelassen wird
         window.addEventListener('mouseup', (event) => {
-          
-          this.processMouseUp();
-         
+            this.processMouseUp();
         });
         this._canvasElement?.addEventListener('mousemove', (event) => {
           this.processMouseMove(event);
@@ -58,7 +57,6 @@ export class Diagram {
     get places(): Array<Place> {
         return this._places;
     }
-
 
     get transitions(): Array<Transition> {
         return this._transitions;
@@ -73,17 +71,14 @@ export class Diagram {
     }
 
     pushPlace(place: Place): void {
-        
         this._places.push(place);
     }
 
     pushTransition(transition: Transition): void {
-        
         this._transitions.push(transition);
     }
 
     pushLine(line: Line): void {
-       
         this._lines.push(line);
     }
 
@@ -97,18 +92,19 @@ export class Diagram {
         this._lines.splice(0, this._lines.length);
     }
 
-      createCircleObject(x: number, y:number){
+    createCircleObject(x: number, y:number){
 
         let idString: string = "p" + (this._places.length + 1);
         let circleObject = new Place(idString, x, y);
         // Objekt im Array abspeichern
         this.pushPlace(circleObject);
         this.pushID(idString);
+
         return circleObject;
-      }
+    }
 
 
-      createRectObject (x: number, y: number){
+    createRectObject (x: number, y: number){
 
         let idString: string = "t" + (this._transitions.length + 1);
         let rectObject = new Transition(idString, x, y);
@@ -116,34 +112,34 @@ export class Diagram {
         this.pushTransition(rectObject);
         this.pushID(idString);
         return rectObject;
-      }
+    }
 
-      createLineObject (source: Transition | Place, target: Transition| Place){
-    
+    createLineObject (source: Transition | Place, target: Transition| Place){
+
         let idString: string = "a" + (this.lines.length + 1);
         let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
         this.pushID(idString);
         return lineObject;
-      }
+    }
 
-      resetSelectedElements() {
+    resetSelectedElements() {
         this.selectedCircle = undefined;
         this.selectedRect = undefined;
         this.selectedLine = undefined;
 
       }
 
-      resetCounterVar() {
+    resetCounterVar() {
         this.lightningCount = 0;
-      }
+    }
 
-      clearOrder() {
+    clearOrder() {
         this._order.splice(0, this._order.length);
-      }
+    }
 
-      private processMouseDown(event: MouseEvent) {
+    private processMouseDown(event: MouseEvent) {
         
         if(Diagram.drawingIsActive){
             return;
@@ -151,43 +147,32 @@ export class Diagram {
 
         this._isDragging = true;
         const svgContainer = this._canvasElement?.getBoundingClientRect();
-       
+
         this.startPoint = {
           x: (event.clientX - svgContainer!.left) * Diagram.zoomFactor + Diagram.viewBox.x,
           y: (event.clientY - svgContainer!.top) * Diagram.zoomFactor + Diagram.viewBox.y
-      }; 
-        
+      };
+
     }
 
     private processMouseUp() {
-       
+
         if (this._isDragging) {
             this._isDragging = false;
-
         }
-       
-
-        
     }
 
     private processMouseMove(event: MouseEvent) {
-       
+
         if (this._isDragging) {
           const svgContainer = this._canvasElement?.getBoundingClientRect();
           const x = (( event.clientX - svgContainer!.left ) * Diagram.zoomFactor)- this.startPoint.x;
           const y = ((event.clientY - svgContainer!.top ) * Diagram.zoomFactor)- this.startPoint.y;
-            
+
           Diagram.viewBox.x = -x;
           Diagram.viewBox.y = -y;
-          
+
           this._canvasElement?.setAttribute('viewBox', `${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}`)
-         
-          
-          
-          
         }
-        
     }
-
-
 }

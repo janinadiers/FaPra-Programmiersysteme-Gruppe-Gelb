@@ -8,7 +8,7 @@ export class Place extends Element {
     private _amountToken: number;
     private _children: Array<Transition>;
     private _label: string;
-    
+
 
     constructor(id: string, x: number, y: number, amountToken?: number) {
         super(id, x, y);
@@ -16,7 +16,7 @@ export class Place extends Element {
         this._amountToken = amountToken ?? 0; //Default sind keine Marken gesetzt
         this._children = [];
         this._label = id;
-     
+
     }
 
     get radius(): number {
@@ -52,16 +52,20 @@ export class Place extends Element {
     }
 
     override createSVG(){
+        if (this.svgElement) {
+            return this.svgElement;
+        }
+
         const group = super.createSVG('g');
         group.setAttribute('id', this._label);
         group.setAttribute('transform', `translate(${this.x}, ${this.y})`);
         //Circle
         const circle = super.createSVG('circle');
         circle.setAttribute('id', this._label.toString());
-        circle.setAttribute('r', this._radius.toString());  
-        circle.setAttribute('fill', 'white'); 
-        circle.setAttribute('stroke', 'black'); 
-        circle.setAttribute('stroke-width', '2'); 
+        circle.setAttribute('r', this._radius.toString());
+        circle.setAttribute('fill', 'white');
+        circle.setAttribute('stroke', 'black');
+        circle.setAttribute('stroke-width', '2');
         group.appendChild(circle);
 
         //Marker

@@ -1,14 +1,14 @@
-import { Element } from 'src/app/classes/diagram/element';
-import { Coords } from '../json-petri-net';
-import { Transition } from './transition';
+import {Element} from 'src/app/classes/diagram/element';
+import {Coords} from '../json-petri-net';
+import {Transition} from './transition';
 
-export class Line  {
+export class Line {
 
     private readonly _id: string;
     private _sourcePosition: Coords | undefined;
     private _targetPosition: Coords | undefined;
-    private _source : Element;
-    private _target : Element;
+    private _source: Element;
+    private _target: Element;
     private _tokens: number;
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
@@ -28,7 +28,7 @@ export class Line  {
             // Update des Schnittpunkts von Linie und Transition
             let refX: number = this.updateMarker();
             this._marker?.setAttribute('refX', refX.toString());
-            
+
         });
         target.getPositionChangeObservable().subscribe((target) => {
             this.updateTarget({x: target.x, y: target.y});
@@ -78,8 +78,8 @@ export class Line  {
 
     private updateSource(updatedPosition: Coords): void {
 
-        if(this._svgElement) {
-            if(this._svgElement.childNodes[0] instanceof SVGElement) {
+        if (this._svgElement) {
+            if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
                     ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
                         ${this._targetPosition?.y}`);
@@ -90,22 +90,21 @@ export class Line  {
             let tokenCircleCx = this.calcMidCoords().x.toString();
             let tokenCircleCy = this.calcMidCoords().y.toString();
 
-            if(!this.svgElement){
+            if (!this.svgElement) {
                 return;
             }
-            this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
-            this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
-            this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
-            this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
+            this.svgElement!.querySelector('circle')!.setAttribute('cx', tokenCircleCx);
+            this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
+            this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
+            this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
         }
-
 
 
     }
 
     private updateTarget(updatedPosition: Coords): void {
 
-        if(this._svgElement) {
+        if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
@@ -116,19 +115,19 @@ export class Line  {
         let tokenCircleCx = this.calcMidCoords().x.toString();
         let tokenCircleCy = this.calcMidCoords().y.toString();
 
-        if(!this.svgElement) {
+        if (!this.svgElement) {
             return;
         }
-        this.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx);
-        this.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy);
-        this.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx);
-        this.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy);
+        this.svgElement!.querySelector('circle')!.setAttribute('cx', tokenCircleCx);
+        this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
+        this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
+        this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
     }
 
     //Iterate through found coords and return them as string
     private getCoordsString(): string {
         let result = '';
-        if(this._coords) {
+        if (this._coords) {
             this._coords.forEach(coord => {
                 result += coord.x + ',' + coord.y + ' ';
             });
@@ -177,6 +176,10 @@ export class Line  {
     }
 
     createSVG() {
+        if (this._svgElement) {
+            return this._svgElement;
+        }
+
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
 
@@ -247,47 +250,45 @@ export class Line  {
     }
 
 
-    private updateMarker(): number{
- 
-        if (this._target instanceof Transition){
-            
+    private updateMarker(): number {
+
+        if (this._target instanceof Transition) {
+
             const x1 = this._source.x;
             const y1 = this._source.y;
             const x2 = this._target.x;
             const y2 = this._target.y;
             const width = this._target.width;
             const height = this._target.height;
-            
-            const leftX= this._target.x - (width/2);
-            const rightX = this._target.x + (width/2);
-            const upperY = this._target.y + (height/2);
-            const lowerY = this._target.y - (height/2);
-            // Berechne m die Steigung der Geraden 
+
+            const leftX = this._target.x - (width / 2);
+            const rightX = this._target.x + (width / 2);
+            const upperY = this._target.y + (height / 2);
+            const lowerY = this._target.y - (height / 2);
+            // Berechne m die Steigung der Geraden
             const m = (y2 - y1) / (x2 - x1);
             // Berechne den y-Achsenabschnitt b
             const b = y1 - m * x1;
 
-            const intersectionpointsX: Array<number>= [(upperY - b) / m,  (lowerY - b) / m, leftX, rightX ];
-            const intersectionpointsY: Array<number> = [upperY, lowerY, m * leftX + b,  m * rightX + b ];
-            
-            for (let  i = 0; i < 4; i++) {
+            const intersectionpointsX: Array<number> = [(upperY - b) / m, (lowerY - b) / m, leftX, rightX];
+            const intersectionpointsY: Array<number> = [upperY, lowerY, m * leftX + b, m * rightX + b];
+
+            for (let i = 0; i < 4; i++) {
 
                 const withinRectangle =
-                intersectionpointsX[i] >= leftX && 
-                intersectionpointsX[i] <= rightX && 
-                intersectionpointsY[i] >= lowerY && 
-                intersectionpointsY[i] <= upperY;
-                
+                    intersectionpointsX[i] >= leftX &&
+                    intersectionpointsX[i] <= rightX &&
+                    intersectionpointsY[i] >= lowerY &&
+                    intersectionpointsY[i] <= upperY;
+
                 if (withinRectangle) {
-                let distance = this.calculateDistance(x2, y2, intersectionpointsX[i], intersectionpointsY[i]);
-                return distance + 10;
+                    let distance = this.calculateDistance(x2, y2, intersectionpointsX[i], intersectionpointsY[i]);
+                    return distance + 10;
                 }
             }
 
-            return 35;    
-        }   
-
-        else{
+            return 35;
+        } else {
             return 35;
         }
     }

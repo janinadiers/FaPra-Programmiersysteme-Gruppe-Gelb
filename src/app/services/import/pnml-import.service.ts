@@ -15,7 +15,6 @@ import { Coords } from '../../classes/json-petri-net';
 })
 export class PnmlImportService implements ImportService {
 
-    constructor(private _svgService: SvgService) {}
     import(content: string): Diagram | undefined {
 
         // convert pnml string to DOM object
@@ -37,10 +36,14 @@ export class PnmlImportService implements ImportService {
         const places:NodeListOf<globalThis.Element> = rawData.querySelectorAll('place');
         const result:Array<Place> = []
         places.forEach((place) => {
+
             const placePosition = this.getPlacePosition(place);
+            const placeTokens = place.querySelector('initialMarking')?.querySelector('text')?.textContent ?? '0'
+            const placeLabel = place.querySelector('name')?.querySelector('text')?.textContent ?? ''
             const placeId = place.getAttribute('id');
+
             if(!placeId) throw new Error('Place element misses id: ' + place);
-            const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y);
+            const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y, placeTokens, placeLabel);
             result.push(placeElement);
         });
 
@@ -52,10 +55,13 @@ export class PnmlImportService implements ImportService {
         const transitions = rawData.querySelectorAll('transition');
         const result:Array<Transition> = []
         transitions.forEach((transition) => {
+
             const transitionId = transition.getAttribute('id');
+            const transitionLabel = transition.querySelector('name')?.querySelector('text')?.textContent ?? ''
             const transitionPosition = this.getTransitionPosition(transition);
+
             if(!transitionId) throw new Error('Transition element misses id: ' + transition);
-            const transitionElement = this.createTransition(transitionId, transitionPosition.x, transitionPosition.y);
+            const transitionElement = this.createTransition(transitionId, transitionPosition.x, transitionPosition.y, transitionLabel);
             result.push(transitionElement);
         });
 
@@ -67,11 +73,14 @@ export class PnmlImportService implements ImportService {
         const arcs = rawData.querySelectorAll('arc');
         const lines:Array<Line> = []
         arcs.forEach((arc) => {
+            
             const arcId = arc.getAttribute('id');
+            const arcTokens = arc.querySelector('inscription')?.querySelector('text')?.textContent ?? '0'
             const sourceAndTargetObject = this.getSourceAndTargetElements(arc, elements);
             const positions = this.getArcPositions(arc);
+
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
-            const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions);
+            const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
 
             lines.push(arcElement);
         });
@@ -82,7 +91,6 @@ export class PnmlImportService implements ImportService {
 
 
     private getPlacePosition(element: globalThis.Element):{x:number, y:number}{
-
 
             const graphics = Array.from(element.children).filter(
                 (child) => child.tagName == 'graphics'
@@ -149,30 +157,34 @@ export class PnmlImportService implements ImportService {
     }
 
 
-    private createPlace(id:string, x:number, y:number): Place {
+    private createPlace(id:string, x:number, y:number, amountToken:string, label:string): Place {
         const place = new Place(id, x, y);
         place.x = x;
         place.y = y;
+        place.amountToken = parseInt(amountToken);
+        place.label = label;
         place.svgElement = place.createSVG();
         return place;
 
 
     }
 
-    private createTransition(id:string, x:number, y:number): Transition {
+    private createTransition(id:string, x:number, y:number, label:string): Transition {
         const transition = new Transition(id, x, y);
         transition.x = x;
         transition.y = y;
+        transition.label = label;
         transition.svgElement = transition.createSVG();
         return transition;
 
 
     }
 
-    private createEdge(id:string, source:Element, target:Element, coords: Coords[]): Line{
+    private createEdge(id:string, source:Element, target:Element, coords: Coords[], amountToken:string): Line{
 
         const line:Line = new Line(id, source, target);
         line.coords = coords;
+        line.tokens = parseInt(amountToken);
         line.createSVG();
         return line;
 

@@ -192,35 +192,51 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             let elementOrder = this._diagram.order;
             let lastID = elementOrder.pop();
+
             if (lastID?.startsWith("p")) {
-                let lastCircleObject = this._diagram.places.pop();
-                let lastSvgShape = lastCircleObject?.svgElement;
-                if (lastCircleObject && lastSvgShape) {
-                drawingArea.removeChild(lastSvgShape);
-                }
+                this._diagram.places.pop();
+                drawingArea.removeChild(drawingArea.lastChild as ChildNode);   
             }
             else if (lastID?.startsWith("t")) {
-                let lastRectObject = this._diagram.transitions.pop();
-                let lastSvgShape = lastRectObject?.svgElement;
-                if (lastRectObject && lastSvgShape) {
-                    drawingArea.removeChild(lastSvgShape);
+                this._diagram.transitions.pop();
+                drawingArea.removeChild(drawingArea.lastChild as ChildNode);  
                 }
-            }
             else if (lastID?.startsWith("a")){
-
-                let lastLineObject = this._diagram.lines.pop();
-                let lastSvgLine = lastLineObject?.svgElement;
-                if(lastLineObject && lastSvgLine){
-                    drawingArea.removeChild(lastSvgLine);
-                }
+                this._diagram.lines.pop();
+                drawingArea.removeChild(drawingArea.firstChild as ChildNode);
             }
+            
             this._diagram.resetSelectedElements();
             this._diagram.lightningCount = 0;
         }
     }
 
-
     onCanvasClick(event: MouseEvent) {
+
+        // console.log(this._diagram);
+
+        // Event-Listener für Places, Transitions und Lines hinzufügen
+        this._diagram?.places.forEach((element) => {
+            element.svgElement?.addEventListener(('click'), () => {
+                if(!element.svgElement) {return};
+                this.onCircleSelect(element!.svgElement);
+            });
+        });
+
+        this._diagram?.lines.forEach((element) => {
+            element.svgElement?.addEventListener(('click'), () => {
+                if(!element.svgElement) {return};
+                this.onLineSelect(element!.svgElement);
+            });
+        });
+
+        this._diagram?.transitions.forEach((element) => {
+            element.svgElement?.addEventListener(('click'), () => {
+                if(!element.svgElement) {return;}
+                this.onRectSelect(element!.svgElement);
+            });
+        });
+
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
