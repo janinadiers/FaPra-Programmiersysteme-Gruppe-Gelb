@@ -395,7 +395,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onLineSelect(line: SVGElement) {
-        console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
 
@@ -405,15 +404,15 @@ export class DisplayComponent implements OnInit, OnDestroy {
         
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
         this.deselectPlacesAndLines();
+        line.children[2].setAttribute('fill', 'white');
         line.children[2].setAttribute('stroke', 'blue');
         line.children[2].setAttribute('stroke-width', '2');
-
-        return;
+        
+        
     }
 
 
     onCircleSelect(circle: SVGElement){
-        console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedCircle = circle;
         
@@ -475,6 +474,14 @@ export class DisplayComponent implements OnInit, OnDestroy {
         });
         this._diagram?.lines.forEach((element) => {
             element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+            if(element.tokens > 1){
+                element.svgElement!.children[2].setAttribute('fill', 'white');
+            }
+            else{
+                element.svgElement!.children[2].setAttribute('fill', 'transparent');
+            }
+            
+            
         });
     }
 

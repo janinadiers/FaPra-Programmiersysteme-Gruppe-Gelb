@@ -151,6 +151,7 @@ export class ToolbarComponent {
 
     export(fileType: string): void {
         let exportContent;
+        this.deselectPlacesAndLines();
         switch (fileType) {
             case 'PNML':
                 exportContent = this._pnmlExportService.export();
@@ -213,7 +214,16 @@ export class ToolbarComponent {
         });
         this._diagram?.lines.forEach((element) => {
             element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+            if(element.tokens > 1){
+                element.svgElement!.children[2].setAttribute('fill', 'white');
+            }
+            else{
+                element.svgElement!.children[2].setAttribute('fill', 'transparent');
+            }
+        
         });
+
+        
         
     }
 
