@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {SvgService} from "./svg.service";
 import {Diagram} from "../classes/diagram/diagram";
 import {DisplayService} from "./display.service";
 import {Subscription} from "rxjs";
@@ -13,164 +12,80 @@ export class MarkenspielService {
     private _sub: Subscription;
 
     constructor(
-        private svgService: SvgService,
-        private diplayService: DisplayService)
-        {
+        private diplayService: DisplayService) {
             this._sub = this.diplayService.diagram$.subscribe(diagram => {
                 this._diagram = diagram;
             });
         }
 
-        // Circle-Handling
-        public getCircleId() {
-            if(!this._diagram?.selectedCircle?.svgElement){
-                return;
-            }
-
-            /*
-            // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
-            this._diagram?.places.forEach((element) => {
-                element.svgElement?.setAttribute('stroke', 'black');
-            });
-            this._diagram?.lines.forEach((element) => {
-                element.svgElement?.setAttribute('stroke', 'black');
-                element.svgElement?.setAttribute('stroke-width', '2');
-            }); */
-            // ist in die Display-Component zu onCircleSelect gewandert
-
-            let idString = this._diagram.selectedCircle.svgElement.id;
-            //this._diagram.placeMap.get(idString)!.svgElement!.setAttribute('stroke','red');
-            this._diagram.selectedCircle.svgElement.setAttribute('stroke','red');
-
-            // alter Code:
-            // let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1; // Achtung: funktioniert nicht mehr bei p11...
-            // this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
-
-            return this._diagram?.selectedCircle.svgElement?.id
-        }
-
-        public getCircleToken() {
-            if(!this._diagram?.selectedCircle?.svgElement){
-                return;
-            }
-            let idString = this._diagram.selectedCircle.svgElement?.id;
-            let placeObject = this._diagram.places.find(place => place.id === idString);
-
-            return placeObject?.amountToken;
-        }
-
         public addCircleToken() {
-            if(!this._diagram?.selectedCircle?.svgElement){
+            if(!this._diagram?.selectedCircle){
                 return;
             }
-            let idString = this._diagram.selectedCircle.svgElement.id;
 
-            this._diagram.places.find(place => place.id === idString)!.amountToken++;
-            this._diagram.places.find(place => place.id === idString)!.svgElement!.children[1].textContent =
-                this._diagram.places.find(place => place.id === idString)!.amountToken.toString();
+            this._diagram.selectedCircle.amountToken++;
+
+            this._diagram.selectedCircle.svgElement!.children[1].textContent =
+                this._diagram.selectedCircle.amountToken.toString()
 
             return;
         }
 
         public removeCircleToken() {
-            if(!this._diagram?.selectedCircle?.svgElement) {
+            if(!this._diagram?.selectedCircle) {
                 return;
             }
-            let idString = this._diagram.selectedCircle.svgElement.id;
+            this._diagram.selectedCircle.amountToken--;
 
-            this._diagram.places.find(place => place.id === idString)!.amountToken--;
+            this._diagram.selectedCircle.svgElement!.children[1].textContent =
+                this._diagram.selectedCircle.amountToken.toString()
 
-            if(this._diagram.places.find(place => place.id === idString)!.amountToken  < 0) {
-                this._diagram.places.find(place => place.id === idString)!.amountToken = 0;
+            if(this._diagram.selectedCircle.amountToken  < 0) {
+                this._diagram.selectedCircle.amountToken = 0;
             }
-
-            this._diagram.places.find(place => place.id === idString)!.svgElement!.children[1].textContent =
-                this._diagram.places.find(place => place.id === idString)!.amountToken.toString();
-
             return;
         }
 
         // Line-Handling
-        public getLineId() {
-            if(!this._diagram?.selectedLine?.svgElement){
+        public addLineToken() {
+            if(!this._diagram?.selectedLine){
                 return;
             }
-            /*
-            // Farben setzen: alle Element schwarz setzen, danach das ausgewählte rot
-            this._diagram?.lines.forEach((element) => {
-                element.svgElement?.setAttribute('stroke', 'black');
-                element.svgElement?.setAttribute('stroke-width', '2');
-            });
-            this._diagram?.places.forEach((element) => {
-                element.svgElement?.setAttribute('stroke', 'black');
-            }); */
-            // ist in die Display-Component zu OnLineSelect gewandert
+            this._diagram.selectedLine.tokens++;
 
-            let idString = this._diagram.selectedLine.svgElement.id;
+            this._diagram.selectedLine.svgElement!.childNodes[3].textContent =
+                this._diagram.selectedLine!.tokens.toString();
 
-            this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.
-                setAttribute('stroke', 'blue');
+            this._diagram.selectedLine!.svgElement!.querySelector('text')!.
+             setAttribute('stroke', 'blue');
 
-            // Markierung für die Gewichte der ausgewählten Kante an die Linie anhängen, damit sie mit verschoben werden kann
-            let tokenCircleCx = this._diagram.lines.find(line => line.id === idString)!.calcMidCoords().x;
-            let tokenCircleCy = this._diagram.lines.find(line => line.id === idString)!.calcMidCoords().y;
-            // Hintergrundkreise der Tokens an die Linie anhängen, sodass sie mit verschoben werden
-            this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.setAttribute('cx',tokenCircleCx.toString());
-            this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.setAttribute('cy',tokenCircleCy.toString());
-            // Textfelder für die Tokens an die Linie anhängen, damit die bewegt werden können
-            this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.setAttribute('x',tokenCircleCx.toString());
-            this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.setAttribute('y',tokenCircleCy.toString());
-
-            if(this._diagram.lines.find(line => line.id === idString)!.tokens > 1){
-                this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.
+            if(this._diagram.selectedLine!.tokens > 1){
+                this._diagram.selectedLine!.svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'white');
             } else {
-                this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.
+                this._diagram.selectedLine!.svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'transparent');
             }
-
-            return this._diagram?.selectedLine?.svgElement.id;
-        }
-
-        public getLineToken() {
-            if(!this._diagram?.selectedLine?.svgElement){
-                return;
-            }
-            let idString = this._diagram.selectedLine.svgElement.id;
-
-            return this._diagram.lines.find(line => line.id === idString)!.tokens;
-        }
-
-        public addLineToken() {
-            if(!this._diagram?.selectedLine?.svgElement){
-                return;
-            }
-            let idString = this._diagram.selectedLine.svgElement.id;
-            this._diagram.lines.find(line => line.id === idString)!.tokens++;
-
-            this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent =
-                this._diagram.lines.find(line => line.id === idString)!.tokens.toString();
 
             return;
         }
 
         public removeLineToken () {
-            if(!this._diagram?.selectedLine?.svgElement) {
+            if(!this._diagram?.selectedLine) {
                 return;
             }
-            let idString = this._diagram.selectedLine.svgElement.id;
 
-            this._diagram.lines.find(line => line.id === idString)!.tokens--;
+            this._diagram.selectedLine.tokens--;
 
-            if(this._diagram.lines.find(line => line.id === idString)!.tokens  < 1) {
-                this._diagram.lines.find(line => line.id === idString)!.tokens = 1;
+            if(this._diagram.selectedLine.tokens  < 1) {
+                this._diagram.selectedLine.tokens = 1;
             }
 
-            if(this._diagram.lines.find(line => line.id === idString)!.tokens  > 1) {
-                this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent =
-                    this._diagram.lines.find(line => line.id === idString)!.tokens.toString();
+            if(this._diagram.selectedLine.tokens  > 1) {
+                this._diagram.selectedLine.svgElement!.childNodes[3].textContent =
+                    this._diagram.selectedLine.tokens.toString();
             } else {
-                this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent = "";
+                this._diagram.selectedLine.svgElement!.childNodes[3].textContent = "";
             }
 
             return;

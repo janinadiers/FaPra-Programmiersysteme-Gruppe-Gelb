@@ -10,6 +10,7 @@ import {JsonExportService} from "../../services/export/json-export.service";
 import {PngExportService} from "../../services/export/png-export.service";
 import {SvgService} from "../../services/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
+import {DrawingService} from "../../services/drawing.service";
 
 @Component({
     selector: 'app-toolbar',
@@ -44,7 +45,8 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                public _markenspielService: MarkenspielService
+                public _markenspielService: MarkenspielService,
+                private _drawingService: DrawingService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
@@ -65,9 +67,9 @@ export class ToolbarComponent {
         this.boltActiveColor = false;
         this.rectActiveColor = !this.rectActiveColor;
         this._activeButtonService.RectangleButtonActive();
-        this.deselectPlacesAndLines();
+        this._drawingService.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
-        
+
     }
 
     toggleCircleButton() {
@@ -76,7 +78,7 @@ export class ToolbarComponent {
         this.boltActiveColor = false;
         this.circleActiveColor = !this.circleActiveColor;
         this._activeButtonService.circleButtonActive();
-        this.deselectPlacesAndLines();
+        this._drawingService.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
     }
 
@@ -88,7 +90,7 @@ export class ToolbarComponent {
         // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
         this._diagram?.resetSelectedElements();
         this._activeButtonService.arrowButtonActive();
-        this.deselectPlacesAndLines();
+        this._drawingService.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
     }
 
@@ -101,37 +103,30 @@ export class ToolbarComponent {
         this._diagram?.resetSelectedElements();
         this._diagram!.lightningCount = 0;
         this._activeButtonService.boltButtonActive();
-        this.deselectPlacesAndLines();
+        this._drawingService.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
     }
 
     onAlgorithmSelect() {
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        //const selectedAlgorithm = selectElement?.value;   
-        
+        //const selectedAlgorithm = selectElement?.value;
     }
 
     addToken(){
-       
         if(Diagram.drawingIsActive){
             return
         }
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        
+
         if(addTokenButton.style.color == 'red'){
             this._markenspielService.addCircleToken();
-            
-            
         }
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.addLineToken();
-             
         }
-        
     }
 
     removeToken(){
-      
         if(Diagram.drawingIsActive){
             return
         }
@@ -142,7 +137,6 @@ export class ToolbarComponent {
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.removeLineToken();
         }
-          
     }
 
     onButtonClick(buttonId: string) {
@@ -196,25 +190,12 @@ export class ToolbarComponent {
                 .subscribe((content) => {
                     this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
                     this._appComponent.processSourceChange({fileContent: content, fileExtension: fileExtension});
-                });
+            });
         }
     }
 
     onZoomButtonClick(id: string) {
         this._activeButtonService.zoomButtonClick(id);
-    }
-
-    deselectPlacesAndLines() {
-        this._diagram?.places.forEach((element) => {
-            element.svgElement?.children[0].setAttribute('stroke', 'black');
-            element.svgElement?.children[2].setAttribute('stroke', 'black');
-            
-           
-        });
-        this._diagram?.lines.forEach((element) => {
-            element.svgElement!.children[2].setAttribute('stroke', 'transparent');
-        });
-        
     }
 
     deselectAddAndRemoveTokenButtons(){
@@ -230,6 +211,7 @@ export class ToolbarComponent {
         this.simulationActive = !this.simulationActive;
         if(this.simulationActive){
             simulationButton.style.color = 'green';
+            this._drawingService.deselectPlacesAndLines();
         }
         else{
             simulationButton.style.color = 'black';
