@@ -54,6 +54,9 @@ export class Diagram {
         });
     }
 
+    get nodes(): Array<Place | Transition> {
+        return [...this._places, ...this._transitions]
+    }
     get places(): Array<Place> {
         return this._places;
     }

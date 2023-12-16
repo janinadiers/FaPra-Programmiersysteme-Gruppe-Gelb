@@ -124,23 +124,27 @@ export class Element  {
             this.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
             this.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
 
-            this.svgElement?.childNodes.forEach((node) => {
-
-                if(node instanceof SVGCircleElement){
-
-                    this.svgElement?.setAttribute('transform', `translate(${this.x}, ${this.y})`);
-                }
-                else if(node instanceof SVGRectElement){
-
-                    let transitionWidth = parseInt(node.getAttribute('width')!);
-                    let transitionHeight = parseInt(node.getAttribute('height')!);
-
-                    this.svgElement?.setAttribute('transform', `translate(${this.x - transitionWidth / 2}, ${this.y - transitionHeight / 2})`);
-                }
-
-            });
+            this.updateSVG();
 
         }
+    }
+
+    public updateSVG(){
+        this.svgElement?.childNodes.forEach((node) => {
+
+            if(node instanceof SVGCircleElement){
+
+                this.svgElement?.setAttribute('transform', `translate(${this.x}, ${this.y})`);
+            }
+            else if(node instanceof SVGRectElement){
+
+                let transitionWidth = parseInt(node.getAttribute('width')!);
+                let transitionHeight = parseInt(node.getAttribute('height')!);
+
+                this.svgElement?.setAttribute('transform', `translate(${this.x - transitionWidth / 2}, ${this.y - transitionHeight / 2})`);
+            }
+
+        });
     }
 
     public createSVG(name: string): SVGElement {

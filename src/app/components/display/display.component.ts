@@ -342,9 +342,13 @@ export class DisplayComponent implements OnInit, OnDestroy {
             let circleObject = this._diagram?.places.find(place => place.id === cirlceObjectID);
             let rectobjectID = rect.id;
             let rectObject =  this._diagram?.transitions.find(transition => transition.id === rectobjectID);
+            
 
             if(targetIsCircle){
-
+                // set children of circleObject
+                if (circleObject) {
+                    circleObject.children.push(rectObject!);
+                }
                 // Aufruf der Funktion zu Erzeugung eines Objekts
                 let lineObject = this._diagram?.createLineObject(rectObject!, circleObject!);
 
@@ -368,6 +372,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             }
             else{
+                // set children of rectObject
+                if (rectObject) {
+                    rectObject.children.push(circleObject!);
+                }
                 let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
                 if(!lineObject){ throw new Error("LineObject is undefined")}
                 lineObject.createSVG();

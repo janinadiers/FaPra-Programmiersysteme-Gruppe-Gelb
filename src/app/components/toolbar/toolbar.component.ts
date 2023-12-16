@@ -10,6 +10,7 @@ import {JsonExportService} from "../../services/export/json-export.service";
 import {PngExportService} from "../../services/export/png-export.service";
 import {SvgService} from "../../services/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
+import {SpringEmbedderService} from "../../services/spring-embedder.service";
 
 @Component({
     selector: 'app-toolbar',
@@ -44,7 +45,8 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                public _markenspielService: MarkenspielService
+                public _markenspielService: MarkenspielService,
+                private _springEmbedderService: SpringEmbedderService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
@@ -107,7 +109,11 @@ export class ToolbarComponent {
 
     onAlgorithmSelect() {
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        //const selectedAlgorithm = selectElement?.value;   
+        const selectedAlgorithm = selectElement?.value;   
+        if(selectedAlgorithm === 'spring-embedder'){
+            this._springEmbedderService.apply()
+
+        }
         
     }
 
