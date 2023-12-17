@@ -63,6 +63,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
         else if (buttonId === "deleteLast") {
         this.deleteLastElement();
         }
+        else if (buttonId === "reachabilityGraph"){
+
+            this.generateReachabilityGraph();
+        }
         });
     }
 
@@ -163,6 +167,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     private clearDrawingArea(clearElements?: boolean) {
+        
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -183,6 +188,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     private deleteLastElement() {
 
+        if(this.activeButtonService.isReachButtonActive){
+            return;
+        }
+        
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -213,7 +222,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onCanvasClick(event: MouseEvent) {
 
-        // console.log(this._diagram);
+        console.log(this._diagram);
 
         // Event-Listener für Places, Transitions und Lines hinzufügen
         this._diagram?.places.forEach((element) => {
@@ -478,5 +487,34 @@ export class DisplayComponent implements OnInit, OnDestroy {
         });
     }
 
+    generateReachabilityGraph() {
 
+        const svgElement = document.getElementById('canvas');
+
+        if (this.activeButtonService.isReachButtonActive){
+
+            this.clearDrawingArea();
+        }
+
+      else{
+            this._diagram!.places.forEach(place => {
+                let svgPlace = place.createSVG();
+                svgElement?.appendChild(svgPlace);
+              });
+
+              this._diagram!.transitions.forEach(transition => {
+                let svgTransition = transition.createSVG();
+                svgElement?.appendChild(svgTransition);
+              });
+
+              this._diagram!.lines.forEach(line => {
+                let svgLine = line.createSVG();
+                svgElement?.insertBefore(svgLine!,svgElement.firstChild);
+              });
+
+
+
+            console.log("Else");
+        }
+    }
 }

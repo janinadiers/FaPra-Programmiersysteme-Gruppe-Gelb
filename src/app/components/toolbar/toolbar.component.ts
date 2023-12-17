@@ -58,8 +58,12 @@ export class ToolbarComponent {
     arrowActiveColor: boolean = false;
     boltActiveColor: boolean = false;
     simulationActive: boolean = false;
+    reachabilityActiveColor: boolean = false;
 
     toggleRectangleButton() {
+        if(this.reachabilityActiveColor){
+            return;
+        }
         this.circleActiveColor = false;
         this.arrowActiveColor = false;
         this.boltActiveColor = false;
@@ -71,6 +75,9 @@ export class ToolbarComponent {
     }
 
     toggleCircleButton() {
+        if(this.reachabilityActiveColor){
+            return;
+        }
         this.rectActiveColor = false;
         this.arrowActiveColor = false;
         this.boltActiveColor = false;
@@ -81,6 +88,9 @@ export class ToolbarComponent {
     }
 
     toggleArrowButton() {
+        if(this.reachabilityActiveColor){
+            return;
+        }
         this.circleActiveColor = false;
         this.rectActiveColor = false;
         this.boltActiveColor = false;
@@ -93,6 +103,9 @@ export class ToolbarComponent {
     }
 
     toggleBoltButton() {
+        if(this.reachabilityActiveColor){
+            return;
+        }
         this.circleActiveColor = false;
         this.rectActiveColor = false;
         this.arrowActiveColor = false;
@@ -103,6 +116,16 @@ export class ToolbarComponent {
         this._activeButtonService.boltButtonActive();
         this.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
+    }
+
+
+    toggleReachabilityButton(){
+        this.circleActiveColor = false;
+        this.rectActiveColor = false;
+        this.arrowActiveColor = false;
+        this.boltActiveColor =  false;
+        this.reachabilityActiveColor = !this.reachabilityActiveColor;
+        console.log(this.reachabilityActiveColor);
     }
 
     onAlgorithmSelect() {
@@ -130,6 +153,36 @@ export class ToolbarComponent {
         
     }
 
+    onButtonClick(buttonId: string) {
+        if (buttonId === "reachabilityGraph"){
+            if(this.checkValidity()){
+            this.toggleReachabilityButton();
+            this._activeButtonService.reachabilityButtonActive();
+            this._activeButtonService.sendButtonClick(buttonId);
+            }
+            else{
+                alert("A marked petri net is required!");
+            }
+        }
+        else{
+            this._activeButtonService.sendButtonClick(buttonId);
+        }
+    
+
+    }
+
+    checkValidity(){
+
+        if (this._diagram?.places.some(place => place.amountToken > 0)) {
+            return true;
+          }
+  
+        else{
+            return false;
+        }
+
+    }
+
     removeToken(){
       
         if(Diagram.drawingIsActive){
@@ -145,9 +198,7 @@ export class ToolbarComponent {
           
     }
 
-    onButtonClick(buttonId: string) {
-        this._activeButtonService.sendButtonClick(buttonId);
-    }
+    
 
     export(fileType: string): void {
         let exportContent;
@@ -225,6 +276,10 @@ export class ToolbarComponent {
     }
 
     toggleSimulation() {
+
+    if(this.reachabilityActiveColor){
+        return;
+    }
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
         this.simulationActive = !this.simulationActive;

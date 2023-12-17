@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { Diagram } from '../classes/diagram/diagram';
 
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,6 +14,8 @@ export class ActivebuttonService {
   isRectangleButtonActive: boolean = false;
   isArrowButtonActive: boolean = false;
   isBoltButtonActive: boolean = false;
+  isReachButtonActive: boolean= false;
+  
 
     //Observable für Delete-Button und Zoom-Button
 
@@ -50,6 +54,15 @@ private zoomButtonClickSubject = new Subject<string>();
     Diagram.drawingIsActive = this.isBoltButtonActive;
   }
 
+  reachabilityButtonActive(){
+    this.isCircleButtonActive = false;
+    this.isRectangleButtonActive = false;
+    this.isArrowButtonActive = false;
+    this.isBoltButtonActive = false;
+    this.isReachButtonActive = !this.isReachButtonActive;
+    console.log(this.isReachButtonActive);
+  }
+
 
   zoomButtonClick(buttonId: string) {
     this.zoomButtonClickSubject.next(buttonId);
@@ -60,6 +73,7 @@ private zoomButtonClickSubject = new Subject<string>();
   }
 
   sendButtonClick(buttonId: string) {
+    
     this.buttonClickSubject.next(buttonId);
   }
 
