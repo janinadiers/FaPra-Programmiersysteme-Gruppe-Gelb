@@ -234,7 +234,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
         // Position des SVG Elements relativ zum Viewport
         const svgContainer = svgElement.getBoundingClientRect();
-        // Berechnung der Maus Koordinanten relativ zum SVG Element
+        // Berechnung der Maus Koordinaten relativ zum SVG Element
         // und Anpassung an den Zoomfaktor, da es sonst zu einem Offset beim Klicken kommt
         const mouseX = (event.clientX - svgContainer.left) * Diagram.zoomFactor + Diagram.viewBox.x;
         const mouseY = (event.clientY - svgContainer.top) * Diagram.zoomFactor + Diagram.viewBox.y;
@@ -250,6 +250,29 @@ export class DisplayComponent implements OnInit, OnDestroy {
             this._drawingService.changeTokenButtonColor('black');
             let svgRect = this._drawingService.drawRect(mouseX, mouseY);
             svgElement.appendChild(svgRect.svgElement!);
+        }
+
+
+        // Kante von Transition zu Stelle zeichnen
+        else if (event.button === 0 && this.activeButtonService.isArrowButtonActive) {
+            if(this._diagram!.selectedRect){
+                this._diagram!.lightningCount = 0;
+                if(this._diagram!.selectedCircle){
+                    let targetIsCircle: boolean = true;
+                    this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect,targetIsCircle);
+                }
+            }
+        }
+
+        // Kante von Transition zu Stelle zeichnen
+        else if (event.button === 0 && this.activeButtonService.isArrowButtonActive) {
+            if(this._diagram!.selectedCircle){
+                this._diagram!.lightningCount = 0;
+                if(this._diagram!.selectedRect){
+                    let targetIsCircle: boolean = false;
+                    this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect,targetIsCircle);
+                }
+            }
         }
 
         // Blitz-Tool
@@ -274,6 +297,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 this._diagram.lightningCount++;
             }
 
+
+            // Kante von Stelle zu Transition zeichnen
             else if (this._diagram?.lightningCount === 1){
                 let targetIsCircle: boolean = false;
                 let svgRect = this._drawingService.drawRect(mouseX, mouseY);
@@ -289,7 +314,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }
 
                 this._diagram.lightningCount--;
-            }
+            } 
         }
     }
 
