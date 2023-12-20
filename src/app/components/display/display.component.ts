@@ -213,8 +213,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onCanvasClick(event: MouseEvent) {
 
-        // console.log(this._diagram);
-
         // Event-Listener für Places, Transitions und Lines hinzufügen
         this._diagram?.places.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
@@ -395,7 +393,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onLineSelect(line: SVGElement) {
-        console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
 
@@ -413,12 +410,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
 
     onCircleSelect(circle: SVGElement){
-        console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedCircle = circle;
 
         if (this._diagram?.selectedRect) {
-            console.log("Circle and Rect selected");
             
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
@@ -442,12 +437,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onRectSelect(rect: SVGElement){
-        console.log('on rect select', Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedRect= rect;
        
         if (this._diagram?.selectedCircle) {
-            console.log("Rect and Circle selected");
             
             let circleIsTarget: boolean = false;
             this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
