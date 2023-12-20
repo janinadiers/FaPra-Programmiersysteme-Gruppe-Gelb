@@ -292,7 +292,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 const lastRectObject = this._diagram?.transitions[this._diagram?.transitions.length - 1];
                 this._diagram.selectedRect = lastRectObject!.svgElement;
                 if ( this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
-                    this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                    this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect,targetIsCircle);
                 }
 
                 this._diagram.lightningCount--;
@@ -416,6 +416,15 @@ export class DisplayComponent implements OnInit, OnDestroy {
         console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         
         this._diagram!.selectedCircle = circle;
+
+        if (this._diagram?.selectedRect) {
+            console.log("Circle and Rect selected");
+            
+            let circleIsTarget: boolean = true;
+            this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
+        }
+        else
+        return;
         
         if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
 
@@ -429,18 +438,17 @@ export class DisplayComponent implements OnInit, OnDestroy {
         
         // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
 
-        if (this._diagram?.selectedRect) {
-            let circleIsTarget: boolean = true;
-            this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
-        }
-        else
-        return;
+      
     }
 
     onRectSelect(rect: SVGElement){
+        console.log('on rect select', Diagram.drawingIsActive, Diagram.algorithmIsActive);
+        
         this._diagram!.selectedRect= rect;
        
         if (this._diagram?.selectedCircle) {
+            console.log("Rect and Circle selected");
+            
             let circleIsTarget: boolean = false;
             this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
         }
