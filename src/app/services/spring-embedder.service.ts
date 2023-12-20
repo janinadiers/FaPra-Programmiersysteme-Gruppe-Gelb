@@ -12,17 +12,20 @@ export class SpringEmbedderService {
     private _diagram: any;
     private _adjacencyMatrix: Array<Array<{euclideanDistance: number, xDistance: number, yDistance: number, connected: boolean, obj: Place | Transition, self: Place | Transition}>> = [];
     private _forceVector: Array<{x: number, y: number}> = [];
-    private _neutralDistance: number = 800;
+    private _neutralDistance: number = 1;
     private _repulsionConstant: number = 1;
     private _attractionConstant: number = 1;
-    private _maxIterations: number = 10;
+    private _maxIterations: number = 100;
     private _epsilon: number = 10;
+    //private _widthOfCanvas: number = document.getElementById('canvas')!.clientWidth;
+    //private _heightOfCanvas: number = document.getElementById('canvas')!.clientHeight;
 
    constructor(private _displayService: DisplayService) {
         console.log("SpringEmbedderService constructor called");
         this._displayService.diagram$.subscribe(diagram => {
 
         this._diagram = diagram;
+        //this._neutralDistance = Math.sqrt((this._widthOfCanvas * this._heightOfCanvas) /this._diagram.nodes.length);
 
     });
     
@@ -43,51 +46,51 @@ export class SpringEmbedderService {
         for(let [ i, node] of this._diagram.nodes.entries()){
             const connectedNodes = this._adjacencyMatrix[i].filter(node => node.connected);
             console.log('connectedNodes', connectedNodes);
-            const attractionX = connectedNodes.reduce((acc, curr) =>  acc + curr.xDistance, 0) / connectedNodes.length;
-            const attractionY = connectedNodes.reduce((acc, curr) =>  acc + curr.yDistance, 0) / connectedNodes.length;
-
-            const nearNodes = this._adjacencyMatrix[i].filter(nearnode => (nearnode.euclideanDistance < this._neutralDistance) && (node !== nearnode.obj));
-            let repulsionX = 0;
-            let repulsionY = 0;
-            if(nearNodes.length > 0){
-             repulsionX = nearNodes.reduce((acc, curr) =>  {
-                if (curr.xDistance > 0){
-                    return acc - 800 + curr.xDistance 
-                } else {
-                    return acc + 800 + curr.xDistance
+            // const attractionX = connectedNodes.reduce((acc, curr) =>  acc + curr.xDistance, 0) / connectedNodes.length;
+            // const attractionY = connectedNodes.reduce((acc, curr) =>  acc + curr.yDistance, 0) / connectedNodes.length;
+            const attraction = connectedNodes.reduce((acc, curr) =>  acc + (2 * Math.log(curr.euclideanDistance)), 0);
+            console.log('jhkfjds', (this._adjacencyMatrix[1][0].euclideanDistance));
+            
+            const repulsion = this._adjacencyMatrix[i].reduce((acc, curr) => {
+                if(curr.obj !== node){
+                    return acc + (1 / Math.pow(curr.euclideanDistance,2))
                 }
-            }, 0) / nearNodes.length;
-
-             repulsionY = nearNodes.reduce((acc, curr) =>  {
-                if (curr.yDistance > 0){
-                    return acc - 800 + curr.yDistance 
-                } else {
-                    return acc + 800 + curr.yDistance
-                }
-            }, 0) / nearNodes.length;
-        }
-          console.log('repulsionX', repulsionX, 'repulsionY', repulsionY, 'attractionX', attractionX, 'attractionY', attractionY);
-          
-       
-
-            this._forceVector[i] = {x: (attractionX + repulsionX) , y: (attractionY + repulsionY)};
-        }
+                return acc;
+            }, 0)
+                
+                
+            console.log('repulsion', repulsion, 'attraction', attraction);
+            
+            this._forceVector[i] = {x: (attraction + repulsion) , y: (attraction+ repulsion)};
+    }
+        
 
         for( let [ i, node] of this._diagram.nodes.entries()){
             const vector = this._forceVector[i];
-            console.log('vector', vector.x * coolingFactor, vector.y * coolingFactor);
+            console.log('vector', vector);
             
-            node.x += (vector.x * coolingFactor);
-            node.y += (vector.y * coolingFactor);
-            console.log('node', node.x, node.y)
+            node.x += (vector.x * 0.1);
+            node.y += (vector.y * 0.1);
             node.updateSVG()
-            await new Promise(resolve => setTimeout(resolve, 15000));
+            //await new Promise(resolve => setTimeout(resolve, 10000));
 
         }
 
         maxForce = Math.max(...this._forceVector.map((curr) => Math.max(Math.abs(curr.x), Math.abs(curr.y))));
         iteration++;
     }
+    }
+
+    getAttractionForce(absoluteDistance:[number,number] ){
+        let absoluteDistanceX = absoluteDistance[0];
+        let absoluteDistanceY = absoluteDistance[1];
+        return [(Math.pow(absoluteDistanceX,2) / this._neutralDistance), (Math.pow(absoluteDistanceY,2) / this._neutralDistance)];
+    }
+
+    getRepulsionForce(absoluteDistance:[number,number]){
+        let absoluteDistanceX = absoluteDistance[0];
+        let absoluteDistanceY = absoluteDistance[1];
+        return [(Math.pow(this._neutralDistance,2) / absoluteDistanceX), (Math.pow(this._neutralDistance,2) / absoluteDistanceY)];
     }
 
     computeAdjacencyMatrix(){
