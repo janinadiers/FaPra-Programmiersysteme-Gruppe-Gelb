@@ -121,6 +121,7 @@ export class Diagram {
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
         this.pushID(idString);
+        source.children = target;
         return lineObject;
     }
 

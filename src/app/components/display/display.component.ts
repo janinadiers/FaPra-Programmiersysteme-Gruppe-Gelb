@@ -213,7 +213,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onCanvasClick(event: MouseEvent) {
 
-        // console.log(this._diagram);
+       // console.log(this._diagram);
 
         // Event-Listener für Places, Transitions und Lines hinzufügen
         this._diagram?.places.forEach((element) => {
