@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
-import {SvgService} from "./svg.service";
 import {Diagram} from "../classes/diagram/diagram";
 import {DisplayService} from "./display.service";
-import {Subscription} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -10,13 +8,12 @@ import {Subscription} from "rxjs";
 
 export class MarkenspielService {
     private _diagram: Diagram | undefined;
-    private _sub: Subscription;
+    
 
     constructor(
-        private svgService: SvgService,
         private diplayService: DisplayService)
         {
-            this._sub = this.diplayService.diagram$.subscribe(diagram => {
+            this.diplayService.diagram$.subscribe(diagram => {
                 this._diagram = diagram;
             });
         }
@@ -78,14 +75,18 @@ export class MarkenspielService {
             }
             let idString = this._diagram.selectedCircle.svgElement.id;
 
-            this._diagram.places.find(place => place.id === idString)!.amountToken--;
+            let placeObject = this._diagram.places.find(place => place.id === idString);
+            placeObject!.amountToken--;
 
-            if(this._diagram.places.find(place => place.id === idString)!.amountToken  < 0) {
-                this._diagram.places.find(place => place.id === idString)!.amountToken = 0;
+            if(placeObject!.amountToken  < 0) {
+                placeObject!.amountToken = 0;
             }
-
-            this._diagram.places.find(place => place.id === idString)!.svgElement!.children[1].textContent =
-                this._diagram.places.find(place => place.id === idString)!.amountToken.toString();
+            if(placeObject!.amountToken  > 1) {
+            placeObject!.svgElement!.children[1].textContent =
+                placeObject!.amountToken.toString();
+            } else {
+                placeObject!.svgElement!.children[1].textContent = "";
+            }
 
             return;
         }
@@ -124,7 +125,8 @@ export class MarkenspielService {
             if(this._diagram.lines.find(line => line.id === idString)!.tokens > 1){
                 this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'white');
-            } else {
+            }
+            else {
                 this._diagram!.lines.find(line => line.id === idString)!.svgElement!.querySelector('circle')!.
                 setAttribute('fill', 'transparent');
             }
@@ -147,7 +149,7 @@ export class MarkenspielService {
             }
             let idString = this._diagram.selectedLine.svgElement.id;
             this._diagram.lines.find(line => line.id === idString)!.tokens++;
-
+            
             this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent =
                 this._diagram.lines.find(line => line.id === idString)!.tokens.toString();
 

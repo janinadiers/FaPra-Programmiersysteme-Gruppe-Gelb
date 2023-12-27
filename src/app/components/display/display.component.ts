@@ -401,15 +401,19 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
     }
 
+
     onLineSelect(line: Line) {
         // console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         this._diagram!.selectedLine = line;
+
 
         if(Diagram.drawingIsActive){return}
         this.changeTokenButtonColor('blue');
 
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
         this.deselectPlacesAndLines();
+
+        line.svgElement!.children[2].setAttribute('fill', 'white');
         line.svgElement!.children[2].setAttribute('stroke', 'blue');
         line.svgElement!.children[2].setAttribute('stroke-width', '2');
 
@@ -419,6 +423,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onCircleSelect(circle: Place){
         // console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive, circle);
+
         this._diagram!.selectedCircle = circle;
         if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
 
@@ -472,6 +477,14 @@ export class DisplayComponent implements OnInit, OnDestroy {
         });
         this._diagram?.lines.forEach((element) => {
             element.svgElement!.children[2].setAttribute('stroke', 'transparent');
+            if(element.tokens > 1){
+                element.svgElement!.children[2].setAttribute('fill', 'white');
+            }
+            else{
+                element.svgElement!.children[2].setAttribute('fill', 'transparent');
+            }
+            
+            
         });
     }
 }
