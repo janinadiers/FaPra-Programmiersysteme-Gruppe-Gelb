@@ -15,9 +15,9 @@ export class Diagram {
     private readonly _lines: Array<Line>;
     private readonly _order: Array<string>;
 
-    selectedCircle: SVGElement | undefined = undefined;
-    selectedRect: SVGElement | undefined = undefined;
-    selectedLine: SVGElement | undefined = undefined;
+    selectedCircle: Place | undefined = undefined;
+    selectedRect: Transition | undefined = undefined;
+    selectedLine: Line | undefined = undefined;
 
     lightningCount: number = 0;
 
@@ -141,7 +141,7 @@ export class Diagram {
     }
 
     private processMouseDown(event: MouseEvent) {
-        
+
         if(Diagram.drawingIsActive){
             return;
         }
