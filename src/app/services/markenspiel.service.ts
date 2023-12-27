@@ -20,7 +20,7 @@ export class MarkenspielService {
 
         // Circle-Handling
         public getCircleId() {
-            if(!this._diagram?.selectedCircle){
+            if(!this._diagram?.selectedCircle?.svgElement){
                 return;
             }
 
@@ -35,32 +35,32 @@ export class MarkenspielService {
             }); */
             // ist in die Display-Component zu onCircleSelect gewandert
 
-            let idString = this._diagram.selectedCircle.id;
+            let idString = this._diagram.selectedCircle.svgElement.id;
             //this._diagram.placeMap.get(idString)!.svgElement!.setAttribute('stroke','red');
-            this._diagram.selectedCircle.setAttribute('stroke','red');
+            this._diagram.selectedCircle.svgElement.setAttribute('stroke','red');
 
             // alter Code:
             // let idNumber = +this._diagram.selectedCircle.id.charAt(1) -1; // Achtung: funktioniert nicht mehr bei p11...
             // this._diagram.places[idNumber].svgElement?.setAttribute('stroke','red');
 
-            return this._diagram?.selectedCircle?.id
+            return this._diagram?.selectedCircle.svgElement?.id
         }
 
         public getCircleToken() {
-            if(!this._diagram?.selectedCircle){
+            if(!this._diagram?.selectedCircle?.svgElement){
                 return;
             }
-            let idString = this._diagram.selectedCircle?.id;
+            let idString = this._diagram.selectedCircle.svgElement?.id;
             let placeObject = this._diagram.places.find(place => place.id === idString);
 
             return placeObject?.amountToken;
         }
 
         public addCircleToken() {
-            if(!this._diagram?.selectedCircle){
+            if(!this._diagram?.selectedCircle?.svgElement){
                 return;
             }
-            let idString = this._diagram.selectedCircle.id;
+            let idString = this._diagram.selectedCircle.svgElement.id;
 
             this._diagram.places.find(place => place.id === idString)!.amountToken++;
             this._diagram.places.find(place => place.id === idString)!.svgElement!.children[1].textContent =
@@ -70,10 +70,10 @@ export class MarkenspielService {
         }
 
         public removeCircleToken() {
-            if(!this._diagram?.selectedCircle) {
+            if(!this._diagram?.selectedCircle?.svgElement) {
                 return;
             }
-            let idString = this._diagram.selectedCircle.id;
+            let idString = this._diagram.selectedCircle.svgElement.id;
 
             let placeObject = this._diagram.places.find(place => place.id === idString);
             placeObject!.amountToken--;
@@ -93,7 +93,7 @@ export class MarkenspielService {
 
         // Line-Handling
         public getLineId() {
-            if(!this._diagram?.selectedLine){
+            if(!this._diagram?.selectedLine?.svgElement){
                 return;
             }
             /*
@@ -107,7 +107,7 @@ export class MarkenspielService {
             }); */
             // ist in die Display-Component zu OnLineSelect gewandert
 
-            let idString = this._diagram.selectedLine.id;
+            let idString = this._diagram.selectedLine.svgElement.id;
 
             this._diagram.lines.find(line => line.id === idString)!.svgElement!.querySelector('text')!.
                 setAttribute('stroke', 'blue');
@@ -131,23 +131,23 @@ export class MarkenspielService {
                 setAttribute('fill', 'transparent');
             }
 
-            return this._diagram?.selectedLine?.id;
+            return this._diagram?.selectedLine?.svgElement.id;
         }
 
         public getLineToken() {
-            if(!this._diagram?.selectedLine){
+            if(!this._diagram?.selectedLine?.svgElement){
                 return;
             }
-            let idString = this._diagram.selectedLine.id;
+            let idString = this._diagram.selectedLine.svgElement.id;
 
             return this._diagram.lines.find(line => line.id === idString)!.tokens;
         }
 
         public addLineToken() {
-            if(!this._diagram?.selectedLine){
+            if(!this._diagram?.selectedLine?.svgElement){
                 return;
             }
-            let idString = this._diagram.selectedLine.id;
+            let idString = this._diagram.selectedLine.svgElement.id;
             this._diagram.lines.find(line => line.id === idString)!.tokens++;
             
             this._diagram.lines.find(line => line.id === idString)!.svgElement!.childNodes[3].textContent =
@@ -157,10 +157,10 @@ export class MarkenspielService {
         }
 
         public removeLineToken () {
-            if(!this._diagram?.selectedLine) {
+            if(!this._diagram?.selectedLine?.svgElement) {
                 return;
             }
-            let idString = this._diagram.selectedLine.id;
+            let idString = this._diagram.selectedLine.svgElement.id;
 
             this._diagram.lines.find(line => line.id === idString)!.tokens--;
 

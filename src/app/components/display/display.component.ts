@@ -6,6 +6,9 @@ import {ExampleFileComponent} from "../example-file/example-file.component";
 import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
+import {Place} from "../../classes/diagram/place";
+import {Transition} from "../../classes/diagram/transition";
+import {Line} from "../../classes/diagram/line";
 
 
 @Component({
@@ -158,7 +161,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
             });
 
         }
-
         this.drawingArea.nativeElement.appendChild(groupedElements);
     }
 
@@ -195,51 +197,48 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             if (lastID?.startsWith("p")) {
                 this._diagram.places.pop();
-                drawingArea.removeChild(drawingArea.lastChild as ChildNode);   
+                drawingArea.removeChild(drawingArea.lastChild as ChildNode);
             }
             else if (lastID?.startsWith("t")) {
                 this._diagram.transitions.pop();
-                drawingArea.removeChild(drawingArea.lastChild as ChildNode);  
+                drawingArea.removeChild(drawingArea.lastChild as ChildNode);
                 }
             else if (lastID?.startsWith("a")){
                 this._diagram.lines.pop();
                 drawingArea.removeChild(drawingArea.firstChild as ChildNode);
             }
-            
+
             this._diagram.resetSelectedElements();
             this._diagram.lightningCount = 0;
         }
     }
 
     onCanvasClick(event: MouseEvent) {
-
         // console.log(this._diagram);
-
         // Event-Listener für Places, Transitions und Lines hinzufügen
         this._diagram?.places.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
                 if(!element.svgElement) {return};
-                this.onCircleSelect(element!.svgElement);
+                this.onCircleSelect(element);
             });
         });
 
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
                 if(!element.svgElement) {return};
-                this.onLineSelect(element!.svgElement);
+                this.onLineSelect(element);
             });
         });
 
         this._diagram?.transitions.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
                 if(!element.svgElement) {return;}
-                this.onRectSelect(element!.svgElement);
+                this.onRectSelect(element);
             });
         });
 
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
-
         if (!svgElement) {
             return;
         }
@@ -251,141 +250,149 @@ export class DisplayComponent implements OnInit, OnDestroy {
         const mouseY = (event.clientY - svgContainer.top) * Diagram.zoomFactor + Diagram.viewBox.y;
 
         // Check ob linker Mouse Button geklickt und Button aktiviert
-       if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
-            
+        if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
             this.changeTokenButtonColor('black');
             let svgCircle = this.drawCircle(mouseX ,mouseY)
-            svgElement.appendChild(svgCircle);
-
+            svgElement.appendChild(svgCircle.svgElement!);
         }
-        
-        
+
         else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
-            
             this.changeTokenButtonColor('black');
             let svgRect = this.drawRect(mouseX, mouseY);
-            svgElement.appendChild(svgRect);
+            svgElement.appendChild(svgRect.svgElement!);
         }
-        //Blitz-Tool
+
+        // Blitz-Tool
         else if (event.button === 0 && this.activeButtonService.isBoltButtonActive){
             this.changeTokenButtonColor('black');
-            if(this._diagram?.lightningCount === 0){
 
+            if(this._diagram?.lightningCount === 0){
                 let targetIsCircle: boolean = true;
                 let svgCircle = this.drawCircle(mouseX ,mouseY);
-                svgElement.appendChild(svgCircle);
+                svgElement.appendChild(svgCircle.svgElement!);
+
                 //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this._diagram?.places[this._diagram?.places.length - 1];
-                this._diagram.selectedCircle = lastCircleObject!.svgElement;
-                if (this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
-                    this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                const lastCircleObject = this._diagram!.places[this._diagram!.places.length - 1];
+
+                if(lastCircleObject.svgElement){
+                    this._diagram.selectedCircle = lastCircleObject;
+                    if (this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
+                        this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                    }
                 }
+
                 this._diagram.lightningCount++;
             }
 
             else if (this._diagram?.lightningCount === 1){
-              
                 let targetIsCircle: boolean = false;
                 let svgRect = this.drawRect(mouseX, mouseY);
-                svgElement.appendChild(svgRect);
+                svgElement.appendChild(svgRect.svgElement!);
+
                 //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
                 const lastRectObject = this._diagram?.transitions[this._diagram?.transitions.length - 1];
-                this._diagram.selectedRect = lastRectObject!.svgElement;
-                if ( this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
-                    this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                if(lastRectObject?.svgElement){
+                    this._diagram.selectedRect = lastRectObject;
+                    if ( this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
+                        this.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                    }
                 }
 
                 this._diagram.lightningCount--;
             }
         }
-
     }
 
+    // Stelen (Kreise) zeichnen
     drawCircle(mouseX:number, mouseY:number){
-        
+
         // Aufruf der Funktion zu Erzeugung eines Objekts
         let circleObject = this._diagram?.createCircleObject(mouseX, mouseY);
         if(!circleObject){ throw new Error("CircleObject is undefined") }
+
+        // Erstellen des SVG-Elements
         let svgCircle = circleObject.createSVG();
+
         // Objekt mit SVG Element verknüpfen
-        circleObject.svgElement = svgCircle;
-        svgCircle.addEventListener('click', () => {
-            this.onCircleSelect(svgCircle);
-            
+        circleObject.svgElement!.addEventListener('click', () => {
+            this.onCircleSelect(circleObject!);
         });
-        return svgCircle;
+
+        return circleObject;
     }
 
+    // Transitionen (Rechtecke) zeichnen
     drawRect(mouseX: number, mouseY: number){
-
         //  Aufruf der Funktion zu Erzeugung eines Objekts
         let rectObject = this._diagram?.createRectObject(mouseX, mouseY);
         if(!rectObject){ throw new Error("RectObject is undefined") }
+
+        // Erstellen des SVG-Elements
         const width = rectObject.width;
         const height = rectObject.height;
         let svgRect = rectObject.createSVG();
+
         // Objekt mit SVG Element verknüpfen
-        rectObject.svgElement = svgRect;
-        svgRect.addEventListener('click', () => {
-            this.onRectSelect(svgRect);
+        rectObject.svgElement!.addEventListener('click', () => {
+            this.onRectSelect(rectObject!);
         });
-        return svgRect
+
+        return rectObject
     }
 
-
-    connectElements(circle: SVGElement, rect: SVGElement, targetIsCircle: boolean) {
-
+    // Linien zeichnen
+    connectElements(circle: Place, rect: Transition, targetIsCircle: boolean) {
+        // Check, ob Blitz-Tool oder Linie angeklickt ist
         if (this.activeButtonService.isArrowButtonActive || this.activeButtonService.isBoltButtonActive) {
+            // Canvas als SVG-Element laden
             const svgElement = document.getElementById('canvas');
 
+            // Kreis-Objekt (Stelle) finden und Variable dafür erstellen
             let cirlceObjectID = circle.id;
             let circleObject = this._diagram?.places.find(place => place.id === cirlceObjectID);
+            // Transition (Rechteck) finden und Objekt dafür erstellen
             let rectobjectID = rect.id;
             let rectObject =  this._diagram?.transitions.find(transition => transition.id === rectobjectID);
 
+            // Linie von Rechteck zu Kreis zeichnen
             if(targetIsCircle){
-
                 // Aufruf der Funktion zu Erzeugung eines Objekts
                 let lineObject = this._diagram?.createLineObject(rectObject!, circleObject!);
+                if(!lineObject){ throw new Error("LineObject is undefined")}
 
-               if(!lineObject){ throw new Error("LineObject is undefined")}
-
+                // Erstellen des SVG
                 lineObject.createSVG();
-
                 let svgLine = lineObject.svgElement;
-
                 if (svgElement) {
                     if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
                     }
                 }
-
                 svgLine?.addEventListener(('click'), () => {
                     if(svgLine){
-                        this.onLineSelect(svgLine);
+                        this.onLineSelect(lineObject!);
                     }
-                } );  // Event-Listener, damit Kante angeklickt werden kann (eine Richtung) */
-
+                } );
             }
+            // Linie von Kreis zu Rechteck zeichnen
             else{
+                // Erstellen des Objekts
                 let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
                 if(!lineObject){ throw new Error("LineObject is undefined")}
                 lineObject.createSVG();
 
+                // Erstellen des SVG
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
                    if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
                     }
                 }
-
-
-
                 svgLine?.addEventListener(('click'), () => {
                     if(svgLine != undefined){
-                        this.onLineSelect(svgLine);
+                        this.onLineSelect(lineObject!);
                         }
-                    } );  // Event-Listener, damit Kante angeklickt werden kann (andere Richtung) */
+                    } );
             }
 
             if(this.activeButtonService.isArrowButtonActive){
@@ -394,60 +401,60 @@ export class DisplayComponent implements OnInit, OnDestroy {
         }
     }
 
-    onLineSelect(line: SVGElement) {
-        
-        this._diagram!.selectedLine = line; // ohne "!" wird selectedLine undefined...
+
+    onLineSelect(line: Line) {
+        // console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
+        this._diagram!.selectedLine = line;
+
 
         if(Diagram.drawingIsActive){return}
-
         this.changeTokenButtonColor('blue');
-        
+
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
         this.deselectPlacesAndLines();
-        line.children[2].setAttribute('fill', 'white');
-        line.children[2].setAttribute('stroke', 'blue');
-        line.children[2].setAttribute('stroke-width', '2');
-        
-        
+
+        line.svgElement!.children[2].setAttribute('fill', 'white');
+        line.svgElement!.children[2].setAttribute('stroke', 'blue');
+        line.svgElement!.children[2].setAttribute('stroke-width', '2');
+
+        return;
     }
 
 
-    onCircleSelect(circle: SVGElement){
-        
+    onCircleSelect(circle: Place){
+        // console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive, circle);
+
         this._diagram!.selectedCircle = circle;
-        
         if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
 
         this.changeTokenButtonColor('red');
 
         // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
         this.deselectPlacesAndLines();
-        circle.children[0].setAttribute('stroke', 'red');
-        circle.children[2].setAttribute('stroke', 'red');
-        circle.children[0].setAttribute('stroke-width', '2');
-        
-        // weitere Farbänderungen unter element.ts bei processMouseUp() und processMouseDown() (?)
+        circle.svgElement!.children[0].setAttribute('stroke', 'red');
+        circle.svgElement!.children[2].setAttribute('stroke', 'red');
+        circle.svgElement!.children[0].setAttribute('stroke-width', '2');
 
-        if (this._diagram?.selectedRect) {
+        if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
-            this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
+            this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
         }
         else
         return;
     }
 
-    onRectSelect(rect: SVGElement){
-        this._diagram!.selectedRect= rect;
-       
-        if (this._diagram?.selectedCircle) {
+    onRectSelect(rect: Transition){
+        this._diagram!.selectedRect = rect;
+
+        if (this._diagram!.selectedCircle) {
             let circleIsTarget: boolean = false;
-            this.connectElements(this._diagram?.selectedCircle, this._diagram?.selectedRect, circleIsTarget);
+            this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
         }
         else
         return;
     }
 
-  handleRightClick(event: MouseEvent) {
+    handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
         if(this.activeButtonService.isBoltButtonActive){
 
@@ -457,20 +464,16 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     changeTokenButtonColor(color:string){
-    
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = color;
         addTokenButton!.style.color = color;
-         
     }
 
     deselectPlacesAndLines(){
         this._diagram?.places.forEach((element) => {
             element.svgElement?.children[0].setAttribute('stroke', 'black');
             element.svgElement?.children[2].setAttribute('stroke', 'black');
-            
-           
         });
         this._diagram?.lines.forEach((element) => {
             element.svgElement!.children[2].setAttribute('stroke', 'transparent');
@@ -484,6 +487,4 @@ export class DisplayComponent implements OnInit, OnDestroy {
             
         });
     }
-
-
 }
