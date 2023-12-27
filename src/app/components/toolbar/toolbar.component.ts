@@ -110,9 +110,11 @@ export class ToolbarComponent {
     onAlgorithmSelect() {
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
         //const selectedAlgorithm = selectElement?.value;
+
     }
 
     addToken(){
+
         if(Diagram.drawingIsActive){
             return
         }
@@ -120,13 +122,18 @@ export class ToolbarComponent {
 
         if(addTokenButton.style.color == 'red'){
             this._markenspielService.addCircleToken();
+
+
         }
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.addLineToken();
+
         }
+
     }
 
     removeToken(){
+
         if(Diagram.drawingIsActive){
             return
         }
@@ -137,6 +144,7 @@ export class ToolbarComponent {
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.removeLineToken();
         }
+
     }
 
     onButtonClick(buttonId: string) {
@@ -145,6 +153,7 @@ export class ToolbarComponent {
 
     export(fileType: string): void {
         let exportContent;
+        this._drawingService.deselectPlacesAndLines();
         switch (fileType) {
             case 'PNML':
                 exportContent = this._pnmlExportService.export();
@@ -190,7 +199,7 @@ export class ToolbarComponent {
                 .subscribe((content) => {
                     this.fileContent.emit({fileContent: content, fileExtension: fileExtension});
                     this._appComponent.processSourceChange({fileContent: content, fileExtension: fileExtension});
-            });
+                });
         }
     }
 

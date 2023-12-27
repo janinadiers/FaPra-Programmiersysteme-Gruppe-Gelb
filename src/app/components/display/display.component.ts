@@ -31,10 +31,13 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 private _drawingService: DrawingService) {
 
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
+
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
 
         this._diagram = diagram;
+
         this.draw();
+
         });
 
         this.activeButtonService.zoomButtonClickObservable().subscribe(buttonId => {
@@ -50,6 +53,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+
         this._diagram!.canvasElement = document.getElementById('canvas') as unknown as SVGElement;
         this.subscriptionOfToolbar = this.activeButtonService.
             getButtonClickObservable().subscribe((buttonId: string) => {
@@ -102,6 +106,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
           // die viewBox ist eine Art zusätzlicher innerer Canvas der die Größe des Diagramms bestimmt unabhängig von der Größe des äußeren Canvas
           Diagram.viewBox.width = rect.width * Diagram.zoomFactor;
           Diagram.viewBox.height = rect.height * Diagram.zoomFactor;
+
 
           return `${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}`;
         }
@@ -198,6 +203,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     private deleteLastElement() {
+
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -264,7 +270,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
             }
         }
 
-        // Kante von Transition zu Stelle zeichnen
+        // Kante von Stelle zu Transition zeichnen
         else if (event.button === 0 && this.activeButtonService.isArrowButtonActive) {
             if(this._diagram!.selectedCircle){
                 this._diagram!.lightningCount = 0;
@@ -314,7 +320,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }
 
                 this._diagram.lightningCount--;
-            } 
+            }
         }
     }
 
