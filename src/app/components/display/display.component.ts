@@ -180,6 +180,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
             });
 
         }
+
         this.drawingArea.nativeElement.appendChild(groupedElements);
     }
 
@@ -235,6 +236,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     onCanvasClick(event: MouseEvent) {
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
+
         if (!svgElement) {
             return;
         }
@@ -286,6 +288,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
             this._drawingService.changeTokenButtonColor('black');
 
             if(this._diagram?.lightningCount === 0){
+
                 let targetIsCircle: boolean = true;
                 let svgCircle = this._drawingService.drawCircle(mouseX ,mouseY);
                 svgElement.appendChild(svgCircle.svgElement!);
@@ -306,6 +309,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             // Kante von Stelle zu Transition zeichnen
             else if (this._diagram?.lightningCount === 1){
+
                 let targetIsCircle: boolean = false;
                 let svgRect = this._drawingService.drawRect(mouseX, mouseY);
                 svgElement.appendChild(svgRect.svgElement!);
