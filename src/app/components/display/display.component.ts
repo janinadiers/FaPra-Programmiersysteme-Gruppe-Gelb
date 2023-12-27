@@ -214,15 +214,15 @@ export class DisplayComponent implements OnInit, OnDestroy {
             let elementOrder = this._diagram.order;
             let lastID = elementOrder.pop();
 
-            if (lastID?.startsWith("p")) {
+            if (lastID?.startsWith("p") && lastID.length <= 4) {
                 this._diagram.places.pop();
                 drawingArea.removeChild(drawingArea.lastChild as ChildNode);
             }
-            else if (lastID?.startsWith("t")) {
+            else if (lastID?.startsWith("t") && lastID.length <= 4) {
                 this._diagram.transitions.pop();
                 drawingArea.removeChild(drawingArea.lastChild as ChildNode);
                 }
-            else if (lastID?.startsWith("a")){
+            else if (lastID && lastID.length >= 5){
                 this._diagram.lines.pop();
                 drawingArea.removeChild(drawingArea.firstChild as ChildNode);
             }

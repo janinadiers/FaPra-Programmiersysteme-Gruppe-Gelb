@@ -116,11 +116,12 @@ export class Diagram {
 
     createLineObject (source: Transition | Place, target: Transition| Place){
 
-        let idString: string = "a" + (this.lines.length + 1);
+        let idString: string = source.id + "," + target.id;
         let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
         this.pushID(idString);
+        source.children = target;
         return lineObject;
     }
 
