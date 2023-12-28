@@ -1,7 +1,6 @@
 
 import { Injectable } from '@angular/core';
 import { Element } from '../../classes/diagram/element';
-import { ImportService } from '../../classes/import-service';
 import { Diagram } from '../../classes/diagram/diagram';
 import { SvgService } from '../svg.service';
 import { Place } from '../../classes/diagram/place';
@@ -13,7 +12,7 @@ import { Coords } from '../../classes/json-petri-net';
 @Injectable({
     providedIn: 'root',
 })
-export class PnmlImportService implements ImportService {
+export class PnmlImportService {
 
     import(content: string): Diagram | undefined {
 
