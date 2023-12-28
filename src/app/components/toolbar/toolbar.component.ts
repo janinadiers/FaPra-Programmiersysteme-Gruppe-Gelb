@@ -122,6 +122,8 @@ export class ToolbarComponent {
 
         if(addTokenButton.style.color == 'red'){
             this._markenspielService.addCircleToken();
+
+
         }
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.addLineToken();

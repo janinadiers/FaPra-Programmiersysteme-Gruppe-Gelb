@@ -56,8 +56,8 @@ export class Transition extends Element {
         return this._children;
     }
 
-    set children(value: Array<Place>) {
-        this._children = value;
+    set children(object: Place) {
+        this._children.push(object);
     }
 
     get parents(): Array<Place> {
