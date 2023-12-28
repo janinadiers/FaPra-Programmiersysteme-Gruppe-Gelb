@@ -7,6 +7,7 @@ export class Transition extends Element {
     private _width: number;
     private _height: number;
     private _children: Array<Place>;
+    private _parents: Array<Place>;
     private _label: string;
 
     constructor(id: string, x: number, y: number, label?: string) {
@@ -15,6 +16,7 @@ export class Transition extends Element {
         this._width = 20;
         this._height = 40;
         this._children = [];
+        this._parents = [];
         this._label = label ?? '';
     }
 
@@ -58,6 +60,14 @@ export class Transition extends Element {
         this._children.push(object);
     }
 
+    get parents(): Array<Place> {
+        return this._parents;
+    }
+
+    set parents(place: Place) {
+        this._parents.push(place);
+    }
+
     override createSVG(){
         if (this.svgElement) {
             return this.svgElement;
@@ -76,15 +86,6 @@ export class Transition extends Element {
         rect.setAttribute('stroke-width', '2');
         group.appendChild(rect);
 
-        //Marker
-        // const marker = super.createSVG('text');
-        // marker.setAttribute('x', this.x.toString());
-        // marker.setAttribute('y', this.y.toString());
-        // marker.setAttribute('text-anchor', 'middle');
-        // marker.setAttribute('dy', '.3em');
-        // marker.textContent = this._amountToken.toString();
-        // group.appendChild(marker);
-
         //Text
         const text = super.createSVG('text');
         text.setAttribute('text-anchor', 'middle');
@@ -98,6 +99,4 @@ export class Transition extends Element {
         super.registerSvg(group);
         return group;
     }
-
-
 }
