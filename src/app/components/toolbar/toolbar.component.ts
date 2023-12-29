@@ -229,7 +229,7 @@ export class ToolbarComponent {
         } else {
             simulationButton.style.color = 'black';
             this._diagram?.transitions.forEach((transition) => {
-                transition.svgElement?.querySelector('rect')!.setAttribute('fill', 'black');
+                this.setTransitionColor(transition, 'black');
             });
         }
     }
