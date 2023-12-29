@@ -6,6 +6,7 @@ import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
 import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
+import {MarkenspielService} from "./markenspiel.service";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class DrawingService {
     private _sub: Subscription;
 
     constructor(private diplayService: DisplayService,
-                private activeButtonService: ActivebuttonService
+                private activeButtonService: ActivebuttonService,
+                private _markenspielService: MarkenspielService
                 )
     {
         this._sub = this.diplayService.diagram$.subscribe(diagram => {
@@ -85,6 +87,10 @@ export class DrawingService {
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement!.addEventListener('click', () => {
             this.onRectSelect(rectObject!);
+        });
+        rectObject.svgElement!.addEventListener(('dblclick'), () => {
+            if(!rectObject!.svgElement) {return}
+            this._markenspielService.fireTransition(rectObject!);
         });
 
         return rectObject

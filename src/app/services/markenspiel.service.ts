@@ -119,53 +119,34 @@ export class MarkenspielService {
     }
 
     private parentsHaveEnoughTokens(places: Array<Place>, line: Line | undefined): boolean {
-        if(!line) {
+        if (!line) {
             return false;
         }
 
         return places.every((place) => place.amountToken >= line.tokens);
     }
 
-    /*startTokenGame(): void {
-        this._diagram?.transitions.forEach((transition) => {
-            this._diagram?.lines.forEach((line) => {
-                if (this.isTransitionConnectedToLine(transition, line)) {
-                    this.processConnectedTransition(transition, line);
-                }
-            });
-        });
-    }
+    public fireTransition(transition: Transition): void {
+        const lines = this._diagram?.lines;
 
-    private isTransitionConnectedToLine(transition: Transition, line: Line): boolean {
-        return line.source.id === transition.id /*|| line.target.id === transition.id;
-    }
-
-    private processConnectedTransition(transition: Transition, line: Line): void {
         transition.parents.forEach((place) => {
-            const amountTokenPlace = place.amountToken;
-            const amountTokenLine = line.tokens;
-
-            if (this.hasEnoughTokens(amountTokenPlace, amountTokenLine)) {
-                this.setTransitionColor(transition, 'green');
-                this.subtractTokensFromPlace(place, amountTokenLine);
-            } else {
-                this.setTransitionColor(transition, 'black');
-            }
+            const line = lines?.find(line => line.source.id === place.id);
+            this.subtractTokensFromPlace(place, line!.tokens);
         });
-    }
 
-    private hasEnoughTokens(amountTokenPlace: number, amountTokenLine: number): boolean {
-        return amountTokenPlace >= amountTokenLine;
-    }
-
-    private setTransitionColor(transition: Transition, color: string): void {
-        transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
+        transition.children.forEach((place) => {
+            const line = lines?.find(line => line.source.id === transition.id && line.target.id === place.id);
+            this.addTokensToPlace(place, line!.tokens);
+        });
     }
 
     private subtractTokensFromPlace(place: Place, amountTokenLine: number): void {
-        console.log('Vorher: ' + place.amountToken);
         place.amountToken -= amountTokenLine;
-        console.log('Nachher: ' + place.amountToken);
         place.svgElement!.childNodes[1].textContent = place.amountToken.toString();
-    }*/
+    }
+
+    private addTokensToPlace(place: Place, amount: number): void {
+        place.amountToken += amount;
+        place.svgElement!.childNodes[1].textContent = place.amountToken.toString();
+    }
 }
