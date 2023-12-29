@@ -230,6 +230,7 @@ export class ToolbarComponent {
             simulationButton.style.color = 'black';
             this._diagram?.transitions.forEach((transition) => {
                 this.setTransitionColor(transition, 'black');
+                transition.isActive = false;
             });
         }
     }
