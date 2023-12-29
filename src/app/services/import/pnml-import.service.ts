@@ -49,6 +49,7 @@ export class PnmlImportService {
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
+            
             result.push(placeElement);
         });
 
