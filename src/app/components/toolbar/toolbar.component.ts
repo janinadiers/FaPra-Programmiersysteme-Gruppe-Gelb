@@ -11,6 +11,8 @@ import {PngExportService} from "../../services/export/png-export.service";
 import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 import {DrawingService} from "../../services/drawing.service";
+import {transition} from "@angular/animations";
+import {Transition} from "../../classes/diagram/transition";
 
 @Component({
     selector: 'app-toolbar',
@@ -45,7 +47,7 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                public _markenspielService: MarkenspielService,
+                private _markenspielService: MarkenspielService,
                 private _drawingService: DrawingService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
@@ -113,35 +115,33 @@ export class ToolbarComponent {
 
     }
 
-    addToken(){
+    addToken() {
 
-        if(Diagram.drawingIsActive){
+        if (Diagram.drawingIsActive) {
             return
         }
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
 
-        if(addTokenButton.style.color == 'red'){
+        if (addTokenButton.style.color == 'red') {
             this._markenspielService.addCircleToken();
 
 
-        }
-        else if(addTokenButton.style.color == 'blue'){
+        } else if (addTokenButton.style.color == 'blue') {
             this._markenspielService.addLineToken();
 
         }
 
     }
 
-    removeToken(){
+    removeToken() {
 
-        if(Diagram.drawingIsActive){
+        if (Diagram.drawingIsActive) {
             return
         }
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        if(addTokenButton.style.color == 'red'){
+        if (addTokenButton.style.color == 'red') {
             this._markenspielService.removeCircleToken();
-        }
-        else if(addTokenButton.style.color == 'blue'){
+        } else if (addTokenButton.style.color == 'blue') {
             this._markenspielService.removeLineToken();
         }
 
@@ -206,7 +206,7 @@ export class ToolbarComponent {
         this._activeButtonService.zoomButtonClick(id);
     }
 
-    deselectAddAndRemoveTokenButtons(){
+    deselectAddAndRemoveTokenButtons() {
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = 'black';
@@ -217,12 +217,24 @@ export class ToolbarComponent {
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
         this.simulationActive = !this.simulationActive;
-        if(this.simulationActive){
+        if (this.simulationActive) {
             simulationButton.style.color = 'green';
             this._drawingService.deselectPlacesAndLines();
-        }
-        else{
+
+            const startTransitions = this._markenspielService.getPossibleStartTransitions();
+            startTransitions.forEach((transition) => {
+                this.setTransitionColor(transition, 'green');
+            });
+            //this._markenspielService.startTokenGame();
+        } else {
             simulationButton.style.color = 'black';
+            this._diagram?.transitions.forEach((transition) => {
+                transition.svgElement?.querySelector('rect')!.setAttribute('fill', 'black');
+            });
         }
+    }
+
+    private setTransitionColor(transition: Transition, color: string): void {
+        transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
     }
 }
