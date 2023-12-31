@@ -221,11 +221,10 @@ export class ToolbarComponent {
             simulationButton.style.color = 'green';
             this._drawingService.deselectPlacesAndLines();
 
-            const startTransitions = this._markenspielService.getPossibleStartTransitions();
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
             startTransitions.forEach((transition) => {
                 this.setTransitionColor(transition, 'green');
             });
-            //this._markenspielService.startTokenGame();
         } else {
             simulationButton.style.color = 'black';
             this._diagram?.transitions.forEach((transition) => {

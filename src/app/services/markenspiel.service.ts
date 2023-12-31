@@ -92,7 +92,7 @@ export class MarkenspielService {
         return;
     }
 
-    public getPossibleStartTransitions(): Array<Transition> {
+    public getPossibleActiveTransitions(): Array<Transition> {
         const startTransitions: Array<Transition> = [];
         const transitions = this._diagram?.transitions;
         const lines = this._diagram?.lines;
@@ -111,12 +111,12 @@ export class MarkenspielService {
     }
 
     private transitionCanBeActivated(transition: Transition, line: Line | undefined): boolean {
-        return this.parentIsStartpoint(transition.parents) && this.parentsHaveEnoughTokens(transition.parents, line);
+        return /*this.parentIsStartpoint(transition.parents) &&*/ this.parentsHaveEnoughTokens(transition.parents, line);
     }
 
-    private parentIsStartpoint(places: Array<Place>): boolean {
+    /*private parentIsStartpoint(places: Array<Place>): boolean {
         return places.some((place) => !place.parents || place.parents.length === 0);
-    }
+    }*/
 
     private parentsHaveEnoughTokens(places: Array<Place>, line: Line | undefined): boolean {
         if (!line) {
@@ -126,18 +126,26 @@ export class MarkenspielService {
         return places.every((place) => place.amountToken >= line.tokens);
     }
 
-    public fireTransition(transition: Transition): void {
+    public fireTransition(transition: Transition): Array<Transition> {
         const lines = this._diagram?.lines;
+
+        const targetLine = lines?.find(line => line.target.id === transition.id);
+        if(!this.parentsHaveEnoughTokens(transition.parents, targetLine)) {
+            return this.getPossibleActiveTransitions();
+        }
 
         transition.parents.forEach((place) => {
             const line = lines?.find(line => line.source.id === place.id);
             this.subtractTokensFromPlace(place, line!.tokens);
+
         });
 
         transition.children.forEach((place) => {
             const line = lines?.find(line => line.source.id === transition.id && line.target.id === place.id);
             this.addTokensToPlace(place, line!.tokens);
         });
+
+        return this.getPossibleActiveTransitions();
     }
 
     private subtractTokensFromPlace(place: Place, amountTokenLine: number): void {
