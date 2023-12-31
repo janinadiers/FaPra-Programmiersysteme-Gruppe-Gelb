@@ -28,7 +28,9 @@ export class PnmlImportService {
 
         // get all arcs as an Element instance from DOM object
         let arcs = this.importArcs(rawData, [...places, ...transitions]);
-
+        // set children and parents for places and transitions
+        this.setChildrenAndParents(arcs);
+        
         return new Diagram([...places], [...transitions], [...arcs]);
 
     }
@@ -197,6 +199,25 @@ export class PnmlImportService {
         line.createSVG();
         return line;
 
+    }
+
+    private setChildrenAndParents(lines:Line[]):void{
+        lines.forEach((line) => {
+            const source = line.source;
+            const target = line.target;
+            
+            if(source instanceof Place && target instanceof Transition){
+                source.children.push(target);
+                target.parents.push(source);
+            
+            }
+            if(source instanceof Transition && target instanceof Place){
+                source.children.push(target);
+                target.parents.push(source);
+            
+            }
+            
+        });
     }
 
 
