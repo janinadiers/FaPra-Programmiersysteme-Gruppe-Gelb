@@ -100,7 +100,7 @@ export class MarkenspielService {
         if (transitions && lines) {
             transitions?.forEach((transition) => {
                 const line = lines?.find(line => line.target.id === transition.id);
-                if (this.transitionCanBeActivated(transition, line)) {
+                if (this.parentsHaveEnoughTokens(transition.parents, line)) {
                     transition.isActive = true;
                     startTransitions.push(transition);
                 }
@@ -109,14 +109,6 @@ export class MarkenspielService {
 
         return startTransitions;
     }
-
-    private transitionCanBeActivated(transition: Transition, line: Line | undefined): boolean {
-        return /*this.parentIsStartpoint(transition.parents) &&*/ this.parentsHaveEnoughTokens(transition.parents, line);
-    }
-
-    /*private parentIsStartpoint(places: Array<Place>): boolean {
-        return places.some((place) => !place.parents || place.parents.length === 0);
-    }*/
 
     private parentsHaveEnoughTokens(places: Array<Place>, line: Line | undefined): boolean {
         if (!line) {
@@ -137,7 +129,6 @@ export class MarkenspielService {
         transition.parents.forEach((place) => {
             const line = lines?.find(line => line.source.id === place.id);
             this.subtractTokensFromPlace(place, line!.tokens);
-
         });
 
         transition.children.forEach((place) => {
@@ -156,5 +147,9 @@ export class MarkenspielService {
     private addTokensToPlace(place: Place, amount: number): void {
         place.amountToken += amount;
         place.svgElement!.childNodes[1].textContent = place.amountToken.toString();
+    }
+
+    public setTransitionColor(transition: Transition, color: string): void {
+        transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
     }
 }

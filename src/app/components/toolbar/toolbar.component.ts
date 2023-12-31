@@ -223,18 +223,14 @@ export class ToolbarComponent {
 
             const startTransitions = this._markenspielService.getPossibleActiveTransitions();
             startTransitions.forEach((transition) => {
-                this.setTransitionColor(transition, 'green');
+                this._markenspielService.setTransitionColor(transition, 'green');
             });
         } else {
             simulationButton.style.color = 'black';
             this._diagram?.transitions.forEach((transition) => {
-                this.setTransitionColor(transition, 'black');
+                this._markenspielService.setTransitionColor(transition, 'black');
                 transition.isActive = false;
             });
         }
-    }
-
-    private setTransitionColor(transition: Transition, color: string): void {
-        transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
     }
 }

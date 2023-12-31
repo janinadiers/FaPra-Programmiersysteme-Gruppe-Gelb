@@ -89,6 +89,23 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }
                 this._drawingService.onRectSelect(element);
             });
+
+            element.svgElement!.addEventListener(('dblclick'), () => {
+                if (!element!.svgElement || (!this.simulationActive && !element?.isActive)) {
+                    return;
+                }
+
+                const transitions = this._markenspielService.fireTransition(element!);
+                transitions.forEach((transition => {
+                    this._markenspielService.setTransitionColor(transition, 'green');
+                    transition.isActive = true;
+                }));
+
+                if(transitions.find(transition => transition.id === element!.id) === undefined) {
+                    element!.isActive = false;
+                    this._markenspielService.setTransitionColor(element!, 'black');
+                }
+            });
         });
     }
 

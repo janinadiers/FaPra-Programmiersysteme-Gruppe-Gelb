@@ -61,7 +61,6 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place) {
-        // console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive, circle);
         this._diagram!.selectedCircle = circle;
         if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
             return
@@ -106,21 +105,17 @@ export class DrawingService {
 
             const transitions = this._markenspielService.fireTransition(rectObject!);
             transitions.forEach((transition => {
-                this.setTransitionColor(transition, 'green');
+                this._markenspielService.setTransitionColor(transition, 'green');
                 transition.isActive = true;
             }));
 
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
-                this.setTransitionColor(rectObject!, 'black');
+                this._markenspielService.setTransitionColor(rectObject!, 'black');
             }
         });
 
         return rectObject
-    }
-
-    private setTransitionColor(transition: Transition, color: string): void {
-        transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
     }
 
     onRectSelect(rect: Transition) {
@@ -199,7 +194,6 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
-        // console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         this._diagram!.selectedLine = line;
 
         if (Diagram.drawingIsActive) {
