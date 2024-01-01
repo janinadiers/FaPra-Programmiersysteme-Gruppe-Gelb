@@ -10,6 +10,8 @@ import {JsonExportService} from "../../services/export/json-export.service";
 import {PngExportService} from "../../services/export/png-export.service";
 import {SvgService} from "../../services/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
+import {SugiyamaService} from "../../services/algorithm/sugiyama.service";
+import { Transition } from 'src/app/classes/diagram/transition';
 
 @Component({
     selector: 'app-toolbar',
@@ -44,7 +46,8 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                public _markenspielService: MarkenspielService
+                public _markenspielService: MarkenspielService,
+                private _sugiyamaService: SugiyamaService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
@@ -106,9 +109,17 @@ export class ToolbarComponent {
     }
 
     onAlgorithmSelect() {
+        if (this._diagram == undefined)
+            return;
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
+        if (selectElement.value === "free") {
+
+        } else if (selectElement.value === "spring-embedder") {
+
+        } else if (selectElement.value === "sugiyama") {
+            this._sugiyamaService.removeBackwardEdges(this._diagram.transitions, this._diagram.places, this._diagram.lines);
+        }
         //const selectedAlgorithm = selectElement?.value;   
-        
     }
 
     addToken(){
