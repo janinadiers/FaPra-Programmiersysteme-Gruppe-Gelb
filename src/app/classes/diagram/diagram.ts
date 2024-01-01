@@ -15,9 +15,9 @@ export class Diagram {
     private readonly _lines: Array<Line>;
     private readonly _order: Array<string>;
 
-    selectedCircle: SVGElement | undefined = undefined;
-    selectedRect: SVGElement | undefined = undefined;
-    selectedLine: SVGElement | undefined = undefined;
+    selectedCircle: Place | undefined = undefined;
+    selectedRect: Transition | undefined = undefined;
+    selectedLine: Line | undefined = undefined;
 
     lightningCount: number = 0;
 
@@ -119,11 +119,12 @@ export class Diagram {
 
     createLineObject (source: Transition | Place, target: Transition| Place){
 
-        let idString: string = "a" + (this.lines.length + 1);
+        let idString: string = source.id + "," + target.id;
         let lineObject = new Line (idString, source, target);
         // Objekt im Array abspeichern
         this.pushLine(lineObject);
         this.pushID(idString);
+        source.children = target;
         return lineObject;
     }
 
@@ -143,7 +144,7 @@ export class Diagram {
     }
 
     private processMouseDown(event: MouseEvent) {
-        
+
         if(Diagram.drawingIsActive){
             return;
         }

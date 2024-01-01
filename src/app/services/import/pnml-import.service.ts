@@ -3,17 +3,20 @@ import { Injectable } from '@angular/core';
 import { Element } from '../../classes/diagram/element';
 import { ImportService } from '../../classes/import-service';
 import { Diagram } from '../../classes/diagram/diagram';
-import { SvgService } from '../svg.service';
 import { Place } from '../../classes/diagram/place';
 import { Transition } from '../../classes/diagram/transition';
 import { Line } from '../../classes/diagram/line';
 import { Coords } from '../../classes/json-petri-net';
+import {DrawingService} from "../drawing.service";
 
 
 @Injectable({
     providedIn: 'root',
 })
 export class PnmlImportService implements ImportService {
+
+    constructor(private _drawingService: DrawingService) {
+    }
 
     import(content: string): Diagram | undefined {
 
@@ -44,6 +47,9 @@ export class PnmlImportService implements ImportService {
 
             if(!placeId) throw new Error('Place element misses id: ' + place);
             const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y, placeTokens, placeLabel);
+            placeElement.svgElement?.addEventListener(('click'), () => {
+                this._drawingService.onCircleSelect(placeElement);
+            });
             result.push(placeElement);
         });
 
@@ -62,6 +68,9 @@ export class PnmlImportService implements ImportService {
 
             if(!transitionId) throw new Error('Transition element misses id: ' + transition);
             const transitionElement = this.createTransition(transitionId, transitionPosition.x, transitionPosition.y, transitionLabel);
+            transitionElement.svgElement?.addEventListener(('click'), () => {
+                this._drawingService.onRectSelect(transitionElement);
+            });
             result.push(transitionElement);
         });
 
@@ -73,7 +82,7 @@ export class PnmlImportService implements ImportService {
         const arcs = rawData.querySelectorAll('arc');
         const lines:Array<Line> = []
         arcs.forEach((arc) => {
-            
+
             const arcId = arc.getAttribute('id');
             const arcTokens = arc.querySelector('inscription')?.querySelector('text')?.textContent ?? '0'
             const sourceAndTargetObject = this.getSourceAndTargetElements(arc, elements);
@@ -81,11 +90,11 @@ export class PnmlImportService implements ImportService {
 
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
             const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
-
+            arcElement.svgElement?.addEventListener(('click'), () => {
+                this._drawingService.onLineSelect(arcElement);
+            });
             lines.push(arcElement);
         });
-
-
        return lines;
     }
 
