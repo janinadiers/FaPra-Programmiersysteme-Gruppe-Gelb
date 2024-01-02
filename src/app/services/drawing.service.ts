@@ -52,7 +52,6 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place){
-        // console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive, circle);
         this._diagram!.selectedCircle = circle;
         if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
 
@@ -64,13 +63,16 @@ export class DrawingService {
         circle.svgElement!.children[2].setAttribute('stroke', 'red');
         circle.svgElement!.children[0].setAttribute('stroke-width', '2');
         circle.svgElement!.children[1].setAttribute('stroke','red');
-
+        
         if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
         }
         else
             return;
+
+        
+        
     }
 
     // Rechtecke zeichnen bzw. Transitionen anlegen
@@ -92,13 +94,15 @@ export class DrawingService {
 
     onRectSelect(rect: Transition){
         this._diagram!.selectedRect = rect;
-
+        
         if (this._diagram!.selectedCircle) {
             let circleIsTarget: boolean = false;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
         }
         else
             return;
+        
+        
     }
 
     // Linien zeichnen bzw. Kanten erstellen
@@ -163,7 +167,6 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
-        // console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
         this._diagram!.selectedLine = line;
 
         if(Diagram.drawingIsActive){return}

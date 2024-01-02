@@ -8,7 +8,7 @@ import {AppComponent} from "../../app.component";
 import {PnmlExportService} from "../../services/export/pnml-export.service";
 import {JsonExportService} from "../../services/export/json-export.service";
 import {PngExportService} from "../../services/export/png-export.service";
-import {SvgService} from "../../services/svg.service";
+import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
@@ -128,8 +128,6 @@ export class ToolbarComponent {
 
         if(addTokenButton.style.color == 'red'){
             this._markenspielService.addCircleToken();
-
-
         }
         else if(addTokenButton.style.color == 'blue'){
             this._markenspielService.addLineToken();
@@ -171,7 +169,6 @@ export class ToolbarComponent {
                 break;
             case 'PNG':
                 this._pngExportService.export().then((blob) => {
-                    console.log(blob);
                     this._downloadService.downloadFile(blob, this.PNG_FILE, this.PNG_TYPE);
                 }).catch((error) => {
                     console.log('Error during creating the PNG file', error);
