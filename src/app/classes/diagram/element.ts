@@ -15,6 +15,7 @@ export class Element  {
         this._x = x
         this._y = y
         this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
+        
 
     }
 
@@ -115,6 +116,10 @@ export class Element  {
         if (this._svgElement === undefined) {
             return;
         }
+
+        // if(this._isDragging && Diagram.springEmbedderIsActive){
+        //     this._springEmbedderService.apply();
+        // }
 
         if (this._isDragging) {
             Diagram.algorithmIsActive = true;

@@ -113,7 +113,8 @@ export class ToolbarComponent {
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
         const selectedAlgorithm = selectElement?.value;   
         if(selectedAlgorithm === 'spring-embedder'){
-            this._springEmbedderService.apply()
+            Diagram.springEmbedderIsActive = true;
+            this._springEmbedderService.start()
 
         }
         

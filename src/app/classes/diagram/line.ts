@@ -323,6 +323,12 @@ export class Line {
         })
     }
 
+    removeCoords(): void {
+        this._coords = undefined;
+        this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+
+    }
+
 
     // Might be needed for "Markenspiel"
     // public registerSvg(svg: SVGElement) {
