@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable} from 'rxjs';
 import { Coords } from '../json-petri-net';
 import { Diagram } from './diagram';
+import { inRange } from 'lodash';
 
 export class Element  {
     private readonly _id: string;
@@ -66,15 +67,21 @@ export class Element  {
 
         this._svgElement = svg;
         this._svgElement.onmousedown = (event) => {
+            console.log('mousedown element');
+            
             Diagram.algorithmIsActive = false;
             event.stopPropagation();
             this.processMouseDown();
         };
         window.addEventListener('mouseup', (event) => {
+            console.log('mouseup element');
+            
             event.stopPropagation();
             this.processMouseUp();
         });
         window.addEventListener('mousemove', (event) => {
+            console.log('mousemove element');
+            
             event.stopPropagation();
             this.processMouseMove(event);
         })
@@ -126,10 +133,13 @@ export class Element  {
             const svgElement = document.getElementById('canvas');
             const svgContainer = svgElement?.getBoundingClientRect();
             // Berechnung der Maus Koordinanten relativ zum SVG Element
-            this.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
-            this.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
+            if(inRange(event.clientX, svgContainer!.x, svgContainer!.x + svgContainer!.width) && inRange(event.clientY, svgContainer!.y, svgContainer!.y + svgContainer!.height)){
+            
+                this.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
+                this.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
 
-            this.updateSVG();
+                this.updateSVG();
+            }
 
         }
     }

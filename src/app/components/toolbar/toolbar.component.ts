@@ -12,6 +12,7 @@ import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
+import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
 
 @Component({
     selector: 'app-toolbar',
@@ -48,6 +49,7 @@ export class ToolbarComponent {
                 private _svgExportService: SvgService,
                 public _markenspielService: MarkenspielService,
                 private _springEmbedderService: SpringEmbedderService,
+                private _freiAlgorithmusService: FreiAlgorithmusService,
                 private _drawingService: DrawingService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
@@ -111,13 +113,30 @@ export class ToolbarComponent {
 
     onAlgorithmSelect() {
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        const selectedAlgorithm = selectElement?.value;   
+        const selectedAlgorithm = selectElement?.value; 
+        this._activeButtonService.deactivateAllButtons();  
+        this.deselectActiveColors();
         if(selectedAlgorithm === 'spring-embedder'){
             Diagram.springEmbedderIsActive = true;
             this._springEmbedderService.start()
 
         }
+        else if(selectedAlgorithm === 'sugyama'){
+            console.log('sugyama');
+            
+        }
+        else{
+            //Diagram.springEmbedderIsActive = false;
+            //this._freiAlgorithmusService.start()
+        }
         
+    }
+
+    deselectActiveColors() {
+        this.rectActiveColor = false;
+        this.circleActiveColor = false;
+        this.arrowActiveColor = false;
+        this.boltActiveColor = false;
     }
 
     addToken(){
