@@ -6,6 +6,7 @@ import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
 import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
+import { FreiAlgorithmusService } from './frei-algorithmus.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,9 @@ export class DrawingService {
     private _sub: Subscription;
 
     constructor(private diplayService: DisplayService,
-                private activeButtonService: ActivebuttonService
+                private activeButtonService: ActivebuttonService,
+                private _freiAlgorithmusService: FreiAlgorithmusService
+                
                 )
     {
         this._sub = this.diplayService.diagram$.subscribe(diagram => {
@@ -42,7 +45,8 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
-
+        
+        this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement!.addEventListener('click', () => {
             this.onCircleSelect(circleObject!);
@@ -83,7 +87,7 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         rectObject.createSVG();
-
+        this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement!.addEventListener('click', () => {
             this.onRectSelect(rectObject!);

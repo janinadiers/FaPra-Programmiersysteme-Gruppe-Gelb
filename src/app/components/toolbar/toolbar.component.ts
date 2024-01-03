@@ -13,6 +13,7 @@ import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
+import { ChangeEvent } from 'react';
 
 @Component({
     selector: 'app-toolbar',
@@ -54,9 +55,14 @@ export class ToolbarComponent {
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
+            this.onAlgorithmSelect();
+            
+            
         });
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
+        
+       
     }
 
     rectActiveColor: boolean = false;
@@ -112,25 +118,24 @@ export class ToolbarComponent {
     }
 
     onAlgorithmSelect() {
+        
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
         const selectedAlgorithm = selectElement?.value; 
+        
         this._activeButtonService.deactivateAllButtons();  
         this.deselectActiveColors();
         if(selectedAlgorithm === 'spring-embedder'){
-            Diagram.springEmbedderIsActive = true;
+            this._freiAlgorithmusService.start()
             this._springEmbedderService.start()
 
         }
-        else if(selectedAlgorithm === 'sugyama'){
+        else if(selectedAlgorithm === 'sugiyama'){
             this._springEmbedderService.teardown();
-            console.log('sugyama');
             
         }
         else{
             this._springEmbedderService.teardown();
-            
-            //Diagram.springEmbedderIsActive = false;
-            //this._freiAlgorithmusService.start()
+            this._freiAlgorithmusService.start()
         }
         
     }
@@ -209,12 +214,12 @@ export class ToolbarComponent {
     }
 
     prepareImportFromFile(fileType: string): void {
-        // Implement your logic for importing based on fileType
-        console.log(`Preparing to import ${fileType}`);
+        
         this.input?.nativeElement.click();
     }
 
-    importFromFile(e: Event): void {
+    importFromFile(e:any): void {
+        
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
             var fileExtension = selectedFile.files[0].name.toLowerCase().match(/\.pnml$/) ? 'pnml' : '';
@@ -227,6 +232,7 @@ export class ToolbarComponent {
                     this._appComponent.processSourceChange({fileContent: content, fileExtension: fileExtension});
                 });
         }
+        e.target!.value = '';
     }
 
     onZoomButtonClick(id: string) {

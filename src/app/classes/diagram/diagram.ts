@@ -4,6 +4,7 @@ import { Place } from './place';
 import { Transition } from './transition';
 import { Injectable } from "@angular/core";
 
+
 @Injectable({
     providedIn: 'root'
 })
@@ -23,7 +24,6 @@ export class Diagram {
 
     static drawingIsActive = false;
     static algorithmIsActive:boolean = false;
-    static springEmbedderIsActive:boolean = false;
     static zoomFactor = 1;
     static viewBox:{x: number, y: number, width: number, height: number} = {x: 0, y: 0, width: 0, height: 0};
     private _canvasElement: SVGElement | undefined;
@@ -103,7 +103,7 @@ export class Diagram {
         // Objekt im Array abspeichern
         this.pushPlace(circleObject);
         this.pushID(idString);
-
+        
         return circleObject;
     }
 

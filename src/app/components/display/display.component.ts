@@ -7,6 +7,8 @@ import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
+import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
+
 
 @Component({
     selector: 'app-display',
@@ -28,14 +30,17 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 private _fileReaderService: FileReaderService,
                 private _http: HttpClient,
                 private activeButtonService: ActivebuttonService,
-                private _drawingService: DrawingService) {
+                private _drawingService: DrawingService,
+                private _freiAlgorithmusService: FreiAlgorithmusService) {
 
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 
         this._sub  = this._displayService.diagram$.subscribe(diagram => {
 
         this._diagram = diagram;
-
+        
+        console.log('test');
+        
         this.draw();
 
         });
@@ -326,6 +331,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 this._diagram.lightningCount--;
             }
         }
+       
     }
 
     handleRightClick(event: MouseEvent) {

@@ -1,6 +1,7 @@
 import {Element} from 'src/app/classes/diagram/element';
 import {Coords} from '../json-petri-net';
 import {Transition} from './transition';
+import { update } from 'lodash';
 
 export class Line {
 
@@ -77,13 +78,14 @@ export class Line {
     }
 
     private updateSource(updatedPosition: Coords): void {
-
+        
         if (this._svgElement) {
+            
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
                     ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
                         ${this._targetPosition?.y}`);
-            }
+            }            
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
 
             // Markierungen für die Gewichte an die Kante hängen
@@ -103,7 +105,7 @@ export class Line {
     }
 
     private updateTarget(updatedPosition: Coords): void {
-
+        
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
@@ -246,6 +248,7 @@ export class Line {
         this.addHoverEventForBackgroundCircle(backgroundCircle, token);
 
         this._svgElement = group;
+        
         return group;
     }
 

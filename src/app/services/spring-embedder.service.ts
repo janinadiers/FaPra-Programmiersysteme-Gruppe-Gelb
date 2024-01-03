@@ -15,17 +15,20 @@ export class SpringEmbedderService {
     
     private _diagram: any;
     private _forceVector: Array<{x: number, y: number}> = [];
-    private _maxIterations: number = 16;
+    private _maxIterations: number = 120;
     private _millisecondsBetweenRenderSteps: number = 0;
     private _epsilon: number = 20;
     private _forceFactor : number = 0.055
     private _idealLength: number = 80;
-    private _debounceMS : number = 0
+    private _debounceMS : number = 2
     private _scaleOfCanvas: {x: number, y:number, width: number, height: number} | undefined = undefined;
     private _activeNode: Place | Transition | undefined = undefined;
     private handlers = new Map();
+    private _maxForce: number = 2_000;
+    private _minForce: number = -2_000;
 
    constructor(private _displayService: DisplayService) {
+    
         this.processMouseDown = this.processMouseDown.bind(this);
         this.processMouseUp = this.processMouseUp.bind(this);
         this.processMouseMove = this.processMouseMove.bind(this);
@@ -61,17 +64,17 @@ export class SpringEmbedderService {
             let forceX =  attraction.x + repulsion.x
             let forceY = attraction.y + repulsion.y;
             
-            if(forceX >= 2_000){
-                forceX = 2_000
+            if(forceX >= this._maxForce){
+                forceX = this._maxForce
             }
-            if(forceX <= -2_000){
-                forceX = -2_000
+            if(forceX <= this._minForce){
+                forceX = this._minForce
             }
-            if(forceY >= 2_000){
-                forceY = 2_000
+            if(forceY >= this._maxForce){
+                forceY = this._maxForce
             }
-            if(forceY <= -2_000){
-                forceY = -2_000
+            if(forceY <= this._minForce){
+                forceY = this._minForce
             }
             
             this._forceVector[i] = {x: forceX , y: forceY};
@@ -89,14 +92,15 @@ export class SpringEmbedderService {
                 node.updateSVG()
             } 
             
-            await new Promise(resolve => setTimeout(resolve, this._millisecondsBetweenRenderSteps));
+            
 
         }
+        await new Promise(resolve => setTimeout(resolve, this._millisecondsBetweenRenderSteps));
 
         maxForce = Math.max(...this._forceVector.map((elem) => Math.max(Math.abs(elem.x), Math.abs(elem.y))));
         iteration++;
     }
-    //this._isRunning = false;
+   
     }
 
     getAttractionForce(node: Place | Transition, connectedNodes: Array<{euclideanDistance: number, xDistance: number, yDistance: number, connected: boolean, obj: Place | Transition, self: Place | Transition}>){
@@ -162,12 +166,16 @@ export class SpringEmbedderService {
         this._diagram.nodes.forEach((node: Place | Transition) => {
             node.lastMouseMove = 0;
             node.isSelected = false
+
             const mouseMoveHandler = this.createMouseMoveHandler(node);
             this.handlers.set(`${node.id}-mouseMove`, mouseMoveHandler);
+
             const mouseDownHandler = this.createMouseDownHandler(node);
             this.handlers.set(`${node.id}-mouseDown`, mouseDownHandler);
+
             const mouseUpHandler = this.createMouseUpHandler(node);
             this.handlers.set(`${node.id}-mouseUp`, mouseUpHandler);
+
             node.svgElement?.addEventListener('mousedown', mouseDownHandler);
             node.svgElement?.addEventListener('mouseup', mouseUpHandler);
             node.svgElement?.addEventListener('mousemove', mouseMoveHandler);
@@ -184,13 +192,13 @@ export class SpringEmbedderService {
     }
 
     createMouseDownHandler(node: Place | Transition) {
-        return (event:MouseEvent) => {
+        return () => {
             this.processMouseDown(node);
         };
     }
 
     createMouseUpHandler(node: Place | Transition) {
-        return (event:MouseEvent) => {
+        return () => {
             this.processMouseUp(node);
         };
     }
@@ -215,7 +223,7 @@ export class SpringEmbedderService {
     }
 
     teardown() {
-        //remove event listeners
+        
         this._diagram.nodes.forEach((node: any) => {
             
             const handler1 = this.handlers.get(`${node.id}-mouseMove`);
