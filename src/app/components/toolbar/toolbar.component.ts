@@ -122,10 +122,13 @@ export class ToolbarComponent {
 
         }
         else if(selectedAlgorithm === 'sugyama'){
+            this._springEmbedderService.teardown();
             console.log('sugyama');
             
         }
         else{
+            this._springEmbedderService.teardown();
+            
             //Diagram.springEmbedderIsActive = false;
             //this._freiAlgorithmusService.start()
         }

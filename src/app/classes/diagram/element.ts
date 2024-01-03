@@ -10,6 +10,8 @@ export class Element  {
     private _svgElement: SVGElement | undefined;
     private _isDragging = false;
     private _positionChange$: BehaviorSubject<Coords>;
+    private _isSelected = false;
+    private _lastMouseMove = 0;
 
     constructor(id: string, x: number , y: number) {
         this._id = id;
@@ -61,6 +63,22 @@ export class Element  {
 
     set svgElement(svgElement: SVGElement) {
         this._svgElement = svgElement;
+    }
+
+    get isSelected(): boolean {
+        return this._isSelected;
+    }
+
+    set isSelected(value: boolean) {
+        this._isSelected = value;
+    }
+
+    get lastMouseMove(): number {
+        return this._lastMouseMove;
+    }
+
+    set lastMouseMove(value: number) {
+        this._lastMouseMove = value;
     }
 
     public registerSvg(svg: SVGElement) {

@@ -14,7 +14,6 @@ type TAdjacencyMatrix = Array<Array<{euclideanDistance: number, xDistance: numbe
 export class SpringEmbedderService {
     
     private _diagram: any;
-    //private _adjacencyMatrix: Array<Array<{euclideanDistance: number, xDistance: number, yDistance: number, connected: boolean, obj: Place | Transition, self: Place | Transition}>> = [];
     private _forceVector: Array<{x: number, y: number}> = [];
     private _maxIterations: number = 16;
     private _millisecondsBetweenRenderSteps: number = 0;
@@ -24,9 +23,12 @@ export class SpringEmbedderService {
     private _debounceMS : number = 0
     private _scaleOfCanvas: {x: number, y:number, width: number, height: number} | undefined = undefined;
     private _activeNode: Place | Transition | undefined = undefined;
-    private _isRunning: boolean = false;
+    private handlers = new Map();
 
    constructor(private _displayService: DisplayService) {
+        this.processMouseDown = this.processMouseDown.bind(this);
+        this.processMouseUp = this.processMouseUp.bind(this);
+        this.processMouseMove = this.processMouseMove.bind(this);
         this._displayService.diagram$.subscribe(diagram => {
         this._diagram = diagram;
 
@@ -35,7 +37,7 @@ export class SpringEmbedderService {
    }
 
    async apply(){
-    //this._isRunning = true;
+    
     this._scaleOfCanvas = document.getElementById('canvas')?.getBoundingClientRect();
     
     let iteration = 0;
@@ -47,14 +49,11 @@ export class SpringEmbedderService {
         let coolingFactor = Math.log(this._maxIterations - iteration ) / Math.log(this._maxIterations );
      
         let adjacencyMatrix:TAdjacencyMatrix = this.computeAdjacencyMatrix();
-        console.log('adjacencyMatrix', adjacencyMatrix)
         
         for(let [ i, node] of this._diagram.nodes.entries()){
 
             const connectedNodes = adjacencyMatrix[i].filter(node => node.connected);
             const allNodes = adjacencyMatrix[i]
-            // console.log('allNodes', allNodes);
-            // console.log('allNodes', allNodes);
             
             let attraction = this.getAttractionForce(node, connectedNodes);
             let repulsion = this.getRepulsionForce(node, allNodes);
@@ -74,31 +73,19 @@ export class SpringEmbedderService {
             if(forceY <= -2_000){
                 forceY = -2_000
             }
-
-           // console.log('attraction', attraction, 'repulsion', repulsion);
             
             this._forceVector[i] = {x: forceX , y: forceY};
         }
         
         for( let [ i, node] of this._diagram.nodes.entries()){
             const vector = this._forceVector[i];
-            //console.log('vector', vector)
-            //console.log('vor new x, new y: ', node.x, (vector.x * coolingFactor * this._forceFactor));
             
             let newX = node.x + (vector.x * coolingFactor * this._forceFactor);
             let newY = node.y + (vector.y * coolingFactor * this._forceFactor);
             if(!this._scaleOfCanvas) return;
             if(node !== this._activeNode){
-                //console.log('new x, new y: ', newX, newY);
-                
                 node.x = newX
                 node.y = newY
-                // if((newX >= this._scaleOfCanvas.x) && (newX <= (this._scaleOfCanvas.x + this._scaleOfCanvas.width))){
-                //     node.x = newX
-                // }
-                // if((newY >= this._scaleOfCanvas.y) && (newY <= (this._scaleOfCanvas.y + this._scaleOfCanvas.height))){
-                //     node.y = newY
-                // }
                 node.updateSVG()
             } 
             
@@ -114,7 +101,7 @@ export class SpringEmbedderService {
 
     getAttractionForce(node: Place | Transition, connectedNodes: Array<{euclideanDistance: number, xDistance: number, yDistance: number, connected: boolean, obj: Place | Transition, self: Place | Transition}>){
         let attraction = {x: 0, y: 0};
-        //console.log('connectedNodes', connectedNodes);
+       
         connectedNodes.forEach((elem) => {
             const diffX = Math.abs(elem.obj.x - node.x);
             const diffY = Math.abs(elem.obj.y - node.y);
@@ -123,18 +110,9 @@ export class SpringEmbedderService {
             let vektorBetrag = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy,2))) <= 1 ? 1 : Math.sqrt((Math.pow(dx, 2) + Math.pow(dy,2)));
             let einheitsVektor =  {x: (dx * (1/vektorBetrag)), y: (dy * (1 / vektorBetrag))}
 
-            // console.log('node', node)
-            // console.log('elem', elem.obj)
-            // console.log('einheitsVektor', einheitsVektor)
-            // console.log('vektorBetrag', vektorBetrag)
-            // console.log('eucleadianDistance', elem.euclideanDistance)
-            // console.log('dx', dx)
-            // console.log('dy', dy)
-            
             attraction.x += ((Math.pow(elem.euclideanDistance,2) / this._idealLength) * einheitsVektor.x);
             attraction.y += ((Math.pow(elem.euclideanDistance,2) / this._idealLength) * einheitsVektor.y);
         });
-       // console.log('attraction', attraction);
         
         return attraction;
 
@@ -155,7 +133,6 @@ export class SpringEmbedderService {
                     repulsion.y += (Math.pow(this._idealLength,2) / eucleadianDistance) * einheitsVektor.y  
                 } 
             })
-            //console.log('repulsion', repulsion);
             
         return repulsion;
     }
@@ -182,49 +159,72 @@ export class SpringEmbedderService {
     }
 
     start() {
-        this._diagram.nodes.forEach((node: any) => {
-            let lastMouseMove = 0;
-            let isSelected = false
-            node._svgElement?.addEventListener('mousedown', (event: MouseEvent) => {
-                this._activeNode = node;
-                //console.log('mousedown spring embedder');
-                
-               isSelected = true
-            });
-            node._svgElement?.addEventListener('mouseup', (event: MouseEvent) => {
-                //console.log('mouseup spring embedder');
-                isSelected = false
-                //this._activeNode = undefined;
-                
-             });
-            node._svgElement?.addEventListener('mousemove', (event: MouseEvent) => {
-                if(inRange(event.clientX, this._scaleOfCanvas!.x, this._scaleOfCanvas!.x + this._scaleOfCanvas!.width) && inRange(event.clientY, this._scaleOfCanvas!.y, this._scaleOfCanvas!.y + this._scaleOfCanvas!.height)){
-                //console.log('mousemove spring embedder');
-                if (!isSelected || Date.now() - lastMouseMove < this._debounceMS ) {
-                    return;
-                }
-                lastMouseMove = Date.now();
-                // if(!this._isRunning){
-                //     this.apply();
-                // }
-                this.apply();
-                
-            }
-            });
+        this._diagram.nodes.forEach((node: Place | Transition) => {
+            node.lastMouseMove = 0;
+            node.isSelected = false
+            const mouseMoveHandler = this.createMouseMoveHandler(node);
+            this.handlers.set(`${node.id}-mouseMove`, mouseMoveHandler);
+            const mouseDownHandler = this.createMouseDownHandler(node);
+            this.handlers.set(`${node.id}-mouseDown`, mouseDownHandler);
+            const mouseUpHandler = this.createMouseUpHandler(node);
+            this.handlers.set(`${node.id}-mouseUp`, mouseUpHandler);
+            node.svgElement?.addEventListener('mousedown', mouseDownHandler);
+            node.svgElement?.addEventListener('mouseup', mouseUpHandler);
+            node.svgElement?.addEventListener('mousemove', mouseMoveHandler);
         });
-        // if(!this._isRunning){
-        //     this.apply();
-        // }
+
         this.apply();
 
+    }
+
+    createMouseMoveHandler(node: Place | Transition) {
+        return (event:MouseEvent) => {
+            this.processMouseMove(event, node);
+        };
+    }
+
+    createMouseDownHandler(node: Place | Transition) {
+        return (event:MouseEvent) => {
+            this.processMouseDown(node);
+        };
+    }
+
+    createMouseUpHandler(node: Place | Transition) {
+        return (event:MouseEvent) => {
+            this.processMouseUp(node);
+        };
+    }
+
+    processMouseDown(node: Place | Transition) {
+        this._activeNode = node;
+        node.isSelected = true
+    }
+    processMouseUp(node: Place | Transition) {
+        node.isSelected = false
+    }
+    processMouseMove(event: MouseEvent, node: Place | Transition) {
+        if(inRange(event.clientX, this._scaleOfCanvas!.x, this._scaleOfCanvas!.x + this._scaleOfCanvas!.width) && inRange(event.clientY, this._scaleOfCanvas!.y, this._scaleOfCanvas!.y + this._scaleOfCanvas!.height)){
+
+            if (!node.isSelected || Date.now() - node.lastMouseMove < this._debounceMS ) {
+                return;
+            }
+            node.lastMouseMove = Date.now();
+            this.apply();
+            
+        }
     }
 
     teardown() {
         //remove event listeners
         this._diagram.nodes.forEach((node: any) => {
-            node._svgElement?.removeEventListener('mousedown');
-            node._svgElement?.removeEventListener('mouseup');
-            node._svgElement?.removeEventListener('mousemove');
+            
+            const handler1 = this.handlers.get(`${node.id}-mouseMove`);
+            const handler2 = this.handlers.get(`${node.id}-mouseDown`);
+            const handler3 = this.handlers.get(`${node.id}-mouseUp`);
+
+            node.svgElement?.removeEventListener('mousedown', handler2);
+            node.svgElement?.removeEventListener('mouseup', handler3);
+            node.svgElement?.removeEventListener('mousemove', handler1);
         });
     }
 
