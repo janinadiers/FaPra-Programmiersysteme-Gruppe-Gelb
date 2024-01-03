@@ -1,6 +1,5 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Transition } from './transition';
-import { SpringEmbedderService } from 'src/app/services/spring-embedder.service';
 
 
 export class Place extends Element {

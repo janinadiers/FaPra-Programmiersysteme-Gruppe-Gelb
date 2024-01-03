@@ -1,7 +1,6 @@
 import {Element} from 'src/app/classes/diagram/element';
 import {Coords} from '../json-petri-net';
 import {Transition} from './transition';
-import { update } from 'lodash';
 
 export class Line {
 

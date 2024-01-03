@@ -7,7 +7,6 @@ import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
-import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
 
 
 @Component({
@@ -30,8 +29,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 private _fileReaderService: FileReaderService,
                 private _http: HttpClient,
                 private activeButtonService: ActivebuttonService,
-                private _drawingService: DrawingService,
-                private _freiAlgorithmusService: FreiAlgorithmusService) {
+                private _drawingService: DrawingService) {
 
         this.fileContent = new EventEmitter<{fileContent:string, fileExtension:string}>();
 

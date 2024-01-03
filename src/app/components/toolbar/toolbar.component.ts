@@ -13,7 +13,6 @@ import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
-import { ChangeEvent } from 'react';
 
 @Component({
     selector: 'app-toolbar',
