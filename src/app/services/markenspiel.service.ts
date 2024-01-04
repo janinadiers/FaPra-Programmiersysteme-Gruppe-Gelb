@@ -40,8 +40,10 @@ export class MarkenspielService {
             this._diagram.selectedCircle.svgElement!.children[1].textContent =
                 this._diagram.selectedCircle.amountToken.toString()
 
-            if(this._diagram.selectedCircle.amountToken  < 0) {
+            if(this._diagram.selectedCircle.amountToken  < 1) {
                 this._diagram.selectedCircle.amountToken = 0;
+                this._diagram.selectedCircle.svgElement!.querySelector('text')!.textContent = "";
+                
             }
             return;
         }
@@ -86,6 +88,7 @@ export class MarkenspielService {
                     this._diagram.selectedLine.tokens.toString();
             } else {
                 this._diagram.selectedLine.svgElement!.childNodes[3].textContent = "";
+                this._diagram.selectedLine.svgElement!.querySelector('circle')!.setAttribute('fill', 'transparent');
             }
 
             return;
