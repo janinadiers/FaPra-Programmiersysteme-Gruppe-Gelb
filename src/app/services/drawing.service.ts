@@ -52,7 +52,6 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place){
-        // console.log("Circle selected", Diagram.drawingIsActive, Diagram.algorithmIsActive, circle);
         this._diagram!.selectedCircle = circle;
         if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
 

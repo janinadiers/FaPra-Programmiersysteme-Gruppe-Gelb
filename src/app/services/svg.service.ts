@@ -57,7 +57,6 @@ export class SvgService {
 
 
         svgElement += `</svg>`;
-        console.log(svgElement);
         
 
         return svgElement;

@@ -93,6 +93,7 @@ export class PnmlImportService implements ImportService {
             arcElement.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
                 this._drawingService.onLineSelect(arcElement);
             });
+           
             lines.push(arcElement);
         });
        return lines;
