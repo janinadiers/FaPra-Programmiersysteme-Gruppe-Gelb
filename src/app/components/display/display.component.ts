@@ -75,6 +75,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
+                
                 if(!element.svgElement) {return}
                 this._drawingService.onLineSelect(element);
             });

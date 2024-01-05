@@ -130,7 +130,7 @@ export class DrawingService {
                     }
                 }
                 svgLine?.addEventListener(('click'), () => {
-                    if(svgLine){
+                    if(svgLine){              
                         this.onLineSelect(lineObject!);
                     }
                 } );
@@ -148,7 +148,7 @@ export class DrawingService {
                     if (svgElement.firstChild){
                         svgElement.insertBefore(svgLine!,svgElement.firstChild);
                     }
-                }
+                }           
                 svgLine?.addEventListener(('click'), () => {
                     if(svgLine != undefined){
                         this.onLineSelect(lineObject!);
@@ -163,7 +163,7 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
-        // console.log("Line selected", Diagram.drawingIsActive, Diagram.algorithmIsActive);
+        
         this._diagram!.selectedLine = line;
 
         if(Diagram.drawingIsActive){return}
@@ -175,6 +175,7 @@ export class DrawingService {
         line.svgElement!.querySelector('text')!.setAttribute('stroke','blue');
         line.svgElement!.querySelector('polyline')!.setAttribute('stroke','blue');
         line.svgElement!.querySelector('path')!.setAttribute('fill','blue');
+
         // line.svgElement!.children[2].setAttribute('stroke', 'blue');
         // line.svgElement!.children[2].setAttribute('stroke-width', '2');
 

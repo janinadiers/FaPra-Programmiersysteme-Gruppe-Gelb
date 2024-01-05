@@ -90,7 +90,7 @@ export class PnmlImportService implements ImportService {
 
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
             const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
-            arcElement.svgElement?.addEventListener(('click'), () => {
+            arcElement.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
                 this._drawingService.onLineSelect(arcElement);
             });
             lines.push(arcElement);

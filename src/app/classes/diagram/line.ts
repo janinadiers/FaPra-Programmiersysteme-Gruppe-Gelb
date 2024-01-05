@@ -1,6 +1,7 @@
 import {Element} from 'src/app/classes/diagram/element';
 import {Coords} from '../json-petri-net';
 import {Transition} from './transition';
+import {Diagram} from './diagram';
 
 export class Line {
 
@@ -13,6 +14,8 @@ export class Line {
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
     private _marker: SVGElement | undefined;
+    private _isDragging = false;
+    private _currentCoordIndex: number | undefined;
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
@@ -193,6 +196,20 @@ export class Line {
 
         group.appendChild(line);
 
+        // Hier werden Kreise für alle coords mit entsprechenden Eventlistener erstellt, damit man sie bewegen kann
+        if (this._coords) {
+            this._coords.forEach(coord => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', coord.x.toString());
+                circle.setAttribute('cy', coord.y.toString());
+                circle.setAttribute('r', '8');
+                circle.setAttribute('fill', 'transparent');
+                group.appendChild(circle);
+                this.addEventListenersForCoords(circle, this._coords!.indexOf(coord));
+            });
+            
+        }
+
         let refX: number;
         refX = this.updateMarker();
 
@@ -300,7 +317,7 @@ export class Line {
 
     }
 
-    addHoverEventForBackgroundCircle(backgroundCircle: SVGElement, token: SVGElement) {
+    addHoverEventForBackgroundCircle(backgroundCircle: SVGElement, token: SVGElement) {       
         backgroundCircle.addEventListener('mouseover', () => {
             
             backgroundCircle.setAttribute('fill', 'blue');
@@ -321,6 +338,71 @@ export class Line {
                 }
             }
         })
+        
+    }
+
+    addEventListenersForCoords(circle: SVGElement, index:number) {
+        
+        circle.addEventListener('mousedown', (event) => {
+            event.stopPropagation();
+            this._isDragging = true; 
+            this._currentCoordIndex = index;
+            
+        });
+        window.addEventListener('mouseup', (event) => {
+            event.stopPropagation();
+            this._isDragging = false;  
+            
+            
+            
+        });
+        window.addEventListener('mousemove', (event) => {
+            event.stopPropagation();
+            if(!this.coords) return;
+            if(this._isDragging){
+                
+                const svgElement = document.getElementById('canvas');
+                const svgContainer = svgElement?.getBoundingClientRect();
+                
+                // Calculate the new coords
+                let x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
+                let y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
+                this.coords = this.coords.map((coord, i) => {
+                    if(i === this._currentCoordIndex){                       
+                        return {x: x, y: y};
+                    }
+                    return {x: coord.x, y: coord.y}
+                });
+                
+                this.svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+                
+                if(this.coords && this._currentCoordIndex){
+                    this.coords.forEach((coord, i) => {
+                        let circle = this.svgElement?.querySelectorAll('circle')[i]
+                        circle?.setAttribute('cx', coord.x.toString());
+                        circle?.setAttribute('cy', coord.y.toString());
+                    });
+                  
+                }
+                
+                // Positionen der Kantengewichte werden mit aktualisiert
+                const midCoords = this.calcMidCoords();
+                let midCircle = this.svgElement?.querySelectorAll('circle')[2]
+                midCircle?.setAttribute('cx', midCoords.x.toString());
+                midCircle?.setAttribute('cy', midCoords.y.toString());
+                
+                this.svgElement?.querySelector('text')?.setAttribute('x', midCoords.x.toString());
+                this.svgElement?.querySelector('text')?.setAttribute('y', midCoords.y.toString());
+            }
+            
+        });
+        circle.addEventListener('mouseout', () => {
+            circle.setAttribute('fill', 'transparent');
+        });
+        circle.addEventListener('mouseover', () => {
+            circle.style.cursor = 'grab';
+            circle.setAttribute('fill', 'gray');
+        });
     }
 
 
