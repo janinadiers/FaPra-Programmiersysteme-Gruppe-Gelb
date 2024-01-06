@@ -1,7 +1,7 @@
 <mat-toolbar class="toolbar">
     <div class="left-toolbar">
-        
-        <button mat-icon-button class="play tooltip" (click)="toggleSimulation()">
+
+        <button mat-icon-button class="play tooltip" (click)="toggleSimulation(); onButtonClick('simulate')">
             <span class="tooltiptext">start simulation</span>
             <mat-icon>play_circle</mat-icon>
         </button>
@@ -50,7 +50,7 @@
                 <mat-icon>remove_circle</mat-icon>
             </button>
             <div class="vertical-line"></div>
-            
+
                 <button mat-icon-button
                     class="hover-class tooltip"
                     (click)="onButtonClick('deleteLast')">
@@ -64,8 +64,8 @@
                     <span class="tooltiptext">clear all</span>
                     <mat-icon>clear</mat-icon>
                 </button>
-            
-        
+
+
     </div>
         <div class="center-toolbar">
             <label for="algorithm-select">Algorithmus: </label>
@@ -106,7 +106,7 @@
                 </button>
             </div>
         </div>
-    
-   
+
+
 
 </mat-toolbar>

@@ -11,6 +11,8 @@ import {PngExportService} from "../../services/export/png-export.service";
 import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 import {DrawingService} from "../../services/drawing.service";
+import {transition} from "@angular/animations";
+import {Transition} from "../../classes/diagram/transition";
 
 @Component({
     selector: 'app-toolbar',
@@ -45,7 +47,7 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                public _markenspielService: MarkenspielService,
+                private _markenspielService: MarkenspielService,
                 private _drawingService: DrawingService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
@@ -113,17 +115,17 @@ export class ToolbarComponent {
 
     }
 
-    addToken(){
+    addToken() {
 
-        if(Diagram.drawingIsActive){
+        if (Diagram.drawingIsActive) {
             return
         }
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
 
-        if(addTokenButton.style.color == 'red'){
+        if (addTokenButton.style.color == 'red') {
             this._markenspielService.addCircleToken();
-        }
-        else if(addTokenButton.style.color == 'blue'){
+
+        } else if (addTokenButton.style.color == 'blue') {
             this._markenspielService.addLineToken();
 
         }
@@ -218,9 +220,17 @@ export class ToolbarComponent {
         if(this.simulationActive){
             simulationButton.style.color = 'green';
             this._drawingService.deselectPlacesAndLines();
-        }
-        else{
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+            });
+        } else {
             simulationButton.style.color = 'black';
+            this._diagram?.transitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'black');
+                transition.isActive = false;
+            });
         }
     }
 }
