@@ -17,6 +17,7 @@ export class DrawingService {
 
     private _diagram: Diagram | undefined;
     private simulationActive: boolean = false;
+    private simulationStatus: number = 0;
 
     constructor(private diplayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
@@ -99,23 +100,54 @@ export class DrawingService {
         });
 
         rectObject.svgElement!.addEventListener(('dblclick'), () => {
-            if (!rectObject!.svgElement || (!this.simulationActive && !rectObject?.isActive)) {
-                return;
-            }
+            this.startSimulation(rectObject!);
+        });
 
+        return rectObject
+    }
+
+    public startSimulation(rectObject: Transition) {
+        if (!rectObject!.svgElement ||
+            (!this.simulationActive && !rectObject?.isActive)) {
+            return;
+        }
+
+        if(this.simulationStatus == 0) {
+            this._diagram?.transitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'black');
+                transition.isActive = false;
+            });
+        }
+
+        if(this.simulationStatus == 1) {
             const transitions = this._markenspielService.fireTransition(rectObject!);
-            transitions.forEach((transition => {
-                this._markenspielService.setTransitionColor(transition, 'green');
-                transition.isActive = true;
-            }));
-
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
                 this._markenspielService.setTransitionColor(rectObject!, 'black');
             }
-        });
 
-        return rectObject
+            transitions.forEach((transition => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+                transition.isActive = true;
+            }));
+        }
+
+        if(this.simulationStatus == 2){
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'violet');
+            });
+
+            const activeTransitions = this._markenspielService.showStep(startTransitions);
+
+            activeTransitions.forEach((transition) => {
+                this._markenspielService.fireSingleTransition(transition);
+            });
+
+            this._markenspielService.showStep(this._markenspielService.getPossibleActiveTransitions());
+        }
     }
 
     onRectSelect(rect: Transition) {
@@ -126,6 +158,11 @@ export class DrawingService {
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
         } else
             return;
+    }
+
+    public setSimulationStatus(status: number) {
+        this.simulationStatus = status;
+        return;
     }
 
     // Linien zeichnen bzw. Kanten erstellen

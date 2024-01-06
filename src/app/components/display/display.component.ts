@@ -23,15 +23,13 @@ export class DisplayComponent implements OnInit, OnDestroy {
     private subscriptionOfToolbar: Subscription = new Subscription;
     private _sub: Subscription;
     private _diagram: Diagram | undefined;
-    private simulationActive: boolean = false;
 
     constructor(
         private _displayService: DisplayService,
         private _fileReaderService: FileReaderService,
         private _http: HttpClient,
         private activeButtonService: ActivebuttonService,
-        private _drawingService: DrawingService,
-        private _markenspielService: MarkenspielService) {
+        private _drawingService: DrawingService) {
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
 
@@ -88,23 +86,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     return
                 }
                 this._drawingService.onRectSelect(element);
-            });
-
-            element.svgElement!.addEventListener(('dblclick'), () => {
-                if (!element!.svgElement || (!this.simulationActive && !element?.isActive)) {
-                    return;
-                }
-
-                const transitions = this._markenspielService.fireTransition(element!);
-                transitions.forEach((transition => {
-                    this._markenspielService.setTransitionColor(transition, 'green');
-                    transition.isActive = true;
-                }));
-
-                if(transitions.find(transition => transition.id === element!.id) === undefined) {
-                    element!.isActive = false;
-                    this._markenspielService.setTransitionColor(element!, 'black');
-                }
             });
         });
     }

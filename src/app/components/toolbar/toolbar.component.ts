@@ -62,6 +62,7 @@ export class ToolbarComponent {
     arrowActiveColor: boolean = false;
     boltActiveColor: boolean = false;
     simulationActive: boolean = false;
+    simulationStatus: number = 0;
 
     toggleRectangleButton() {
         this.circleActiveColor = false;
@@ -216,7 +217,8 @@ export class ToolbarComponent {
     toggleSimulation() {
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
-        this.simulationActive = !this.simulationActive;
+        // this.simulationActive = !this.simulationActive;
+        /*
         if(this.simulationActive){
             simulationButton.style.color = 'green';
             this._drawingService.deselectPlacesAndLines();
@@ -231,6 +233,44 @@ export class ToolbarComponent {
                 this._markenspielService.setTransitionColor(transition, 'black');
                 transition.isActive = false;
             });
+        }*/
+        if(this.simulationStatus == 0){
+            simulationButton.style.color = 'black';
+            this._drawingService.setSimulationStatus(this.simulationStatus);
+
+            this._diagram?.transitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'black');
+                transition.isActive = false;
+            });
+
+            this.simulationStatus = 1;
+
+        } else if (this.simulationStatus == 1) {
+            simulationButton.style.color = 'green';
+            this._drawingService.deselectPlacesAndLines();
+            this._drawingService.setSimulationStatus(this.simulationStatus);
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+            });
+
+            this.simulationStatus = 2;
+        }
+        else if (this.simulationStatus == 2) {
+
+            simulationButton.style.color = 'violet';
+            this._drawingService.deselectPlacesAndLines();
+            this._drawingService.setSimulationStatus(this.simulationStatus);
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'violet');
+            });
+
+            this._markenspielService.showStep(startTransitions);
+            this.simulationStatus = 0;
         }
     }
 }
