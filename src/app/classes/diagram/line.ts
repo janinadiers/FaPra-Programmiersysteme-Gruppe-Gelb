@@ -311,10 +311,15 @@ export class Line {
         backgroundCircle.addEventListener('mouseout', () => {
             token.setAttribute('fill', 'black');
             token.setAttribute('stroke', 'black');
-            if (this._tokens > 1)
+            if (this._tokens > 1){
                 backgroundCircle.setAttribute('fill', 'white');
-            else
-                backgroundCircle.setAttribute('fill', 'transparent');
+            }
+            else{
+                // Da der backgroundCircle nicht nach jedem mouseout event transparent sein soll während man im Bearbeitungsmodus ist, wird hier überprüft, ob die Linie gerade ausgewählt ist
+                if(!(backgroundCircle.getAttribute('stroke') === 'blue')){
+                    backgroundCircle.setAttribute('fill', 'transparent');
+                }
+            }
         })
     }
 
