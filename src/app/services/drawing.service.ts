@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Diagram} from "../classes/diagram/diagram";
 import {Subscription} from "rxjs";
 import {DisplayService} from "./display.service";
@@ -6,39 +6,48 @@ import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
 import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
+import {MarkenspielService} from "./markenspiel.service";
+import {transition} from "@angular/animations";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 
 export class DrawingService {
+
     private _diagram: Diagram | undefined;
-    private _sub: Subscription;
+    private simulationActive: boolean = false;
 
     constructor(private diplayService: DisplayService,
-                private activeButtonService: ActivebuttonService
-                )
-    {
-        this._sub = this.diplayService.diagram$.subscribe(diagram => {
+                private activeButtonService: ActivebuttonService,
+                private _markenspielService: MarkenspielService
+    ) {
+        this.diplayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
         });
 
         this.activeButtonService.zoomButtonClickObservable().subscribe(buttonId => {
-            if(buttonId === "zoom-in"){
+            if (buttonId === "zoom-in") {
                 Diagram.zoomFactor = Diagram.zoomFactor - 0.1;
-            }
-            else if(buttonId === "zoom-out"){
+            } else if (buttonId === "zoom-out") {
                 Diagram.zoomFactor = Diagram.zoomFactor + 0.1;
             }
         });
+
+        this.activeButtonService.getButtonClickObservable().subscribe((buttonId => {
+            if(buttonId === 'simulate') {
+                this.simulationActive = !this.simulationActive;
+            }
+        }));
     }
 
     // Kreise zeichnen bzw. Stellen anlegen
-    drawCircle(mouseX:number, mouseY:number){
-
+    drawCircle(mouseX: number, mouseY: number) {
         // Aufruf der Funktion zu Erzeugung eines Objekts
         let circleObject = this._diagram?.createCircleObject(mouseX, mouseY);
-        if(!circleObject){ throw new Error("CircleObject is undefined") }
+        if (!circleObject) {
+            throw new Error("CircleObject is undefined")
+        }
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
@@ -51,9 +60,11 @@ export class DrawingService {
         return circleObject;
     }
 
-    onCircleSelect(circle: Place){
+    onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
-        if(Diagram.drawingIsActive || Diagram.algorithmIsActive){return}
+        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
+            return
+        }
 
         this.changeTokenButtonColor('red');
 
@@ -62,24 +73,22 @@ export class DrawingService {
         circle.svgElement!.children[0].setAttribute('stroke', 'red');
         circle.svgElement!.children[2].setAttribute('stroke', 'red');
         circle.svgElement!.children[0].setAttribute('stroke-width', '2');
-        circle.svgElement!.children[1].setAttribute('stroke','red');
-        
+        circle.svgElement!.children[1].setAttribute('stroke', 'red');
+
         if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
-        }
-        else
+        } else
             return;
-
-        
-        
     }
 
     // Rechtecke zeichnen bzw. Transitionen anlegen
-    drawRect(mouseX: number, mouseY: number){
+    drawRect(mouseX: number, mouseY: number) {
         //  Aufruf der Funktion zu Erzeugung eines Objekts
         let rectObject = this._diagram?.createRectObject(mouseX, mouseY);
-        if(!rectObject){ throw new Error("RectObject is undefined") }
+        if (!rectObject) {
+            throw new Error("RectObject is undefined")
+        }
 
         // Erstellen des SVG-Elements
         rectObject.createSVG();
@@ -89,20 +98,34 @@ export class DrawingService {
             this.onRectSelect(rectObject!);
         });
 
+        rectObject.svgElement!.addEventListener(('dblclick'), () => {
+            if (!rectObject!.svgElement || (!this.simulationActive && !rectObject?.isActive)) {
+                return;
+            }
+
+            const transitions = this._markenspielService.fireTransition(rectObject!);
+            transitions.forEach((transition => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+                transition.isActive = true;
+            }));
+
+            if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
+                rectObject!.isActive = false;
+                this._markenspielService.setTransitionColor(rectObject!, 'black');
+            }
+        });
+
         return rectObject
     }
 
-    onRectSelect(rect: Transition){
+    onRectSelect(rect: Transition) {
         this._diagram!.selectedRect = rect;
-        
+
         if (this._diagram!.selectedCircle) {
             let circleIsTarget: boolean = false;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
-        }
-        else
+        } else
             return;
-        
-        
     }
 
     // Linien zeichnen bzw. Kanten erstellen
@@ -117,50 +140,54 @@ export class DrawingService {
             let circleObject = this._diagram?.places.find(place => place.id === cirlceObjectID);
             // Transition (Rechteck) finden und Objekt dafür erstellen
             let rectobjectID = rect.id;
-            let rectObject =  this._diagram?.transitions.find(transition => transition.id === rectobjectID);
+            let rectObject = this._diagram?.transitions.find(transition => transition.id === rectobjectID);
 
             // Linie von Rechteck zu Kreis zeichnen
-            if(targetIsCircle){
+            if (targetIsCircle) {
                 // Aufruf der Funktion zu Erzeugung eines Objekts
                 let lineObject = this._diagram?.createLineObject(rectObject!, circleObject!);
-                if(!lineObject){ throw new Error("LineObject is undefined")}
+                if (!lineObject) {
+                    throw new Error("LineObject is undefined")
+                }
 
                 // Erstellen des SVG
                 lineObject.createSVG();
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
-                    if (svgElement.firstChild){
-                        svgElement.insertBefore(svgLine!,svgElement.firstChild);
+                    if (svgElement.firstChild) {
+                        svgElement.insertBefore(svgLine!, svgElement.firstChild);
                     }
                 }
                 svgLine?.addEventListener(('click'), () => {
-                    if(svgLine){
+                    if (svgLine) {
                         this.onLineSelect(lineObject!);
                     }
-                } );
+                });
             }
             // Linie von Kreis zu Rechteck zeichnen
-            else{
+            else {
                 // Erstellen des Objekts
                 let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
-                if(!lineObject){ throw new Error("LineObject is undefined")}
+                if (!lineObject) {
+                    throw new Error("LineObject is undefined")
+                }
                 lineObject.createSVG();
 
                 // Erstellen des SVG
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
-                    if (svgElement.firstChild){
-                        svgElement.insertBefore(svgLine!,svgElement.firstChild);
+                    if (svgElement.firstChild) {
+                        svgElement.insertBefore(svgLine!, svgElement.firstChild);
                     }
                 }
                 svgLine?.addEventListener(('click'), () => {
-                    if(svgLine != undefined){
+                    if (svgLine != undefined) {
                         this.onLineSelect(lineObject!);
                     }
-                } );
+                });
             }
 
-            if(this.activeButtonService.isArrowButtonActive){
+            if (this.activeButtonService.isArrowButtonActive) {
                 this._diagram?.resetSelectedElements();
             }
         }
@@ -169,15 +196,17 @@ export class DrawingService {
     onLineSelect(line: Line) {
         this._diagram!.selectedLine = line;
 
-        if(Diagram.drawingIsActive){return}
+        if (Diagram.drawingIsActive) {
+            return
+        }
         this.changeTokenButtonColor('blue');
 
         // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
         this.deselectPlacesAndLines();
 
-        line.svgElement!.querySelector('text')!.setAttribute('stroke','blue');
-        line.svgElement!.querySelector('polyline')!.setAttribute('stroke','blue');
-        line.svgElement!.querySelector('path')!.setAttribute('fill','blue');
+        line.svgElement!.querySelector('text')!.setAttribute('stroke', 'blue');
+        line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'blue');
+        line.svgElement!.querySelector('path')!.setAttribute('fill', 'blue');
         // line.svgElement!.children[2].setAttribute('stroke', 'blue');
         // line.svgElement!.children[2].setAttribute('stroke-width', '2');
 
@@ -185,7 +214,7 @@ export class DrawingService {
     }
 
     // Farbänderungen in der Toolbar
-    changeTokenButtonColor(color:string){
+    changeTokenButtonColor(color: string) {
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = color;
@@ -193,24 +222,23 @@ export class DrawingService {
     }
 
     // Aufheben der Auswahl
-    deselectPlacesAndLines(){
+    deselectPlacesAndLines() {
         this._diagram?.places.forEach((element) => {
-            element.svgElement!.querySelector('text')!.setAttribute('stroke','black'); // Farbe des Tokens
-            element.svgElement!.querySelector('circle')!.setAttribute('stroke','black'); // Farbe des Kreisrandes
+            element.svgElement!.querySelector('text')!.setAttribute('stroke', 'black'); // Farbe des Tokens
+            element.svgElement!.querySelector('circle')!.setAttribute('stroke', 'black'); // Farbe des Kreisrandes
             // element.svgElement?.children[0].setAttribute('stroke', 'black'); // Farbe des Kreisrandes
             element.svgElement?.children[2].setAttribute('stroke', 'black'); // Farbe des Labels
         });
         this._diagram?.lines.forEach((element) => {
-            element.svgElement!.querySelector('text')!.setAttribute('stroke','black');
-            element.svgElement!.querySelector('polyline')!.setAttribute('stroke','black');
-            element.svgElement!.querySelector('path')!.setAttribute('fill','black');
+            element.svgElement!.querySelector('text')!.setAttribute('stroke', 'black');
+            element.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'black');
+            element.svgElement!.querySelector('path')!.setAttribute('fill', 'black');
             // element.svgElement!.children[2].setAttribute('stroke', 'transparent');
             // element.svgElement!.children[2].setAttribute('fill','transparent');
-            if(element.tokens > 1) {
-                element.svgElement!.querySelector('circle')!.setAttribute('fill','white');
+            if (element.tokens > 1) {
+                element.svgElement!.querySelector('circle')!.setAttribute('fill', 'white');
                 //element.svgElement!.children[2].setAttribute('fill','white');
-            }
-            else {
+            } else {
                 element.svgElement!.querySelector('circle')!.setAttribute('fill', 'transparent');
             }
         });
