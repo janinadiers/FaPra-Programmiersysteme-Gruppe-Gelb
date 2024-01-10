@@ -1,7 +1,6 @@
 
 import { Injectable } from '@angular/core';
 import { Element } from '../../classes/diagram/element';
-import { ImportService } from '../../classes/import-service';
 import { Diagram } from '../../classes/diagram/diagram';
 import { Place } from '../../classes/diagram/place';
 import { Transition } from '../../classes/diagram/transition';
@@ -13,7 +12,7 @@ import {DrawingService} from "../drawing.service";
 @Injectable({
     providedIn: 'root',
 })
-export class PnmlImportService implements ImportService {
+export class PnmlImportService {
 
     constructor(private _drawingService: DrawingService) {
     }

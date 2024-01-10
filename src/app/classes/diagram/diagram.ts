@@ -122,6 +122,7 @@ export class Diagram {
         this.pushLine(lineObject);
         this.pushID(idString);
         source.children = target;
+        target.parents = source;
         return lineObject;
     }
 
