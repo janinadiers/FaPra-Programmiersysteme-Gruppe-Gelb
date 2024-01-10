@@ -22,7 +22,7 @@ export class MarkenspielService {
             if(!this._diagram?.selectedCircle){
                 return;
             }
-
+            
             this._diagram.selectedCircle.amountToken++;
 
             this._diagram.selectedCircle.svgElement!.children[1].textContent =
