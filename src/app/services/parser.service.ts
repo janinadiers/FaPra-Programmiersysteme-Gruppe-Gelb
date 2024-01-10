@@ -81,6 +81,9 @@ export class ParserService {
                 transition.svgElement?.addEventListener(('click'), () => {
                     this._drawingService.onRectSelect(transition);
                 })
+                transition.svgElement?.addEventListener(('dblclick'), () => {
+                    this._drawingService.startSimulation(transition);
+                })
                 transitions.push(transition)
             }
         }
@@ -122,13 +125,28 @@ export class ParserService {
                 }
             }
             lines.forEach(line => {
-                line.createSVG();
-                line.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
+                line.createSVG();            
+                this.setChildrenAndParents(line);
+                line.svgElement?.addEventListener(('click'), () => {
                         this._drawingService.onLineSelect(line);
                     }
                 );
             });
         }
         return lines;
+    }
+
+    private setChildrenAndParents(line:Line):void{
+        const source = line.source;
+        const target = line.target;
+
+        if(source instanceof Place && target instanceof Transition){
+            source.children.push(target);
+            target.parents.push(source);
+        }
+        if(source instanceof Transition && target instanceof Place){
+            source.children.push(target);
+            target.parents.push(source);
+        }
     }
 }
