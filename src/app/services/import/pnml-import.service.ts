@@ -73,6 +73,9 @@ export class PnmlImportService {
             transitionElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onRectSelect(transitionElement);
             });
+            transitionElement.svgElement?.addEventListener(('dblclick'), () => {
+                this._drawingService.startSimulation(transitionElement);
+            });
             result.push(transitionElement);
         });
 
