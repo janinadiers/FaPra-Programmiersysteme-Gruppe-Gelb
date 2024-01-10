@@ -1,7 +1,6 @@
 
 import { Injectable } from '@angular/core';
 import { Element } from '../../classes/diagram/element';
-import { ImportService } from '../../classes/import-service';
 import { Diagram } from '../../classes/diagram/diagram';
 import { Place } from '../../classes/diagram/place';
 import { Transition } from '../../classes/diagram/transition';
@@ -13,7 +12,7 @@ import {DrawingService} from "../drawing.service";
 @Injectable({
     providedIn: 'root',
 })
-export class PnmlImportService implements ImportService {
+export class PnmlImportService {
 
     constructor(private _drawingService: DrawingService) {
     }
@@ -29,7 +28,9 @@ export class PnmlImportService implements ImportService {
 
         // get all arcs as an Element instance from DOM object
         let arcs = this.importArcs(rawData, [...places, ...transitions]);
-
+        // set children and parents for places and transitions
+        this.setChildrenAndParents(arcs);
+        
         return new Diagram([...places], [...transitions], [...arcs]);
 
     }
@@ -50,6 +51,7 @@ export class PnmlImportService implements ImportService {
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
+            
             result.push(placeElement);
         });
 
@@ -198,6 +200,25 @@ export class PnmlImportService implements ImportService {
         line.createSVG();
         return line;
 
+    }
+
+    private setChildrenAndParents(lines:Line[]):void{
+        lines.forEach((line) => {
+            const source = line.source;
+            const target = line.target;
+            
+            if(source instanceof Place && target instanceof Transition){
+                source.children.push(target);
+                target.parents.push(source);
+            
+            }
+            if(source instanceof Transition && target instanceof Place){
+                source.children.push(target);
+                target.parents.push(source);
+            
+            }
+            
+        });
     }
 
 

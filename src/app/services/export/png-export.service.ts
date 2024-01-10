@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {SvgService} from "../svg.service";
+import {SvgService} from "./svg.service";
 
 @Injectable({
     providedIn: 'root'

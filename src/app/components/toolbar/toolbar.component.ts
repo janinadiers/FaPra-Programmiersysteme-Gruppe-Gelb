@@ -8,9 +8,11 @@ import {AppComponent} from "../../app.component";
 import {PnmlExportService} from "../../services/export/pnml-export.service";
 import {JsonExportService} from "../../services/export/json-export.service";
 import {PngExportService} from "../../services/export/png-export.service";
-import {SvgService} from "../../services/svg.service";
+import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 import {DrawingService} from "../../services/drawing.service";
+import {transition} from "@angular/animations";
+import {Transition} from "../../classes/diagram/transition";
 
 @Component({
     selector: 'app-toolbar',
@@ -45,7 +47,7 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                public _markenspielService: MarkenspielService,
+                private _markenspielService: MarkenspielService,
                 private _drawingService: DrawingService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
@@ -60,6 +62,7 @@ export class ToolbarComponent {
     arrowActiveColor: boolean = false;
     boltActiveColor: boolean = false;
     simulationActive: boolean = false;
+    simulationStatus: number = 0;
 
     toggleRectangleButton() {
         this.circleActiveColor = false;
@@ -113,19 +116,17 @@ export class ToolbarComponent {
 
     }
 
-    addToken(){
+    addToken() {
 
-        if(Diagram.drawingIsActive){
+        if (Diagram.drawingIsActive) {
             return
         }
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
 
-        if(addTokenButton.style.color == 'red'){
+        if (addTokenButton.style.color == 'red') {
             this._markenspielService.addCircleToken();
 
-
-        }
-        else if(addTokenButton.style.color == 'blue'){
+        } else if (addTokenButton.style.color == 'blue') {
             this._markenspielService.addLineToken();
 
         }
@@ -165,7 +166,6 @@ export class ToolbarComponent {
                 break;
             case 'PNG':
                 this._pngExportService.export().then((blob) => {
-                    console.log(blob);
                     this._downloadService.downloadFile(blob, this.PNG_FILE, this.PNG_TYPE);
                 }).catch((error) => {
                     console.log('Error during creating the PNG file', error);
@@ -217,13 +217,60 @@ export class ToolbarComponent {
     toggleSimulation() {
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
-        this.simulationActive = !this.simulationActive;
+        // this.simulationActive = !this.simulationActive;
+        /*
         if(this.simulationActive){
             simulationButton.style.color = 'green';
             this._drawingService.deselectPlacesAndLines();
-        }
-        else{
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+            });
+        } else {
             simulationButton.style.color = 'black';
+            this._diagram?.transitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'black');
+                transition.isActive = false;
+            });
+        }*/
+        if(this.simulationStatus == 0){
+            simulationButton.style.color = 'black';
+            this._drawingService.setSimulationStatus(this.simulationStatus);
+
+            this._diagram?.transitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'black');
+                transition.isActive = false;
+            });
+
+            this.simulationStatus = 1;
+
+        } else if (this.simulationStatus == 1) {
+            simulationButton.style.color = 'green';
+            this._drawingService.deselectPlacesAndLines();
+            this._drawingService.setSimulationStatus(this.simulationStatus);
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+            });
+
+            this.simulationStatus = 2;
+        }
+        else if (this.simulationStatus == 2) {
+
+            simulationButton.style.color = 'violet';
+            this._drawingService.deselectPlacesAndLines();
+            this._drawingService.setSimulationStatus(this.simulationStatus);
+
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'violet');
+            });
+
+            this._markenspielService.showStep(startTransitions);
+            this.simulationStatus = 0;
         }
     }
 }

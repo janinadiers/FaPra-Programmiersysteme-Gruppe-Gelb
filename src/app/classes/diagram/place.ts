@@ -7,6 +7,7 @@ export class Place extends Element {
     private _radius: number;
     private _amountToken: number;
     private _children: Array<Transition>;
+    private _parents: Array<Transition>;
     private _label: string;
 
 
@@ -15,6 +16,7 @@ export class Place extends Element {
         this._radius = 25; // Default Radius
         this._amountToken = amountToken ?? 0; //Default sind keine Marken gesetzt
         this._children = [];
+        this._parents = [];
         this._label = id;
 
     }
@@ -51,6 +53,14 @@ export class Place extends Element {
         this._children.push(object);
     }
 
+    get parents(): Array<Transition> {
+        return this._parents;
+    }
+
+    set parents(transition: Transition) {
+        this._parents.push(transition);
+    }
+
     override createSVG(){
         if (this.svgElement) {
             return this.svgElement;
@@ -76,8 +86,8 @@ export class Place extends Element {
             marker.textContent = this._amountToken.toString();
             
         }
-            
-        
+
+
         group.appendChild(marker);
 
         //Text
