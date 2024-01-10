@@ -50,7 +50,14 @@ private zoomButtonClickSubject = new Subject<string>();
     Diagram.drawingIsActive = this.isBoltButtonActive;
   }
 
-
+  deactivateAllButtons() {
+    this.isCircleButtonActive = false;
+    this.isRectangleButtonActive = false;
+    this.isArrowButtonActive = false;
+    this.isBoltButtonActive = false;
+    Diagram.drawingIsActive = false;
+  }
+  
   zoomButtonClick(buttonId: string) {
     this.zoomButtonClickSubject.next(buttonId);
   }

@@ -80,9 +80,14 @@ export class Line {
 
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
-                this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
-                    ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
-                        ${this._targetPosition?.y}`);
+                if ((document.getElementById('algorithm-select') as HTMLSelectElement).value === 'free') //Only add midCoords if no algorithm selected
+                    this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
+                        ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
+                            ${this._targetPosition?.y}`);
+                else 
+                    this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
+                        ${updatedPosition.y} ${this._targetPosition?.x},
+                            ${this._targetPosition?.y}`);
             }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
 
@@ -106,7 +111,10 @@ export class Line {
 
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
-                this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
+                if ((document.getElementById('algorithm-select') as HTMLSelectElement).value === 'free') //Only add midCoords if no algorithm selected
+                    this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
+                else 
+                    this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${updatedPosition.x},${updatedPosition.y}`);
             }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
         }

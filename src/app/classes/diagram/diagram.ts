@@ -163,7 +163,6 @@ export class Diagram {
     }
 
     private processMouseMove(event: MouseEvent) {
-
         if (this._isDragging) {
           const svgContainer = this._canvasElement?.getBoundingClientRect();
           const x = (( event.clientX - svgContainer!.left ) * Diagram.zoomFactor)- this.startPoint.x;

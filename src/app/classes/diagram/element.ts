@@ -9,24 +9,32 @@ export class Element  {
     private _svgElement: SVGElement | undefined;
     private _isDragging = false;
     private _positionChange$: BehaviorSubject<Coords>;
+    private _layer: number;
 
     constructor(id: string, x: number , y: number) {
         this._id = id;
         this._x = x
         this._y = y
         this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
-
+        this._layer = 0;
     }
 
     updatePosition(newPosition: Coords) {
 
         this._positionChange$.next(newPosition);
-
     }
 
     getPositionChangeObservable(): Observable<Coords> {
 
         return this._positionChange$.asObservable();
+    }
+
+    get layer(): number {
+        return this._layer;
+    }
+
+    set layer(value: number) {
+        this._layer = value;
     }
 
     get id(): string {
@@ -121,7 +129,8 @@ export class Element  {
             const svgElement = document.getElementById('canvas');
             const svgContainer = svgElement?.getBoundingClientRect();
             // Berechnung der Maus Koordinanten relativ zum SVG Element
-            this.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
+            if ((document.getElementById('algorithm-select') as HTMLSelectElement).value !== 'sugiyama') //only allow y-coord if sugiyama
+                this.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
             this.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
 
             this.svgElement?.childNodes.forEach((node) => {

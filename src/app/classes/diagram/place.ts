@@ -1,5 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Transition } from './transition';
+import { Coords } from '../json-petri-net';
 
 
 export class Place extends Element {
@@ -16,7 +17,13 @@ export class Place extends Element {
         this._amountToken = amountToken ?? 0; //Default sind keine Marken gesetzt
         this._children = [];
         this._label = id;
+    }
 
+    updateGroup(newPosition: Coords) {
+        super.x = newPosition.x;
+        super.y = newPosition.y;
+
+        super.svgElement?.setAttribute('transform', `translate(${newPosition.x}, ${newPosition.y})`);
     }
 
     get radius(): number {

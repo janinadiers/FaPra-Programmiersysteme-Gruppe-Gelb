@@ -1,5 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Place } from './place';
+import { Coords } from '../json-petri-net';
 
 export class Transition extends Element {
 
@@ -16,6 +17,13 @@ export class Transition extends Element {
         this._height = 40;
         this._children = [];
         this._label = label ?? '';
+    }
+    
+    updateGroup(newPosition: Coords) {
+        super.x = newPosition.x;
+        super.y = newPosition.y;
+
+        super.svgElement?.setAttribute('transform', `translate(${newPosition.x - this.width / 2}, ${newPosition.y - this.height / 2})`);
     }
 
     get isActive(): boolean {

@@ -51,6 +51,7 @@ export class ToolbarComponent {
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
+            this.onAlgorithmSelect();
         });
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
@@ -111,15 +112,29 @@ export class ToolbarComponent {
     onAlgorithmSelect() {
         if (this._diagram == undefined)
             return;
+
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        if (selectElement.value === "free") {
+        const selectedAlgorithm = selectElement?.value; 
 
-        } else if (selectElement.value === "spring-embedder") {
+        this._activeButtonService.deactivateAllButtons();  
+        this.deselectActiveColors();
+        if(selectedAlgorithm === 'spring-embedder'){
 
-        } else if (selectElement.value === "sugiyama") {
-            this._sugiyamaService.removeBackwardEdges(this._diagram.transitions, this._diagram.places, this._diagram.lines);
         }
-        //const selectedAlgorithm = selectElement?.value;   
+        else if(selectedAlgorithm === 'sugiyama'){
+            this._sugiyamaService.begin(this._diagram);
+        }
+        else{
+            
+        }
+
+    }
+
+    deselectActiveColors() {
+        this.rectActiveColor = false;
+        this.circleActiveColor = false;
+        this.arrowActiveColor = false;
+        this.boltActiveColor = false;
     }
 
     addToken(){
