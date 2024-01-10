@@ -122,7 +122,8 @@ export class ParserService {
                 }
             }
             lines.forEach(line => {
-                line.createSVG();
+                line.createSVG();            
+                this.setChildrenAndParents(line);
                 line.svgElement?.addEventListener(('click'), () => {
                         this._drawingService.onLineSelect(line);
                     }
@@ -130,5 +131,19 @@ export class ParserService {
             });
         }
         return lines;
+    }
+
+    private setChildrenAndParents(line:Line):void{
+        const source = line.source;
+        const target = line.target;
+
+        if(source instanceof Place && target instanceof Transition){
+            source.children.push(target);
+            target.parents.push(source);
+        }
+        if(source instanceof Transition && target instanceof Place){
+            source.children.push(target);
+            target.parents.push(source);
+        }
     }
 }
