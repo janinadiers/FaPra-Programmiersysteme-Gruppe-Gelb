@@ -123,7 +123,7 @@ export class ParserService {
             }
             lines.forEach(line => {
                 line.createSVG();
-                line.svgElement?.addEventListener(('click'), () => {
+                line.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
                         this._drawingService.onLineSelect(line);
                     }
                 );
