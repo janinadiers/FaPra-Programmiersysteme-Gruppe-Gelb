@@ -6,6 +6,7 @@ import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
 import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
+import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
 import {transition} from "@angular/animations";
 
@@ -21,9 +22,13 @@ export class DrawingService {
 
     constructor(private diplayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
+                private _freiAlgorithmusService: FreiAlgorithmusService,
                 private _markenspielService: MarkenspielService
-    ) {
+                )
+    {
+    
         this.diplayService.diagram$.subscribe(diagram => {
+
             this._diagram = diagram;
         });
 
@@ -52,7 +57,8 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
-
+        
+        this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement!.addEventListener('click', () => {
             this.onCircleSelect(circleObject!);
@@ -93,7 +99,7 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         rectObject.createSVG();
-
+        this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement!.addEventListener('click', () => {
             this.onRectSelect(rectObject!);
@@ -196,7 +202,7 @@ export class DrawingService {
                     }
                 }
                 svgLine?.addEventListener(('click'), () => {
-                    if (svgLine) {
+                    if(svgLine){              
                         this.onLineSelect(lineObject!);
                     }
                 });
@@ -216,7 +222,7 @@ export class DrawingService {
                     if (svgElement.firstChild) {
                         svgElement.insertBefore(svgLine!, svgElement.firstChild);
                     }
-                }
+                }           
                 svgLine?.addEventListener(('click'), () => {
                     if (svgLine != undefined) {
                         this.onLineSelect(lineObject!);
@@ -231,6 +237,7 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
+        
         this._diagram!.selectedLine = line;
 
         if (Diagram.drawingIsActive) {
