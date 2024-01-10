@@ -81,6 +81,9 @@ export class ParserService {
                 transition.svgElement?.addEventListener(('click'), () => {
                     this._drawingService.onRectSelect(transition);
                 })
+                transition.svgElement?.addEventListener(('dblclick'), () => {
+                    this._drawingService.startSimulation(transition);
+                })
                 transitions.push(transition)
             }
         }
