@@ -85,6 +85,8 @@ export class Place extends Element {
         if (this._amountToken > 0){
             marker.textContent = this._amountToken.toString();
         }
+
+
         group.appendChild(marker);
 
         //Text

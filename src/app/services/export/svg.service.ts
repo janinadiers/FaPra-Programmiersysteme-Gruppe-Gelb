@@ -55,6 +55,7 @@ export class SvgService {
             }
         });
 
+
         svgElement += `</svg>`;
 
         return svgElement;

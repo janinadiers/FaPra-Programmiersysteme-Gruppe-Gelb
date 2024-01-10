@@ -14,6 +14,7 @@ import {Line} from "../classes/diagram/line";
 export class MarkenspielService {
 
     private _diagram: Diagram | undefined;
+    private _steps: boolean = false;
 
     constructor(
         private diplayService: DisplayService) {
@@ -50,7 +51,6 @@ export class MarkenspielService {
         return;
     }
 
-    // Line-Handling
     public addLineToken() {
         if (!this._diagram?.selectedLine) {
             return;
@@ -137,6 +137,69 @@ export class MarkenspielService {
         });
 
         return this.getPossibleActiveTransitions();
+    }
+
+    // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
+    public showStep(startTransitions: Array<Transition>) {
+        this._steps = !this._steps;
+
+        if(this._steps){
+            startTransitions.reverse();
+        }
+
+        const transitions = this.getPossibleActiveTransitions();
+        const lines = this._diagram?.lines;
+
+        let activeTransitions: Transition[] = [];
+        let sourcePlaceIds: String[] = [];
+
+        startTransitions.forEach((transition) => {
+            const line = lines?.find(line => line.target.id === transition.id);
+            let currentSourceID = line!.source.id;
+
+            // Prüfen, ob die Stelle im Vorbereich schon von einer anderen Transition benutzt wurde
+            if(!sourcePlaceIds.includes(currentSourceID)){
+                activeTransitions.push(transition);
+                sourcePlaceIds.push(currentSourceID);
+            }
+        });
+
+        // Erneutes Setzen der jetzt aktiven Transitionen
+        transitions?.forEach((transition) => {
+            transition.isActive = false;
+            this.setTransitionColor(transition, 'black');
+        });
+
+        activeTransitions?.forEach((transition) => {
+            lines?.find(line => line.source.id === transition.id);
+            transition.isActive = true;
+            this.setTransitionColor(transition, 'violet');
+        });
+
+        return activeTransitions;
+    }
+
+    public fireSingleTransition(element: Transition) {
+        const lines = this._diagram?.lines;
+
+        const targetLine = lines?.find(line => line.target.id === element.id);
+        if(!this.parentsHaveEnoughTokens(element.parents, targetLine)) {
+            return this.getPossibleActiveTransitions();
+        }
+
+        element.parents.forEach((place) => {
+            const line = lines?.find(line => line.source.id === place.id);
+            this.subtractTokensFromPlace(place, line!.tokens);
+        });
+
+        element.children.forEach((place) => {
+            const line = lines?.find(line => line.source.id === element.id && line.target.id === place.id);
+            this.addTokensToPlace(place, line!.tokens);
+        });
+
+        this.setTransitionColor(element,'black');
+
+        return;
     }
 
     private subtractTokensFromPlace(place: Place, amountTokenLine: number): void {
