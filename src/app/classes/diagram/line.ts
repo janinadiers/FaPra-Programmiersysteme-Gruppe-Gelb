@@ -79,13 +79,14 @@ export class Line {
     }
 
     private updateSource(updatedPosition: Coords): void {
-
+        
         if (this._svgElement) {
+            
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
                     ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
                         ${this._targetPosition?.y}`);
-            }
+            }            
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
 
             // Markierungen für die Gewichte an die Kante hängen
@@ -105,7 +106,7 @@ export class Line {
     }
 
     private updateTarget(updatedPosition: Coords): void {
-
+        
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
@@ -268,6 +269,7 @@ export class Line {
         }
 
         this._svgElement = group;
+        
         return group;
     }
 
@@ -344,6 +346,12 @@ export class Line {
             }
         })
         
+    }
+
+    removeCoords(): void {
+        this._coords = undefined;
+        this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+
     }
 
     addEventListenersForCoord(circle: SVGElement, index:number) {

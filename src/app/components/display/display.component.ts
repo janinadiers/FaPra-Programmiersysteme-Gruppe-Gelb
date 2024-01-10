@@ -9,6 +9,7 @@ import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 
+
 @Component({
     selector: 'app-display',
     templateUrl: './display.component.html',
@@ -323,6 +324,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 this._diagram.lightningCount--;
             }
         }
+       
     }
 
     handleRightClick(event: MouseEvent) {

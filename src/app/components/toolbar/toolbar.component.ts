@@ -10,7 +10,9 @@ import {JsonExportService} from "../../services/export/json-export.service";
 import {PngExportService} from "../../services/export/png-export.service";
 import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
+import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
+import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
 import {transition} from "@angular/animations";
 import {Transition} from "../../classes/diagram/transition";
 
@@ -47,14 +49,21 @@ export class ToolbarComponent {
                 private _jsonExportService: JsonExportService,
                 private _pngExportService: PngExportService,
                 private _svgExportService: SvgService,
-                private _markenspielService: MarkenspielService,
+                public _markenspielService: MarkenspielService,
+                private _springEmbedderService: SpringEmbedderService,
+                private _freiAlgorithmusService: FreiAlgorithmusService,
                 private _drawingService: DrawingService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
+            this.onAlgorithmSelect();
+            
+            
         });
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
+        
+       
     }
 
     rectActiveColor: boolean = false;
@@ -111,9 +120,33 @@ export class ToolbarComponent {
     }
 
     onAlgorithmSelect() {
+        
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        //const selectedAlgorithm = selectElement?.value;
+        const selectedAlgorithm = selectElement?.value; 
+        
+        this._activeButtonService.deactivateAllButtons();  
+        this.deselectActiveColors();
+        if(selectedAlgorithm === 'spring-embedder'){
+            this._freiAlgorithmusService.start()
+            this._springEmbedderService.start()
 
+        }
+        else if(selectedAlgorithm === 'sugiyama'){
+            this._springEmbedderService.teardown();
+            
+        }
+        else{
+            this._springEmbedderService.teardown();
+            this._freiAlgorithmusService.start()
+        }
+        
+    }
+
+    deselectActiveColors() {
+        this.rectActiveColor = false;
+        this.circleActiveColor = false;
+        this.arrowActiveColor = false;
+        this.boltActiveColor = false;
     }
 
     addToken() {
@@ -183,12 +216,12 @@ export class ToolbarComponent {
     }
 
     prepareImportFromFile(fileType: string): void {
-        // Implement your logic for importing based on fileType
-        console.log(`Preparing to import ${fileType}`);
+        
         this.input?.nativeElement.click();
     }
 
-    importFromFile(e: Event): void {
+    importFromFile(e:any): void {
+        
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
             var fileExtension = selectedFile.files[0].name.toLowerCase().match(/\.pnml$/) ? 'pnml' : '';
@@ -201,6 +234,7 @@ export class ToolbarComponent {
                     this._appComponent.processSourceChange({fileContent: content, fileExtension: fileExtension});
                 });
         }
+        e.target!.value = '';
     }
 
     onZoomButtonClick(id: string) {

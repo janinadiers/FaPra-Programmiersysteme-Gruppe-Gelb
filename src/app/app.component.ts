@@ -29,8 +29,11 @@ export class AppComponent {
         const fileExtensionLowerCase = newSource.fileExtension.toLowerCase();
 
         if (fileExtensionLowerCase === 'pnml') {
+            console.log('pnmllll');
+            
             result = this._pnmlImportService.import(newSource.fileContent);
-
+            console.log('result', result);
+            
 
         } else if (fileExtensionLowerCase === 'json') {
             result = this._parserService.parse(newSource.fileContent);
