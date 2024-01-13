@@ -93,6 +93,8 @@ export class MarkenspielService {
     }
 
     public getPossibleActiveTransitions(): Array<Transition> {
+        
+        
         const startTransitions: Array<Transition> = [];
         const transitions = this._diagram?.transitions;
         const lines = this._diagram?.lines;
@@ -100,7 +102,9 @@ export class MarkenspielService {
         if (transitions && lines) {
             transitions?.forEach((transition) => {
                 const line = lines?.find(line => line.target.id === transition.id);
+                
                 if (this.parentsHaveEnoughTokens(transition.parents, line)) {
+                    
                     transition.isActive = true;
                     startTransitions.push(transition);
                 }
@@ -114,7 +118,8 @@ export class MarkenspielService {
         if (!line) {
             return false;
         }
-
+       
+        
         return places.every((place) => place.amountToken >= line.tokens);
     }
 
@@ -128,6 +133,7 @@ export class MarkenspielService {
 
         transition.parents.forEach((place) => {
             const line = lines?.find(line => line.source.id === place.id);
+            
             this.subtractTokensFromPlace(place, line!.tokens);
         });
 
