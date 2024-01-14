@@ -7,35 +7,36 @@
         </button>
 
         <div class="vertical-line"></div>
-            <button mat-icon-button
+
+             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="circleActiveColor"
                     (click)="toggleCircleButton()">
                 <mat-icon>panorama_fish_eye</mat-icon>
             </button>
 
-            <button mat-icon-button
+            <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="rectActiveColor"
                     (click)="toggleRectangleButton()">
                 <mat-icon>crop_portrait</mat-icon>
             </button>
 
-            <button mat-icon-button
+            <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="arrowActiveColor"
                     (click)="toggleArrowButton()">
                 <mat-icon>north_east</mat-icon>
             </button>
 
-            <button mat-icon-button
+            <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="boltActiveColor"
                     (click)="toggleBoltButton()">
                 <mat-icon>bolt</mat-icon>
             </button>
 
-            <button mat-icon-button
+            <button mat-icon-button *ngIf="!simulationActive"
                 class="add-token tooltip"
                 (click)="addToken()">
                 <span class="tooltiptext">add tokens</span>
@@ -43,22 +44,25 @@
              </button>
 
 
-            <button mat-icon-button
+            <button mat-icon-button *ngIf="!simulationActive"
                     class="remove-token tooltip"
                     (click)="removeToken()">
                 <span class="tooltiptext">remove tokens</span>
                 <mat-icon>remove_circle</mat-icon>
             </button>
+
+            <label *ngIf="simulationActive">{{markenspielText()}}</label>
+
             <div class="vertical-line"></div>
 
-                <button mat-icon-button
+                <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class tooltip"
                     (click)="onButtonClick('deleteLast')">
                     <span class="tooltiptext">delete last</span>
                 <mat-icon>delete</mat-icon>
                 </button>
 
-                <button mat-icon-button
+                <button mat-icon-button *ngIf="!simulationActive"
                         class="hover-class tooltip"
                         (click)="onButtonClick('clear')">
                     <span class="tooltiptext">clear all</span>
