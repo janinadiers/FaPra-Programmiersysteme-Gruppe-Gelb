@@ -1,6 +1,7 @@
 import {Element} from 'src/app/classes/diagram/element';
 import {Coords} from '../json-petri-net';
 import {Transition} from './transition';
+import {Diagram} from './diagram';
 
 export class Line {
 
@@ -13,6 +14,7 @@ export class Line {
     private _svgElement: SVGElement | undefined;
     private _coords?: Coords[];
     private _marker: SVGElement | undefined;
+    private _isDragging = false;
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
         this._id = id;
@@ -77,13 +79,14 @@ export class Line {
     }
 
     private updateSource(updatedPosition: Coords): void {
-
+        
         if (this._svgElement) {
+            
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
                     ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
                         ${this._targetPosition?.y}`);
-            }
+            }            
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
 
             // Markierungen für die Gewichte an die Kante hängen
@@ -103,7 +106,7 @@ export class Line {
     }
 
     private updateTarget(updatedPosition: Coords): void {
-
+        
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
@@ -138,12 +141,13 @@ export class Line {
     public calcMidCoords(): Coords {
         let midCoords: Coords = {x: -50000, y: -50000}; //Placeholder to define Coords variable
 
-        if (this._coords) {
+        if (this.coords) {
             //Calc mid coord of the polyline (Sum the distances between each pair of consecutive points in the polyline)
             let totalLength = 0;
             let lastX = this._source.x;
             let lastY = this._source.y;
-            this._coords.forEach(coord => {
+            
+            this.coords.forEach(coord => {
                 totalLength += Math.hypot(coord.x - lastX, coord.y - lastY);
                 lastX = coord.x;
                 lastY = coord.y;
@@ -154,19 +158,24 @@ export class Line {
             let accumulatedLength = 0;
             lastX = this._source.x;
             lastY = this._source.y;
-            for (let i = 0; i < this._coords.length; i++) {
-                const coord = this._coords[i];
+
+            for (let i = 0; i < this.coords.length; i++) {
+                const coord = this.coords[i];
                 const segmentLength = Math.hypot(coord.x - lastX, coord.y - lastY);
-                if (accumulatedLength + segmentLength >= totalLength / 2) {
-                    const ratio = (totalLength / 2 - accumulatedLength) / segmentLength;
-                    midCoords.x = lastX + ratio * (coord.x - lastX);
-                    midCoords.y = lastY + ratio * (coord.y - lastY);
+                accumulatedLength += segmentLength;
+                if (accumulatedLength  >= totalLength / 2) {
+                    const ratio = (accumulatedLength - (totalLength / 2)) / segmentLength;
+                    midCoords.x = coord.x - ratio * (coord.x - lastX);
+                    midCoords.y = coord.y - ratio * (coord.y - lastY);
                     return midCoords;
                 }
-                accumulatedLength += segmentLength;
                 lastX = coord.x;
                 lastY = coord.y;
             }
+            // If the midpoint wasn't found in the loop, it's at the last segment
+            const ratio = ((totalLength/2) - accumulatedLength) / Math.hypot(this._target.x - lastX, this._target.y - lastY);
+            midCoords.x = lastX + ratio * (this._target.x - lastX);
+            midCoords.y = lastY + ratio * (this._target.y - lastY);
         }
 
         midCoords.x = (this._source.x + this._target.x) / 2;
@@ -191,7 +200,7 @@ export class Line {
         line.setAttribute('fill', 'transparent');
         this._svgElement = line;
 
-        group.appendChild(line);
+        group.appendChild(line);        
 
         let refX: number;
         refX = this.updateMarker();
@@ -245,7 +254,22 @@ export class Line {
 
         this.addHoverEventForBackgroundCircle(backgroundCircle, token);
 
+        // Hier werden Kreise für alle coords mit entsprechenden Eventlistener erstellt, damit man sie bewegen kann
+        if (this.coords) {
+            this.coords.forEach(coord => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', coord.x.toString());
+                circle.setAttribute('cy', coord.y.toString());
+                circle.setAttribute('r', '8');
+                circle.setAttribute('fill', 'transparent');
+                group.appendChild(circle);
+                this.addEventListenersForCoord(circle, this.coords!.indexOf(coord));
+            });
+            
+        }
+
         this._svgElement = group;
+        
         return group;
     }
 
@@ -300,7 +324,7 @@ export class Line {
 
     }
 
-    addHoverEventForBackgroundCircle(backgroundCircle: SVGElement, token: SVGElement) {
+    addHoverEventForBackgroundCircle(backgroundCircle: SVGElement, token: SVGElement) {       
         backgroundCircle.addEventListener('mouseover', () => {
             
             backgroundCircle.setAttribute('fill', 'blue');
@@ -321,8 +345,79 @@ export class Line {
                 }
             }
         })
+        
     }
 
+    removeCoords(): void {
+        this._coords = undefined;
+        this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+
+    }
+
+    addEventListenersForCoord(circle: SVGElement, index:number) {
+        let currentDraggingCircleIndex:number|null = null;
+
+        circle.addEventListener('mousedown', (event) => {
+            event.stopPropagation();
+            this._isDragging = true;
+            currentDraggingCircleIndex = index;
+             
+           
+            
+        });
+        window.addEventListener('mousemove', (event) => {
+            event.stopPropagation();
+            if (!this._isDragging || currentDraggingCircleIndex === null) return;
+
+            if(!this.coords) return;
+            if(this._isDragging){
+                
+                const svgElement = document.getElementById('canvas');
+                const svgContainer = svgElement?.getBoundingClientRect();
+                
+                // Calculate the new coords for the polyline
+                let x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
+                let y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
+                this.coords = this.coords.map((coord, i) => {
+                    if(i === index){
+                        return {x: x, y: y};
+                    }
+                    return coord;
+                });
+                
+                this.svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+            
+                circle?.setAttribute('cx', this.coords[index].x.toString());
+                circle?.setAttribute('cy', this.coords[index].y.toString());
+                
+                // Positionen der Kantengewichte werden mit aktualisiert
+                const midCoords = this.calcMidCoords();
+                const midCircle = this.svgElement?.querySelectorAll('circle')[0]
+                
+                midCircle?.setAttribute('cx', midCoords.x.toString());
+                midCircle?.setAttribute('cy', midCoords.y.toString());
+                this.svgElement?.querySelector('text')?.setAttribute('x', midCoords.x.toString());
+                this.svgElement?.querySelector('text')?.setAttribute('y', midCoords.y.toString());
+                
+            }
+            
+        });
+        window.addEventListener('mouseup', (event) => {
+            event.stopPropagation();
+            this._isDragging = false;  
+            currentDraggingCircleIndex = null;
+             
+        });
+        
+       
+        circle.addEventListener('mouseout', () => {
+            circle.setAttribute('fill', 'transparent');
+        });
+        circle.addEventListener('mouseover', () => {
+            circle.style.cursor = 'grab';
+            circle.setAttribute('fill', 'gray');
+        });
+    }
 
     // Might be needed for "Markenspiel"
     // public registerSvg(svg: SVGElement) {

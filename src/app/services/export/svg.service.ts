@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Element} from '../classes/diagram/element';
-import {Place} from "../classes/diagram/place";
-import {Transition} from "../classes/diagram/transition";
-import {Line} from "../classes/diagram/line";
-import {DisplayService} from "./display.service";
+import {Element} from '../../classes/diagram/element';
+import {Place} from "../../classes/diagram/place";
+import {Transition} from "../../classes/diagram/transition";
+import {Line} from "../../classes/diagram/line";
+import {DisplayService} from "../display.service";
 
 @Injectable({
     providedIn: 'root'
@@ -57,7 +57,6 @@ export class SvgService {
 
 
         svgElement += `</svg>`;
-        console.log(svgElement);
         
 
         return svgElement;

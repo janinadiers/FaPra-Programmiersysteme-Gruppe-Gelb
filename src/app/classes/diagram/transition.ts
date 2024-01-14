@@ -86,15 +86,6 @@ export class Transition extends Element {
         rect.setAttribute('stroke-width', '2');
         group.appendChild(rect);
 
-        //Marker
-        // const marker = super.createSVG('text');
-        // marker.setAttribute('x', this.x.toString());
-        // marker.setAttribute('y', this.y.toString());
-        // marker.setAttribute('text-anchor', 'middle');
-        // marker.setAttribute('dy', '.3em');
-        // marker.textContent = this._amountToken.toString();
-        // group.appendChild(marker);
-
         //Text
         const text = super.createSVG('text');
         text.setAttribute('text-anchor', 'middle');
@@ -108,6 +99,4 @@ export class Transition extends Element {
         super.registerSvg(group);
         return group;
     }
-
-
 }

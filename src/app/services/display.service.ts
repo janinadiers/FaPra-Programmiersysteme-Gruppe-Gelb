@@ -27,6 +27,7 @@ export class DisplayService implements OnDestroy {
 
     public display(net: Diagram) {
         this._diagram$.next(net);
+
     }
 
 }
