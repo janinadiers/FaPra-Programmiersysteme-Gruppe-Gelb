@@ -194,6 +194,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     private clearDrawingArea(clearElements?: boolean) {
+
         
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
