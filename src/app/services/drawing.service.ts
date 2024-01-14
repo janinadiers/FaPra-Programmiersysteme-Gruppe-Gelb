@@ -20,14 +20,14 @@ export class DrawingService {
     private simulationActive: boolean = false;
     private simulationStatus: number = 0;
 
-    constructor(private diplayService: DisplayService,
+    constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
                 private _markenspielService: MarkenspielService
                 )
     {
 
-        this.diplayService.diagram$.subscribe(diagram => {
+        this.displayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
         });
@@ -50,7 +50,7 @@ export class DrawingService {
     circleActive: boolean = false;
     activeCircleId: String = "";
     lineActive: boolean = false;
-    acitveLineId: String = "";
+    activeLineId: String = "";
 
     // Kreise zeichnen bzw. Stellen anlegen
     drawCircle(mouseX: number, mouseY: number) {
@@ -73,13 +73,13 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place) {
-        this.circleActive = !this.circleActive;
+        this._diagram!.selectedCircle = circle;
 
         if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
             return
         }
 
-        this._diagram!.selectedCircle = circle;
+        this.circleActive = !this.circleActive;
 
         if(this.circleActive || this.activeCircleId != circle.id){
             this.circleActive = true;
@@ -108,8 +108,9 @@ export class DrawingService {
         if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
-        } else
+        } else{
             return;
+        }
     }
 
     // Rechtecke zeichnen bzw. Transitionen anlegen
@@ -261,16 +262,15 @@ export class DrawingService {
 
     onLineSelect(line: Line) {
         this._diagram!.selectedLine = line;
+        this.lineActive = !this.lineActive
 
         if (Diagram.drawingIsActive) {
             return
         }
 
-        this.lineActive = !this.lineActive
-
-        if(this.lineActive || line.id != this.acitveLineId){
+        if(this.lineActive || line.id != this.activeLineId){
             this.lineActive = true;
-            this.acitveLineId = line.id
+            this.activeLineId = line.id
 
             this.changeTokenButtonColor('blue');
             // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
@@ -284,7 +284,7 @@ export class DrawingService {
         }
         else {
             this.lineActive = false;
-            this.acitveLineId = line.id;
+            this.activeLineId = line.id;
 
             this.changeTokenButtonColor('black');
             this.deselectPlacesAndLines();
@@ -293,7 +293,7 @@ export class DrawingService {
             line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'black');
             line.svgElement!.querySelector('path')!.setAttribute('fill', 'black');
         }
-        
+
         return;
     }
 
