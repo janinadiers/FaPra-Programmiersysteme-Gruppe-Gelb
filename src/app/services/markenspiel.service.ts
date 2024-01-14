@@ -14,7 +14,6 @@ import {Line} from "../classes/diagram/line";
 export class MarkenspielService {
 
     private _diagram: Diagram | undefined;
-    private _steps: boolean = false;
 
     constructor(
         private diplayService: DisplayService) {
@@ -141,11 +140,8 @@ export class MarkenspielService {
 
     // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
     public showStep(startTransitions: Array<Transition>) {
-        this._steps = !this._steps;
-
-        if(this._steps){
-            startTransitions.reverse();
-        }
+        // startTransitions wird mit dem Fisher-Yates-Shuffle zufällig angeordnet
+        startTransitions = this.shuffle(startTransitions);
 
         const transitions = this.getPossibleActiveTransitions();
         const lines = this._diagram?.lines;
@@ -214,5 +210,20 @@ export class MarkenspielService {
 
     public setTransitionColor(transition: Transition, color: string): void {
         transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
+    }
+
+    private shuffle(startTransitions: Array<Transition>) {
+
+        let m = startTransitions.length, t, i;
+
+        while(m) {
+            i = Math.floor(Math.random()*m--);
+
+            t = startTransitions[m];
+            startTransitions[m] = startTransitions[i];
+            startTransitions[i] = t;
+        }
+
+        return startTransitions;
     }
 }
