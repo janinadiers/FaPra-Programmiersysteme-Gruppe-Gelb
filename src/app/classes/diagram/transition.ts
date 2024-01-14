@@ -7,6 +7,7 @@ export class Transition extends Element {
     private _width: number;
     private _height: number;
     private _children: Array<Place>;
+    private _parents: Array<Place>;
     private _label: string;
 
     constructor(id: string, x: number, y: number, label?: string) {
@@ -15,6 +16,7 @@ export class Transition extends Element {
         this._width = 20;
         this._height = 40;
         this._children = [];
+        this._parents = [];
         this._label = label ?? '';
     }
 
@@ -56,6 +58,14 @@ export class Transition extends Element {
 
     set children(object: Place) {
         this._children.push(object);
+    }
+
+    get parents(): Array<Place> {
+        return this._parents;
+    }
+
+    set parents(place: Place) {
+        this._parents.push(place);
     }
 
     override createSVG(){

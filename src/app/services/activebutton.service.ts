@@ -60,7 +60,6 @@ private zoomButtonClickSubject = new Subject<string>();
     this.isArrowButtonActive = false;
     this.isBoltButtonActive = false;
     this.isReachButtonActive = !this.isReachButtonActive;
-    console.log(this.isReachButtonActive);
   }
 
 

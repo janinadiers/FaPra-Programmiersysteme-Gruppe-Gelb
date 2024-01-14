@@ -127,7 +127,6 @@ export class ToolbarComponent {
         this.arrowActiveColor = false;
         this.boltActiveColor =  false;
         this.reachabilityActiveColor = !this.reachabilityActiveColor;
-        console.log(this.reachabilityActiveColor);
     }
 
     onAlgorithmSelect() {

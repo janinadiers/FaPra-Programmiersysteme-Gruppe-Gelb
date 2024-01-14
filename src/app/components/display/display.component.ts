@@ -7,6 +7,7 @@ import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import { ActivebuttonService } from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
+import { ReachabilityGraph } from 'src/app/classes/diagram/reachability-graph';
 
 @Component({
     selector: 'app-display',
@@ -243,6 +244,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onCanvasClick(event: MouseEvent) {
+
+        console.log(this._diagram);
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
@@ -353,9 +356,17 @@ export class DisplayComponent implements OnInit, OnDestroy {
         if (this.activeButtonService.isReachButtonActive){
 
             this.clearDrawingArea();
+
+            let graph = new ReachabilityGraph(this._diagram!);
+
+            graph.createReachabilityGraph();
+
         }
 
       else{
+
+            this.clearDrawingArea();
+
             this._diagram!.places.forEach(place => {
                 let svgPlace = place.createSVG();
                 svgElement?.appendChild(svgPlace);
@@ -372,8 +383,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
               });
 
 
-
-            console.log("Else");
         }
     }
 }
