@@ -322,7 +322,7 @@ export class ToolbarComponent {
                 this._markenspielService.setTransitionColor(transition, 'violet');
             });
 
-            this._markenspielService.showStep(startTransitions);
+            this._markenspielService.showStep();
 
             this.simulationStatus = 0;
         }

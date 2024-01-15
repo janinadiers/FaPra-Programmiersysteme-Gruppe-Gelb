@@ -74,7 +74,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
-                
+
                 if(!element.svgElement) {return}
                 this._drawingService.onLineSelect(element);
             });
@@ -86,6 +86,15 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     return
                 }
                 this._drawingService.onRectSelect(element);
+            });
+        });
+
+        this._diagram?.transitions.forEach((element) => {
+            element.svgElement?.addEventListener(('dblclick'), () => {
+                if (!element.svgElement) {
+                    return
+                }
+                this._drawingService.startSimulation(element);
             });
         });
     }
@@ -324,7 +333,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 this._diagram.lightningCount--;
             }
         }
-       
+
     }
 
     handleRightClick(event: MouseEvent) {

@@ -26,7 +26,7 @@ export class DrawingService {
                 private _markenspielService: MarkenspielService
                 )
     {
-    
+
         this.diplayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
@@ -57,7 +57,7 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
-        
+
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement!.addEventListener('click', () => {
@@ -69,7 +69,7 @@ export class DrawingService {
 
     onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
-        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
+        if (Diagram.drawingIsActive || Diagram.algorithmIsActive || this.simulationActive) {
             return
         }
 
@@ -126,6 +126,7 @@ export class DrawingService {
         }
 
         if(this.simulationStatus == 1) {
+
             const transitions = this._markenspielService.fireTransition(rectObject!);
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
@@ -140,19 +141,15 @@ export class DrawingService {
 
         if(this.simulationStatus == 2){
 
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'violet');
-            });
-
-            const activeTransitions = this._markenspielService.showStep(startTransitions);
+            let activeTransitions = this._markenspielService.showStep();
 
             activeTransitions.forEach((transition) => {
                 this._markenspielService.fireSingleTransition(transition);
             });
 
-            this._markenspielService.showStep(this._markenspielService.getPossibleActiveTransitions());
+            this._markenspielService.shuffle(this._diagram!.transitions);
+
+            activeTransitions = this._markenspielService.showStep();
         }
     }
 
@@ -202,7 +199,7 @@ export class DrawingService {
                     }
                 }
                 svgLine?.addEventListener(('click'), () => {
-                    if(svgLine){              
+                    if(svgLine){
                         this.onLineSelect(lineObject!);
                     }
                 });
@@ -222,7 +219,7 @@ export class DrawingService {
                     if (svgElement.firstChild) {
                         svgElement.insertBefore(svgLine!, svgElement.firstChild);
                     }
-                }           
+                }
                 svgLine?.addEventListener(('click'), () => {
                     if (svgLine != undefined) {
                         this.onLineSelect(lineObject!);
@@ -237,7 +234,7 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
-        
+
         this._diagram!.selectedLine = line;
 
         if (Diagram.drawingIsActive) {
@@ -259,6 +256,10 @@ export class DrawingService {
 
     // Farbänderungen in der Toolbar
     changeTokenButtonColor(color: string) {
+        if(this.simulationStatus == 1 || this.simulationStatus == 2){
+            return;
+        }
+
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = color;
