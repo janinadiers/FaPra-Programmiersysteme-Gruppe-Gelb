@@ -15,6 +15,7 @@ import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
 import {transition} from "@angular/animations";
 import {Transition} from "../../classes/diagram/transition";
+import {SugiyamaService} from "../../services/sugiyama.service";
 
 @Component({
     selector: 'app-toolbar',
@@ -52,13 +53,12 @@ export class ToolbarComponent {
                 public _markenspielService: MarkenspielService,
                 private _springEmbedderService: SpringEmbedderService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
-                private _drawingService: DrawingService
+                private _drawingService: DrawingService,
+                private _sugiyamaService: SugiyamaService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
             this.onAlgorithmSelect();
-            
-            
         });
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
@@ -119,7 +119,9 @@ export class ToolbarComponent {
         this.deselectAddAndRemoveTokenButtons();
     }
 
-    onAlgorithmSelect() {
+    onAlgorithmSelect() {        
+        if (this._diagram == undefined)
+            return;
         
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
         const selectedAlgorithm = selectElement?.value; 
@@ -132,6 +134,7 @@ export class ToolbarComponent {
 
         }
         else if(selectedAlgorithm === 'sugiyama'){
+            this._sugiyamaService.begin(this._diagram);
             this._springEmbedderService.teardown();
             
         }
