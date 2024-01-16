@@ -30,7 +30,7 @@ export class PnmlImportService {
         let arcs = this.importArcs(rawData, [...places, ...transitions]);
         // set children and parents for places and transitions
         this.setChildrenAndParents(arcs);
-        
+
         return new Diagram([...places], [...transitions], [...arcs]);
 
     }
@@ -51,7 +51,7 @@ export class PnmlImportService {
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
-            
+
             result.push(placeElement);
         });
 
@@ -95,10 +95,10 @@ export class PnmlImportService {
 
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
             const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
-            arcElement.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
+            arcElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onLineSelect(arcElement);
             });
-           
+
             lines.push(arcElement);
         });
        return lines;
@@ -209,18 +209,18 @@ export class PnmlImportService {
         lines.forEach((line) => {
             const source = line.source;
             const target = line.target;
-            
+
             if(source instanceof Place && target instanceof Transition){
                 source.children.push(target);
                 target.parents.push(source);
-            
+
             }
             if(source instanceof Transition && target instanceof Place){
                 source.children.push(target);
                 target.parents.push(source);
-            
+
             }
-            
+
         });
     }
 

@@ -164,19 +164,14 @@ export class DrawingService {
 
         if(this.simulationStatus == 2){
 
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'violet');
-            });
-
-            const activeTransitions = this._markenspielService.showStep(startTransitions);
+            let activeTransitions = this._markenspielService.showStep();
 
             activeTransitions.forEach((transition) => {
                 this._markenspielService.fireSingleTransition(transition);
             });
 
-            this._markenspielService.showStep(this._markenspielService.getPossibleActiveTransitions());
+            this._markenspielService.shuffle(this._diagram!.transitions);
+            activeTransitions = this._markenspielService.showStep();
         }
     }
 
