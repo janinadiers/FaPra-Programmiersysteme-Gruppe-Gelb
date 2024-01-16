@@ -20,14 +20,14 @@ export class DrawingService {
     private simulationActive: boolean = false;
     private simulationStatus: number = 0;
 
-    constructor(private diplayService: DisplayService,
+    constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
                 private _markenspielService: MarkenspielService
                 )
     {
 
-        this.diplayService.diagram$.subscribe(diagram => {
+        this.displayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
         });
@@ -46,6 +46,11 @@ export class DrawingService {
             }
         }));
     }
+
+    circleActive: boolean = false;
+    activeCircleId: String = "";
+    lineActive: boolean = false;
+    activeLineId: String = "";
 
     // Kreise zeichnen bzw. Stellen anlegen
     drawCircle(mouseX: number, mouseY: number) {
@@ -69,24 +74,43 @@ export class DrawingService {
 
     onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
-        if (Diagram.drawingIsActive || Diagram.algorithmIsActive || this.simulationActive) {
+
+        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
             return
         }
 
-        this.changeTokenButtonColor('red');
+        this.circleActive = !this.circleActive;
 
-        // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
-        this.deselectPlacesAndLines();
-        circle.svgElement!.children[0].setAttribute('stroke', 'red');
-        circle.svgElement!.children[2].setAttribute('stroke', 'red');
-        circle.svgElement!.children[0].setAttribute('stroke-width', '2');
-        circle.svgElement!.children[1].setAttribute('stroke', 'red');
+        if(this.circleActive || this.activeCircleId != circle.id){
+            this.circleActive = true;
+            this.activeCircleId = circle.id;
+            this.changeTokenButtonColor('red');
+
+            // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
+            this.deselectPlacesAndLines();
+            circle.svgElement!.children[0].setAttribute('stroke', 'red');
+            circle.svgElement!.children[2].setAttribute('stroke', 'red');
+            circle.svgElement!.children[0].setAttribute('stroke-width', '2');
+            circle.svgElement!.children[1].setAttribute('stroke', 'red');
+        } else {
+            this.activeCircleId = circle.id;
+            this.circleActive = false;
+            this.changeTokenButtonColor('black');
+
+            // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
+            this.deselectPlacesAndLines();
+            circle.svgElement!.children[0].setAttribute('stroke', 'black');
+            circle.svgElement!.children[2].setAttribute('stroke', 'black');
+            circle.svgElement!.children[0].setAttribute('stroke-width', '2');
+            circle.svgElement!.children[1].setAttribute('stroke', 'black');
+        }
 
         if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
-        } else
+        } else{
             return;
+        }
     }
 
     // Rechtecke zeichnen bzw. Transitionen anlegen
@@ -126,7 +150,6 @@ export class DrawingService {
         }
 
         if(this.simulationStatus == 1) {
-
             const transitions = this._markenspielService.fireTransition(rectObject!);
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
@@ -141,15 +164,19 @@ export class DrawingService {
 
         if(this.simulationStatus == 2){
 
-            let activeTransitions = this._markenspielService.showStep();
+            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+
+            startTransitions.forEach((transition) => {
+                this._markenspielService.setTransitionColor(transition, 'violet');
+            });
+
+            const activeTransitions = this._markenspielService.showStep(startTransitions);
 
             activeTransitions.forEach((transition) => {
                 this._markenspielService.fireSingleTransition(transition);
             });
 
-            this._markenspielService.shuffle(this._diagram!.transitions);
-
-            activeTransitions = this._markenspielService.showStep();
+            this._markenspielService.showStep(this._markenspielService.getPossibleActiveTransitions());
         }
     }
 
@@ -236,20 +263,37 @@ export class DrawingService {
     onLineSelect(line: Line) {
 
         this._diagram!.selectedLine = line;
+        this.lineActive = !this.lineActive
 
         if (Diagram.drawingIsActive) {
             return
         }
-        this.changeTokenButtonColor('blue');
 
-        // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
-        this.deselectPlacesAndLines();
+        if(this.lineActive || line.id != this.activeLineId){
+            this.lineActive = true;
+            this.activeLineId = line.id
 
-        line.svgElement!.querySelector('text')!.setAttribute('stroke', 'blue');
-        line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'blue');
-        line.svgElement!.querySelector('path')!.setAttribute('fill', 'blue');
-        // line.svgElement!.children[2].setAttribute('stroke', 'blue');
-        // line.svgElement!.children[2].setAttribute('stroke-width', '2');
+            this.changeTokenButtonColor('blue');
+            // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
+            this.deselectPlacesAndLines();
+
+            line.svgElement!.querySelector('text')!.setAttribute('stroke', 'blue');
+            line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'blue');
+            line.svgElement!.querySelector('path')!.setAttribute('fill', 'blue');
+            // line.svgElement!.children[2].setAttribute('stroke', 'blue');
+            // line.svgElement!.children[2].setAttribute('stroke-width', '2');
+        }
+        else {
+            this.lineActive = false;
+            this.activeLineId = line.id;
+
+            this.changeTokenButtonColor('black');
+            this.deselectPlacesAndLines();
+
+            line.svgElement!.querySelector('text')!.setAttribute('stroke', 'black');
+            line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'black');
+            line.svgElement!.querySelector('path')!.setAttribute('fill', 'black');
+        }
 
         return;
     }
