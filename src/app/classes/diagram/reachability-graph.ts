@@ -1,7 +1,6 @@
 import { Diagram } from './diagram';
 import { Transition } from './transition';
 import { State } from './state';
-import { Place } from './place';
 import { Line } from './line';
 
 
@@ -36,8 +35,6 @@ export class ReachabilityGraph {
           } while (this._currentState.length > 0 || this._newStates.length > 0);
 
           this.drawGraph();
-          console.log("Finished! There are " + this._visited.length +" States.");
-          console.log(this._visited, this._currentState, this._newStates);
           
     }
   
@@ -104,7 +101,6 @@ export class ReachabilityGraph {
                     let placeToken = this._currentState[0].state.get(line.source.id)
                     if (placeToken! >= line.tokens){
                         placesWithEnoughTokens++;
-                        console.log("placeswithenoghtokens="+ placesWithEnoughTokens);
                     }
                 });
 
@@ -149,13 +145,10 @@ export class ReachabilityGraph {
         // Tokens im Nachbereich hinzufügen
        connectedLines.forEach(line => {
             let placeID = line.target.id;
-            console.log(line.target.id);
             let placeToken = currentState.state.get(placeID);
-            console.log(placeToken); 
             
             placeToken = placeToken! + line.tokens;
             state.set(placeID, placeToken);    
-            console.log(placeID, placeToken);
         });
         connectedLines.splice(0, connectedLines.length);
         
@@ -165,8 +158,6 @@ export class ReachabilityGraph {
 
         newState.parents = currentState;
         currentState.children = newState ;
-
-        console.log(newState);
 
         newState.x = this._currentState[0].x + 140;
         newState.y = this._currentState[0].y;
@@ -192,22 +183,37 @@ export class ReachabilityGraph {
     }
 
     seperateNodes(){
-
+        // Aufeinander liegende SVG Kreise verschieben
         let offset: number = 40;  
 
-       for (let i = 0; i < this.sameLevel.length; i++){
+        if (this.iteration === 1){
 
-            this.sameLevel[i].y = this.sameLevel[i].parents[0].y + (offset);
-
+            for (let i = 0; i < this.sameLevel.length; i++){
+                this.sameLevel[i].y = this.sameLevel[i].parents[0].y + (offset);
                 offset = offset * (-1);
-
-              let m: number = 1;
-              
-              if (i == m){
+                
+                let m: number = 1;
+                if (i == m){
                     offset = offset + 40;
-                    m = m +2
+                     m = m +2
+                }   
+            }  
+
+        }
+        else{
+            for (let i = 1; i < this.sameLevel.length; i++){
+                
+                if( this.sameLevel[i].y < 180 ){
+
+                    this.sameLevel[i].y = this.sameLevel[i].parents[0].y - offset;
                 }
-       }
+                else{
+                    this.sameLevel[i].y = this.sameLevel[i].parents[0].y + offset;
+                }
+                offset = offset + 40;
+            }
+        }
        this.sameLevel.splice(0, this.sameLevel.length);
-    }      
+
+    }
 }

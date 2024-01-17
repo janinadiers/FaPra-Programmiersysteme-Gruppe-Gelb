@@ -248,7 +248,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     onCanvasClick(event: MouseEvent) {
 
-        console.log(this._diagram);
+        //console.log(this._diagram);
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
