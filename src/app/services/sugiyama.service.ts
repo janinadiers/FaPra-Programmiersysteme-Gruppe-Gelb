@@ -14,8 +14,8 @@ export class SugiyamaService {
         this.diagram = diagram;
         this.addLayers();
         this.reduceCrossings();
+        this.pseudoLayers(); //TODO
         this.assignCoordinates();
-        this.routeEdges(); //TODO
     }
 
     // Step 1: BFS (Breadth-first search) for layer assignment
@@ -60,7 +60,7 @@ export class SugiyamaService {
         }
     }
 
-    // Step 2: Reduce crossings using the barycenter heuristic
+    // Step 2: Reduce crossings using the barycenter heuristic - nN. for basic petrinet
     reduceCrossings() {
         let improved = true;
         let iterationCount = 0;
@@ -82,7 +82,12 @@ export class SugiyamaService {
         }
     }
 
-    // Step 3: Assign coordinates to each element
+    // Step 3: Edge Routing
+    pseudoLayers() {
+        // Route edges as PolyLine 
+    }
+
+    // Step 4: Assign coordinates to each element
     assignCoordinates() {
         const layerWidth  = 200;
         const nodeHeight  = 100;
@@ -91,18 +96,19 @@ export class SugiyamaService {
             let layer = this.layers[i];
             for (let j = 0; j < layer.length; j++) {
                 let elementID = layer[j].id;
-                let places = this.diagram.places.find((place) => place.id == elementID);
-                places?.updateGroup({x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight});
+                this.diagram.places.find((place) => place.id == elementID)?.
+                    updateGroup(
+                        {x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
+                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight}
+                    );
                 
-                let transitions = this.diagram.transitions.find((transition) => transition.id == elementID);
-                transitions?.updateGroup({x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight});
+                this.diagram.transitions.find((transition) => transition.id == elementID)?.
+                    updateGroup(
+                        {x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
+                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight}
+                    );
             }
         }
-    }
-
-    // Step 4: Edge Routing
-    routeEdges() {
-        // Route edges as PolyLine 
     }
 
     private getConnectedElements(elem: Element): Element[] {
