@@ -140,8 +140,6 @@ export class MarkenspielService {
 
     // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
     public showStep(startTransitions: Array<Transition>) {
-        // startTransitions wird mit dem Fisher-Yates-Shuffle zufällig angeordnet
-        startTransitions = this.shuffle(startTransitions);
 
         const transitions = this.getPossibleActiveTransitions();
         const lines = this._diagram?.lines;
@@ -210,20 +208,5 @@ export class MarkenspielService {
 
     public setTransitionColor(transition: Transition, color: string): void {
         transition.svgElement?.querySelector('rect')!.setAttribute('fill', color);
-    }
-
-    private shuffle(startTransitions: Array<Transition>) {
-
-        let m = startTransitions.length, t, i;
-
-        while(m) {
-            i = Math.floor(Math.random()*m--);
-
-            t = startTransitions[m];
-            startTransitions[m] = startTransitions[i];
-            startTransitions[i] = t;
-        }
-
-        return startTransitions;
     }
 }
