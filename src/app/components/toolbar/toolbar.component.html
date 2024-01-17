@@ -1,9 +1,19 @@
 <mat-toolbar class="toolbar">
     <div class="left-toolbar">
+        
+        <button mat-icon-button 
+                class="play tooltip" 
+                (click)="toggleSimulation()">
+                <span class="tooltiptext">start simulation</span>
+                <mat-icon>play_circle</mat-icon>
+        </button>
 
-        <button mat-icon-button class="play tooltip" (click)="toggleSimulation(); onButtonClick('simulate')">
-            <span class="tooltiptext">start simulation</span>
-            <mat-icon>play_circle</mat-icon>
+        <button mat-icon-button 
+                class="hover-class tooltip"
+                [class.active]="reachabilityActiveColor"
+                (click)="onButtonClick('reachabilityGraph')">
+                <span class="tooltiptext">reachability graph</span>
+            <mat-icon>share</mat-icon>
         </button>
 
         <div class="vertical-line"></div>
