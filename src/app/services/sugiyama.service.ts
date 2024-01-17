@@ -97,14 +97,14 @@ export class SugiyamaService {
             for (let j = 0; j < layer.length; j++) {
                 let elementID = layer[j].id;
                 this.diagram.places.find((place) => place.id == elementID)?.
-                    updateGroup(
-                        {x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
+                    updateGroup({
+                        x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
                         y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight}
                     );
                 
                 this.diagram.transitions.find((transition) => transition.id == elementID)?.
-                    updateGroup(
-                        {x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
+                    updateGroup({
+                        x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
                         y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight}
                     );
             }
