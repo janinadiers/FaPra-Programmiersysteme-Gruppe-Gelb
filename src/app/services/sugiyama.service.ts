@@ -13,8 +13,9 @@ export class SugiyamaService {
     public begin(diagram: Diagram) {
         this.diagram = diagram;
         this.addLayers();
+        this.removeLowerDirectedLines();//TODO
         this.reduceCrossings();
-        this.pseudoLayers(); //TODO
+        this.routeEdges(); //TODO
         this.assignCoordinates();
     }
 
@@ -60,13 +61,65 @@ export class SugiyamaService {
         }
     }
 
-    // Step 2: Reduce crossings using the barycenter heuristic - nN. for basic petrinet
+    // Step 2: Reorder layers based on connections
+    removeLowerDirectedLines() {
+        // check if line is directed towards lower layer, if yes -> set target on layer above (loop)
+
+        // while loop
+        // loop through layer-Elements and 
+        let reset: boolean = false;
+        let counter = 0;
+        while(!reset) {
+            reset = false;
+            for (let i = 0; i < this.layers.length; i++) {
+                let layer = this.layers[i];
+                for (let j = 0; j < layer.length; j++) {
+                    console.log('i: ' + i + ' - j: ' + j);
+                    // check attached outgoing lines
+                    let elementID = layer[j].id;
+                    let currentLines = this.diagram.lines.filter((line) => line.source.id == elementID);
+                    currentLines.forEach(currentLine => {
+                        if (i > 0) {
+                            // if target is on lower layer -> set target on layer above (+1) 
+                            let target = this.layers[i-1].find((target) => target.id == currentLine?.target.id);
+                            if (target) {
+                                let movedLayer: boolean = false;
+                                if (this.layers[i+1]) {
+                                    //add target to layer[i+1]
+                                    this.layers[i+1].push(target);
+                                    
+                                    reset = true;
+                                    // movedLayer = true;
+                                } else {
+                                    //create new layer and add target to layer[i+1]
+                                    let newLayer: Element[] = [];
+                                    newLayer.push(target);
+                                    this.layers.push(newLayer);
+    
+                                    reset = true;
+                                    // movedLayer = true;
+                                }
+                                // if (movedLayer) {
+                                //     // layer.splice(j, 1);
+                                //     // layer.splice(j);
+                                //     //remove target from layer[i-1]
+                                //     //reset and start from first layer again
+                                //     reset = true;
+                                // }
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    // Step 3: Reduce crossings using the barycenter heuristic - nN. for basic petrinet
     reduceCrossings() {
         let improved = true;
         let iterationCount = 0;
-        const maxIterations = 100;
 
-        while (improved && iterationCount < maxIterations) {
+        while (improved && iterationCount < 100) {
             improved = false; // Reset flag for this iteration
             iterationCount++;
 
@@ -82,14 +135,14 @@ export class SugiyamaService {
         }
     }
 
-    // Step 3: Edge Routing
-    pseudoLayers() {
-        // Route edges as PolyLine 
+    // Step 4: Edge Routing
+    routeEdges() {
+        // Route edges as PolyLine (add line-points on Layer)
     }
 
-    // Step 4: Assign coordinates to each element
+    // Step 5: Assign coordinates to each element
     assignCoordinates() {
-        const layerWidth  = 200;
+        const layerWidth  = 100;
         const nodeHeight  = 100;
 
         for (let i = 0; i < this.layers.length; i++) {
@@ -99,14 +152,14 @@ export class SugiyamaService {
                 this.diagram.places.find((place) => place.id == elementID)?.
                     updateGroup({
                         x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
-                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight}
-                    );
+                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight
+                    });
                 
                 this.diagram.transitions.find((transition) => transition.id == elementID)?.
                     updateGroup({
                         x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
-                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight}
-                    );
+                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight
+                    });
             }
         }
     }
