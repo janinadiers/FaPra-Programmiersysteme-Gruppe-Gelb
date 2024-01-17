@@ -6,27 +6,23 @@ import { Diagram } from 'src/app/classes/diagram/diagram';
     providedIn: 'root',
 })
 
-
 export class SugiyamaService {
     diagram: Diagram = new Diagram([], []);
     layers: Element[][] = [];
 
-
     public begin(diagram: Diagram) {
         this.diagram = diagram;
         this.addLayers();
-        this.reduceCrossings(); //TODO
+        this.reduceCrossings();
         this.assignCoordinates();
         this.routeEdges(); //TODO
     }
-
 
     // Step 1: BFS (Breadth-first search) for layer assignment
     addLayers() {
         this.layers = []; 
         let visited = new Set<Element>(); // To keep track of visited nodes
         let queue: Element[] = [];
-
 
         //Convert initialLayer of Place[] to Element[]
         //let initialLayer: Element[] = this.diagram.lines.filter((line) => line.target.id == 't1').map(line => line.source as unknown as Element); // Assumption that a Petrinet's first Transition is t1
@@ -39,16 +35,13 @@ export class SugiyamaService {
             queue.push(elem);
         });
 
-
         // Continue with alternating layers of transitions and places
         while (queue.length > 0) {
             let currentLayer: Element[] = [];
             let nextQueue: Element[] = [];
 
-
             for (let elem of queue) {
                 let connectedElements = this.getConnectedElements(elem).filter(e => !visited.has(e));
-
 
                 for (let connectedElem of connectedElements) {
                     if (!visited.has(connectedElem)) {
@@ -59,16 +52,13 @@ export class SugiyamaService {
                 }
             }
 
-
             if (currentLayer.length > 0) {
                 this.layers.push(currentLayer); // Add new layer
             }
 
-
             queue = nextQueue; // Prepare next layer
         }
     }
-
 
     // Step 2: Reduce crossings using the barycenter heuristic
     reduceCrossings() {
@@ -76,18 +66,14 @@ export class SugiyamaService {
         let iterationCount = 0;
         const maxIterations = 100;
 
-
         while (improved && iterationCount < maxIterations) {
             improved = false; // Reset flag for this iteration
             iterationCount++;
-            console.log(iterationCount);
-
 
             // Perform one downward sweep (top to bottom)
             for (let i = 0; i < this.layers.length - 1; i++) {
                 improved = this.orderLayerByBarycenter(this.layers[i], this.layers[i + 1]) || improved;
             }
-
 
             // Perform one upward sweep (bottom to top)
             for (let i = this.layers.length - 1; i > 0; i--) {
@@ -96,12 +82,10 @@ export class SugiyamaService {
         }
     }
 
-
     // Step 3: Assign coordinates to each element
     assignCoordinates() {
         const layerWidth  = 200;
         const nodeHeight  = 100;
-
 
         for (let i = 0; i < this.layers.length; i++) {
             let layer = this.layers[i];
@@ -116,12 +100,10 @@ export class SugiyamaService {
         }
     }
 
-
     // Step 4: Edge Routing
     routeEdges() {
         // Route edges as PolyLine 
     }
-
 
     private getConnectedElements(elem: Element): Element[] {
         // This will hold the connected elements
@@ -140,10 +122,8 @@ export class SugiyamaService {
             }
         });
 
-
         return connectedElements;
     }
-
 
     // Helper function to order a layer by the barycenter heuristic
     orderLayerByBarycenter(currentLayer: Element[], adjacentLayer: Element[]): boolean {
@@ -155,19 +135,15 @@ export class SugiyamaService {
             return averagePosition;
         });
 
-
         // Create a list of elements with their barycenters and original indices
         let indexedBarycenters = barycenters.map((barycenter, index) => ({ barycenter, index }));
-
 
         // Sort by barycenter
         indexedBarycenters.sort((a, b) => a.barycenter - b.barycenter);
 
-
         // Reorder elements in the current layer according to sorted barycenters
         let newOrder = indexedBarycenters.map(bc => currentLayer[bc.index]);
         let hasChanged = !newOrder.every((elem, idx) => elem === currentLayer[idx]);
-
 
         // Update current layer order if there was a change
         if (hasChanged) {
@@ -176,28 +152,8 @@ export class SugiyamaService {
             }
         }
 
-
         return hasChanged;
     }
-
-
-    // Utility function to swap two elements in a layer
-    // swapElements(layer: Element[], index1: number, index2: number) {
-    //     let temp = layer[index1];
-    //     layer[index1] = layer[index2];
-    //     layer[index2] = temp;
-    // }
-
-
-    // Function to count crossings between two layers
-    // countCrossings(layer1: Element[], layer2: Element[]): number {
-    //     let crossings = 0;
-    //     // ... Implement logic to count crossings based on connections ...
-    //     return crossings;
-    // }
-
-
-
 
 
 
