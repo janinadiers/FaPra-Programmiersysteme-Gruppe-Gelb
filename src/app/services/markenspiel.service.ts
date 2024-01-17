@@ -14,7 +14,6 @@ import {Line} from "../classes/diagram/line";
 export class MarkenspielService {
 
     private _diagram: Diagram | undefined;
-    private _steps: boolean = false;
 
     constructor(
         private diplayService: DisplayService) {
@@ -160,11 +159,6 @@ export class MarkenspielService {
 
     // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
     public showStep(startTransitions: Array<Transition>) {
-        this._steps = !this._steps;
-
-        if(this._steps){
-            startTransitions.reverse();
-        }
 
         const transitions = this.getPossibleActiveTransitions();
         const lines = this._diagram?.lines;

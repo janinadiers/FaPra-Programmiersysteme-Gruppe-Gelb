@@ -15,6 +15,7 @@ import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
 import {transition} from "@angular/animations";
 import {Transition} from "../../classes/diagram/transition";
+import {template} from "lodash";
 
 @Component({
     selector: 'app-toolbar',
@@ -57,13 +58,13 @@ export class ToolbarComponent {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
             this.onAlgorithmSelect();
-            
-            
+
+
         });
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
-        
-       
+
+
     }
 
     rectActiveColor: boolean = false;
@@ -73,6 +74,21 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+
+    ngOnInit() {
+        let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
+        this.simulationStatus = 0;
+
+        simulationButton.style.color = 'black';
+        this._drawingService.setSimulationStatus(this.simulationStatus);
+
+        this._diagram?.transitions.forEach((transition) => {
+            this._markenspielService.setTransitionColor(transition, 'black');
+            transition.isActive = false;
+        });
+
+        this.simulationStatus = 1;
+    }
 
     toggleRectangleButton() {
         if(this.reachabilityActiveColor){
@@ -142,11 +158,11 @@ export class ToolbarComponent {
     }
 
     onAlgorithmSelect() {
-        
+
         const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        const selectedAlgorithm = selectElement?.value; 
-        
-        this._activeButtonService.deactivateAllButtons();  
+        const selectedAlgorithm = selectElement?.value;
+
+        this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
         if(selectedAlgorithm === 'spring-embedder'){
             this._freiAlgorithmusService.start()
@@ -155,13 +171,13 @@ export class ToolbarComponent {
         }
         else if(selectedAlgorithm === 'sugiyama'){
             this._springEmbedderService.teardown();
-            
+
         }
         else{
             this._springEmbedderService.teardown();
             this._freiAlgorithmusService.start()
         }
-        
+
     }
 
     deselectActiveColors() {
@@ -266,12 +282,12 @@ export class ToolbarComponent {
     }
 
     prepareImportFromFile(fileType: string): void {
-        
+
         this.input?.nativeElement.click();
     }
 
     importFromFile(e:any): void {
-        
+
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
             var fileExtension = selectedFile.files[0].name.toLowerCase().match(/\.pnml$/) ? 'pnml' : '';
@@ -298,6 +314,19 @@ export class ToolbarComponent {
         addTokenButton!.style.color = 'black';
     }
 
+    markenspielText() {
+        if(this.simulationStatus == 2) {
+            return "Markenspiel";
+        }
+        if(this.simulationStatus == 0){
+            return "Markenspiel mit Schritten";
+        }
+        else
+            return;
+    }
+
+
+
     toggleSimulation() {
 
     if(this.reachabilityActiveColor){
@@ -305,26 +334,11 @@ export class ToolbarComponent {
     }
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
-        // this.simulationActive = !this.simulationActive;
-        /*
-        if(this.simulationActive){
-            simulationButton.style.color = 'green';
-            this._drawingService.deselectPlacesAndLines();
-
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'green');
-            });
-        } else {
-            simulationButton.style.color = 'black';
-            this._diagram?.transitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'black');
-                transition.isActive = false;
-            });
-        }*/
+        // Zeichenmodus (Status 0)
         if(this.simulationStatus == 0){
             simulationButton.style.color = 'black';
             this._drawingService.setSimulationStatus(this.simulationStatus);
+            this.simulationActive = false;
 
             this._diagram?.transitions.forEach((transition) => {
                 this._markenspielService.setTransitionColor(transition, 'black');
@@ -332,11 +346,14 @@ export class ToolbarComponent {
             });
 
             this.simulationStatus = 1;
-
-        } else if (this.simulationStatus == 1) {
+            // Statusvariable hochzählen, damit beim nächsten Mal weiter geschaltet wird
+        }
+        // Einfaches Markenspiel (Status 1)
+        else if (this.simulationStatus == 1) {
             simulationButton.style.color = 'green';
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
+            this.simulationActive = true;
 
             const startTransitions = this._markenspielService.getPossibleActiveTransitions();
             startTransitions.forEach((transition) => {
@@ -345,11 +362,13 @@ export class ToolbarComponent {
 
             this.simulationStatus = 2;
         }
+        // Markenspiel mit Schritten (Status 2)
         else if (this.simulationStatus == 2) {
 
             simulationButton.style.color = 'violet';
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
+            this.simulationActive = true;
 
             const startTransitions = this._markenspielService.getPossibleActiveTransitions();
 
@@ -358,6 +377,7 @@ export class ToolbarComponent {
             });
 
             this._markenspielService.showStep(startTransitions);
+
             this.simulationStatus = 0;
         }
     }
