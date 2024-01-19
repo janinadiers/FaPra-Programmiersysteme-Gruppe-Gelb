@@ -22,7 +22,7 @@ export class MarkenspielService {
         });
     }
     currentActiveTransitions: Array<Transition> = [];
-
+    // Marken und Gewichte setzen
     public addCircleToken() {
         if (!this._diagram?.selectedCircle) {
             return;
