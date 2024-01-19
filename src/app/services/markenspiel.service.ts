@@ -44,8 +44,9 @@ export class MarkenspielService {
         this._diagram.selectedCircle.svgElement!.children[1].textContent =
             this._diagram.selectedCircle.amountToken.toString()
 
-        if (this._diagram.selectedCircle.amountToken < 0) {
+        if (this._diagram.selectedCircle.amountToken <= 0) {
             this._diagram.selectedCircle.amountToken = 0;
+            this._diagram.selectedCircle.svgElement!.children[1].textContent = ''
         }
         return;
     }
@@ -77,8 +78,9 @@ export class MarkenspielService {
 
         this._diagram.selectedLine.tokens--;
 
-        if (this._diagram.selectedLine.tokens < 1) {
+        if (this._diagram.selectedLine.tokens <= 1) {
             this._diagram.selectedLine.tokens = 1;
+            this._diagram.selectedLine.svgElement!.querySelector('circle')!.setAttribute('fill', 'transparent');
         }
 
         if (this._diagram.selectedLine.tokens > 1) {
@@ -99,17 +101,29 @@ export class MarkenspielService {
         if (transitions && lines) {
             transitions?.forEach((transition) => {
                 const line = lines?.find(line => line.target.id === transition.id);
+
                 if (this.parentsHaveEnoughTokens(transition.parents, line)) {
+
                     transition.isActive = true;
                     startTransitions.push(transition);
                 }
+                else {
+                    transition.isActive = false;
+                }
             });
         }
+
+        let notActiveTransitions = transitions?.filter(transition => !transition.isActive);
+
+        notActiveTransitions?.forEach((transition) => {
+            this.setTransitionColor(transition, 'black');
+        });
 
         return startTransitions;
     }
 
     private parentsHaveEnoughTokens(places: Array<Place>, line: Line | undefined): boolean {
+
         if (!line) {
             return false;
         }
@@ -121,17 +135,22 @@ export class MarkenspielService {
         const lines = this._diagram?.lines;
 
         const targetLine = lines?.find(line => line.target.id === transition.id);
+
         if(!this.parentsHaveEnoughTokens(transition.parents, targetLine)) {
+
             return this.getPossibleActiveTransitions();
         }
 
+
         transition.parents.forEach((place) => {
-            const line = lines?.find(line => line.source.id === place.id);
+            const line = lines?.find(line => line.source.id === place.id && line.target.id === transition.id);
+
             this.subtractTokensFromPlace(place, line!.tokens);
         });
 
         transition.children.forEach((place) => {
             const line = lines?.find(line => line.source.id === transition.id && line.target.id === place.id);
+
             this.addTokensToPlace(place, line!.tokens);
         });
 
@@ -139,8 +158,7 @@ export class MarkenspielService {
     }
 
     // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
-    public showStep() {
-        let startTransitions = this.getPossibleActiveTransitions();
+    public showStep(startTransitions: Array<Transition>) {
 
         const transitions = this.getPossibleActiveTransitions();
         const lines = this._diagram?.lines;
@@ -198,12 +216,22 @@ export class MarkenspielService {
     }
 
     private subtractTokensFromPlace(place: Place, amountTokenLine: number): void {
+
         place.amountToken -= amountTokenLine;
-        place.svgElement!.childNodes[1].textContent = place.amountToken.toString();
+
+        if(place.amountToken <= 0){
+            place.amountToken = 0;
+            place.svgElement!.childNodes[1].textContent = '';
+        }
+        else{
+            place.svgElement!.childNodes[1].textContent = place.amountToken.toString();
+        }
     }
 
     private addTokensToPlace(place: Place, amount: number): void {
+
         place.amountToken += amount;
+
         place.svgElement!.childNodes[1].textContent = place.amountToken.toString();
     }
 

@@ -89,7 +89,7 @@ export class PnmlImportService {
         arcs.forEach((arc) => {
 
             const arcId = arc.getAttribute('id');
-            const arcTokens = arc.querySelector('inscription')?.querySelector('text')?.textContent ?? '0'
+            const arcTokens = arc.querySelector('inscription')?.querySelector('text')?.textContent ?? '1'
             const sourceAndTargetObject = this.getSourceAndTargetElements(arc, elements);
             const positions = this.getArcPositions(arc);
 

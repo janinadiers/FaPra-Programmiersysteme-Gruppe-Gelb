@@ -7,6 +7,7 @@ import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
+import { ReachabilityGraph } from 'src/app/classes/diagram/reachability-graph';
 import {MarkenspielService} from "../../services/markenspiel.service";
 
 
@@ -54,13 +55,19 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this._diagram!.canvasElement = document.getElementById('canvas') as unknown as SVGElement;
-        this.subscriptionOfToolbar = this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
-            if (buttonId === "clear") {
-                let clearElements: boolean = true;
-                this.clearDrawingArea(clearElements);
-            } else if (buttonId === "deleteLast") {
-                this.deleteLastElement();
-            }
+        this.subscriptionOfToolbar = this.activeButtonService.
+            getButtonClickObservable().subscribe((buttonId: string) => {
+                if (buttonId === "clear" && this.activeButtonService.isReachButtonActive == false) {
+                    let clearElements: boolean = true;
+                    this.clearDrawingArea(clearElements);
+                }
+                else if (buttonId === "deleteLast" && this.activeButtonService.isReachButtonActive == false) {
+                    this.deleteLastElement();
+                }
+                else if (buttonId === "reachabilityGraph"){
+
+                    this.generateReachabilityGraph();
+                }
         });
 
         this._diagram?.places.forEach((element) => {
@@ -196,6 +203,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     private clearDrawingArea(clearElements?: boolean) {
+
+        
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -216,6 +225,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     private deleteLastElement() {
 
+        if(this.activeButtonService.isReachButtonActive){
+            return;
+        }
+        
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -243,6 +256,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onCanvasClick(event: MouseEvent) {
+
+        //console.log(this._diagram);
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
@@ -342,6 +357,43 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             this._diagram?.resetSelectedElements();
             this._diagram!.lightningCount = 0;
+        }
+    }
+
+    generateReachabilityGraph() {
+
+        const svgElement = document.getElementById('canvas');
+
+        if (this.activeButtonService.isReachButtonActive){
+
+            this.clearDrawingArea();
+
+            let graph = new ReachabilityGraph(this._diagram!);
+
+            graph.createReachabilityGraph();
+
+        }
+
+      else{
+
+            this.clearDrawingArea();
+
+            this._diagram!.places.forEach(place => {
+                let svgPlace = place.createSVG();
+                svgElement?.appendChild(svgPlace);
+              });
+
+              this._diagram!.transitions.forEach(transition => {
+                let svgTransition = transition.createSVG();
+                svgElement?.appendChild(svgTransition);
+              });
+
+              this._diagram!.lines.forEach(line => {
+                let svgLine = line.createSVG();
+                svgElement?.insertBefore(svgLine!,svgElement.firstChild);
+              });
+
+
         }
     }
 }
