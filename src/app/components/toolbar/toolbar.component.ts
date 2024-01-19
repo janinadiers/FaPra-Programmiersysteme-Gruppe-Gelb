@@ -218,7 +218,7 @@ export class ToolbarComponent {
         else{
             this._activeButtonService.sendButtonClick(buttonId);
         }
-    
+
 
     }
 
@@ -227,7 +227,7 @@ export class ToolbarComponent {
         if (this._diagram?.places.some(place => place.amountToken > 0)) {
             return true;
           }
-  
+
         else{
             return false;
         }
@@ -249,7 +249,7 @@ export class ToolbarComponent {
 
     }
 
-    
+
 
     export(fileType: string): void {
         let exportContent;
@@ -369,12 +369,6 @@ export class ToolbarComponent {
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
             this.simulationActive = true;
-
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'violet');
-            });
 
             this._markenspielService.showStep();
 

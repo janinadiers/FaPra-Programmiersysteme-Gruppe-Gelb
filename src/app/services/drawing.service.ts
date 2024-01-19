@@ -164,14 +164,11 @@ export class DrawingService {
 
         if(this.simulationStatus == 2){
 
-            let activeTransitions = this._markenspielService.showStep();
+           this._markenspielService.currentActiveTransitions.forEach((transition) => {
+               this._markenspielService.fireSingleTransition(transition);
+           });
 
-            activeTransitions.forEach((transition) => {
-                this._markenspielService.fireSingleTransition(transition);
-            });
-
-            this._markenspielService.shuffle(this._diagram!.transitions);
-            activeTransitions = this._markenspielService.showStep();
+           this._markenspielService.showStep();
         }
     }
 

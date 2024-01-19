@@ -21,6 +21,7 @@ export class MarkenspielService {
             this._diagram = diagram;
         });
     }
+    currentActiveTransitions: Array<Transition> = [];
 
     public addCircleToken() {
         if (!this._diagram?.selectedCircle) {
@@ -93,6 +94,7 @@ export class MarkenspielService {
         return;
     }
 
+    // Markenspiel
     public getPossibleActiveTransitions(): Array<Transition> {
         const startTransitions: Array<Transition> = [];
         const transitions = this._diagram?.transitions;
@@ -157,39 +159,48 @@ export class MarkenspielService {
         return this.getPossibleActiveTransitions();
     }
 
+    // Markenspiel mit Schritten
+    // Aufräumen: Lokalen Array der gerade aktiven Transitionen leeren und alle Transitionen auf false setzen
+    public cleanUp() {
+        this.currentActiveTransitions = [];
+        this._diagram?.transitions.forEach((transition) => {
+            transition.isActive = false;
+            this.setTransitionColor(transition, 'black');
+        });
+    }
+
     // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
-    public showStep(startTransitions: Array<Transition>) {
+    public showStep() {
+        // 1. Aufräumen und Hilfsvariablen erstellen
+        this.cleanUp();
+        let transitions = this.getPossibleActiveTransitions(); // alle schaltbaren Transitionen holen
 
-        const transitions = this.getPossibleActiveTransitions();
-        const lines = this._diagram?.lines;
+        const lines = this._diagram?.lines; // alle Kanten holen
+        let sourcePlaceIds: String[] = []; // Array für die schon verwendeten Stellen zur Prüfung im Wettbewerbskonflikt
 
-        let activeTransitions: Transition[] = [];
-        let sourcePlaceIds: String[] = [];
+        // 2. Array mischen
+        this.shuffle(transitions);
 
-        startTransitions.forEach((transition) => {
+        // 3. Prüfen auf Konflikte
+        transitions.forEach((transition) => {
             const line = lines?.find(line => line.target.id === transition.id);
             let currentSourceID = line!.source.id;
 
             // Prüfen, ob die Stelle im Vorbereich schon von einer anderen Transition benutzt wurde
             if(!sourcePlaceIds.includes(currentSourceID)){
-                activeTransitions.push(transition);
+                this.currentActiveTransitions.push(transition);
                 sourcePlaceIds.push(currentSourceID);
             }
         });
 
-        // Erneutes Setzen der jetzt aktiven Transitionen
-        transitions?.forEach((transition) => {
-            transition.isActive = false;
-            this.setTransitionColor(transition, 'black');
-        });
-
-        activeTransitions?.forEach((transition) => {
+        // 4. Zeigen des Schrittes
+        this.currentActiveTransitions?.forEach((transition) => {
             lines?.find(line => line.source.id === transition.id);
             transition.isActive = true;
             this.setTransitionColor(transition, 'violet');
         });
 
-        return activeTransitions;
+        return;
     }
 
     public fireSingleTransition(element: Transition) {
