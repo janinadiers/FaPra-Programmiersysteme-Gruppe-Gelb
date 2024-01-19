@@ -325,8 +325,6 @@ export class ToolbarComponent {
             return;
     }
 
-
-
     toggleSimulation() {
 
     if(this.reachabilityActiveColor){
@@ -337,6 +335,7 @@ export class ToolbarComponent {
         // Zeichenmodus (Status 0)
         if(this.simulationStatus == 0){
             simulationButton.style.color = 'black';
+
             this._drawingService.setSimulationStatus(this.simulationStatus);
             this.simulationActive = false;
 
@@ -351,6 +350,7 @@ export class ToolbarComponent {
         // Einfaches Markenspiel (Status 1)
         else if (this.simulationStatus == 1) {
             simulationButton.style.color = 'green';
+
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
             this.simulationActive = true;

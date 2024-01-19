@@ -21,7 +21,9 @@ export class MarkenspielService {
             this._diagram = diagram;
         });
     }
+
     currentActiveTransitions: Array<Transition> = [];
+
     // Marken und Gewichte setzen
     public addCircleToken() {
         if (!this._diagram?.selectedCircle) {
@@ -205,20 +207,19 @@ export class MarkenspielService {
     }
 
     public fireSingleTransition(element: Transition) {
-        const lines = this._diagram?.lines;
+        const targetLine = this._diagram!.lines?.filter(line => line.target.id === element.id); // ausgehende Linie
 
-        const targetLine = lines?.filter(line => line.target.id === element.id);
         if(!this.parentsHaveEnoughTokens(element.parents, targetLine!)) {
             return this.getPossibleActiveTransitions();
         }
 
         element.parents.forEach((place) => {
-            const line = lines?.find(line => line.source.id === place.id);
+            const line = this._diagram!.lines?.find(line => line.source.id === place.id && line.target.id === element.id);
             this.subtractTokensFromPlace(place, line!.tokens);
         });
 
         element.children.forEach((place) => {
-            const line = lines?.find(line => line.source.id === element.id && line.target.id === place.id);
+            const line = this._diagram!.lines?.find(line => line.source.id === element.id && line.target.id === place.id);
             this.addTokensToPlace(place, line!.tokens);
         });
 

@@ -51,6 +51,7 @@ export class DrawingService {
     activeCircleId: String = "";
     lineActive: boolean = false;
     activeLineId: String = "";
+    drawingActive: boolean = true;
 
     // Kreise zeichnen bzw. Stellen anlegen
     drawCircle(mouseX: number, mouseY: number) {
@@ -74,9 +75,12 @@ export class DrawingService {
 
     onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
+        if(!this.drawingActive){
+            return;
+        }
 
         if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
-            return
+            return;
         }
 
         this.circleActive = !this.circleActive;
@@ -163,7 +167,6 @@ export class DrawingService {
         }
 
         if(this.simulationStatus == 2){
-
            this._markenspielService.currentActiveTransitions.forEach((transition) => {
                this._markenspielService.fireSingleTransition(transition);
            });
@@ -183,6 +186,11 @@ export class DrawingService {
     }
 
     public setSimulationStatus(status: number) {
+        if(status == 0){
+            this.drawingActive = true;
+        } else {
+            this.drawingActive = false;
+        }
         this.simulationStatus = status;
         return;
     }
@@ -253,8 +261,12 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
-
         this._diagram!.selectedLine = line;
+
+        if(!this.drawingActive){
+            return;
+        }
+
         this.lineActive = !this.lineActive
 
         if (Diagram.drawingIsActive) {
