@@ -102,9 +102,9 @@ export class MarkenspielService {
 
         if (transitions && lines) {
             transitions?.forEach((transition) => {
-                const line = lines?.find(line => line.target.id === transition.id);
+                const transitionTargetLines = lines.filter(line => line.target.id === transition.id);
 
-                if (this.parentsHaveEnoughTokens(transition.parents, line)) {
+                if (this.parentsHaveEnoughTokens(transition.parents, transitionTargetLines)) {
 
                     transition.isActive = true;
                     startTransitions.push(transition);
@@ -124,25 +124,26 @@ export class MarkenspielService {
         return startTransitions;
     }
 
-    private parentsHaveEnoughTokens(places: Array<Place>, line: Line | undefined): boolean {
-
-        if (!line) {
+    private parentsHaveEnoughTokens(places: Array<Place>, lines: Array<Line>): boolean {
+        if (!lines || lines.length === 0) {
             return false;
         }
 
-        return places.every((place) => place.amountToken >= line.tokens);
+        return lines.every((line) => {
+            const matchingPlace = places.find(place => place.id === line.source.id);
+            return matchingPlace && matchingPlace.amountToken >= line.tokens;
+        });
     }
 
     public fireTransition(transition: Transition): Array<Transition> {
         const lines = this._diagram?.lines;
 
-        const targetLine = lines?.find(line => line.target.id === transition.id);
+        const targetLine = lines?.filter(line => line.target.id === transition.id);
 
-        if(!this.parentsHaveEnoughTokens(transition.parents, targetLine)) {
+        if(!this.parentsHaveEnoughTokens(transition.parents, targetLine!)) {
 
             return this.getPossibleActiveTransitions();
         }
-
 
         transition.parents.forEach((place) => {
             const line = lines?.find(line => line.source.id === place.id && line.target.id === transition.id);
@@ -206,8 +207,8 @@ export class MarkenspielService {
     public fireSingleTransition(element: Transition) {
         const lines = this._diagram?.lines;
 
-        const targetLine = lines?.find(line => line.target.id === element.id);
-        if(!this.parentsHaveEnoughTokens(element.parents, targetLine)) {
+        const targetLine = lines?.filter(line => line.target.id === element.id);
+        if(!this.parentsHaveEnoughTokens(element.parents, targetLine!)) {
             return this.getPossibleActiveTransitions();
         }
 
