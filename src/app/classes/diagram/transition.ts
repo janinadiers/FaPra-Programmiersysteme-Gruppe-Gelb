@@ -17,7 +17,7 @@ export class Transition extends Element {
         this._height = 40;
         this._children = [];
         this._parents = [];
-        this._label = label ?? '';
+        this._label = label ?? id;
     }
 
     get isActive(): boolean {
@@ -86,13 +86,14 @@ export class Transition extends Element {
         rect.setAttribute('stroke-width', '2');
         group.appendChild(rect);
 
+
         //Text
         const text = super.createSVG('text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('alignment-baseline', 'central');
         text.setAttribute('dy', `${this.height + 25}`);
         text.setAttribute('dx', `${this.width / 2}`);
-        text.textContent = this._label;
+        text.textContent = this._label.toString();
         group.appendChild(text);
 
 

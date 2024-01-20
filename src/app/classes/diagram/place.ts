@@ -11,13 +11,13 @@ export class Place extends Element {
     private _label: string;
 
 
-    constructor(id: string, x: number, y: number, amountToken?: number) {
+    constructor(id: string, x: number, y: number, amountToken?: number, label?: string) {
         super(id, x, y);
         this._radius = 25; // Default Radius
         this._amountToken = amountToken ?? 0; //Default sind keine Marken gesetzt
         this._children = [];
         this._parents = [];
-        this._label = id;
+        this._label = label ?? id;
 
     }
 
