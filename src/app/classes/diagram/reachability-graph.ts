@@ -154,6 +154,7 @@ export class ReachabilityGraph {
         
         this.id++;
         let newState = new State(this.iteration, this.id, state);
+        newState.activeTransition = activeTransition.id;
         this._newStates.push(newState);
 
         newState.parents = currentState;

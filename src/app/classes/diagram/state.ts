@@ -8,6 +8,7 @@ export class State {
     private _svgCircle: SVGElement | undefined;
     private _x: number;
     private _y: number;
+    private _activeTransition: string | undefined;
     
     constructor(iteration: number, id: number, state: Map<string, number>) {
       this._iteration = iteration;
@@ -65,6 +66,11 @@ export class State {
 
     }
 
+    set activeTransition(value: string) {
+        this._activeTransition = value;
+
+    }
+
     drawState() {
         const svgElement = document.getElementById('canvas');
     
@@ -94,6 +100,15 @@ export class State {
                 if (svgElement.firstChild) {
                     svgElement.insertBefore(line, svgElement.firstChild);
                 }
+                // Add text to the line
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', ((this._parents[0].x + this._x) / 2).toString());
+            text.setAttribute('y', ((this._parents[0].y + this._y) / 2).toString());
+            text.setAttribute('fill', 'black');
+            text.setAttribute('font-size', '15');
+            text.textContent = this._activeTransition!;
+
+            svgElement?.appendChild(text);
 
             const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
             marker.setAttribute('id', `arrowhead-${this._id}`);
