@@ -167,10 +167,7 @@ export class DrawingService {
         }
 
         if(this.simulationStatus == 2){
-           this._markenspielService.currentActiveTransitions.forEach((transition) => {
-               this._markenspielService.fireSingleTransition(transition);
-           });
-
+           this._markenspielService.fireStep();
            this._markenspielService.showStep();
         }
     }

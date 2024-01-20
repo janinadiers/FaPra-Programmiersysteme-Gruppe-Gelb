@@ -164,7 +164,7 @@ export class MarkenspielService {
 
     // Markenspiel mit Schritten
     // Aufräumen: Lokalen Array der gerade aktiven Transitionen leeren und alle Transitionen auf false setzen
-    public cleanUp() {
+    private cleanUp() {
         this.currentActiveTransitions = [];
         this._diagram?.transitions.forEach((transition) => {
             transition.isActive = false;
@@ -206,11 +206,11 @@ export class MarkenspielService {
         return;
     }
 
-    public fireSingleTransition(element: Transition) {
-        const targetLine = this._diagram!.lines?.filter(line => line.target.id === element.id); // ausgehende Linie
-
+    private fireSingleTransition(element: Transition) {
+        const targetLine = this._diagram!.lines?.filter(line => line.target.id === element.id);
+        // eingehende Linie holen und prüfen, ob die parents (der Vorbereich) genug Marken haben
         if(!this.parentsHaveEnoughTokens(element.parents, targetLine!)) {
-            return this.getPossibleActiveTransitions();
+            return;
         }
 
         element.parents.forEach((place) => {
@@ -226,6 +226,12 @@ export class MarkenspielService {
         this.setTransitionColor(element,'black');
 
         return;
+    }
+
+    public fireStep() {
+        this.currentActiveTransitions.forEach((transition) => {
+            this.fireSingleTransition(transition);
+        });
     }
 
     private subtractTokensFromPlace(place: Place, amountTokenLine: number): void {
