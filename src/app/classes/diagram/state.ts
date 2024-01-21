@@ -4,11 +4,10 @@ export class State {
     private _id: number;
     private _state: Map<string, number>;
     private _parents: Array<State>;
-    private _children: Array<State>;
     private _svgCircle: SVGElement | undefined;
     private _x: number;
     private _y: number;
-    private _activeTransition: string | undefined;
+    private _firedTransitions: string[] = [];
     private _level: number = 0;
     
     constructor(iteration: number, id: number, state: Map<string, number>) {
@@ -16,7 +15,7 @@ export class State {
       this._id = id;
       this._state = state;
       this._parents = [];
-      this._children = [];
+      this._firedTransitions = [];
       this._x = 0;
       this._y = 0;
     }
@@ -33,13 +32,7 @@ export class State {
         return this._state;
     }
 
-    set children(object: State) {
-        this._children.push(object);
-    }
-
-    get children(): Array<State> {
-        return this._children;
-    }
+   
 
     set parents(object: State) {
         this._parents.push(object);
@@ -67,8 +60,12 @@ export class State {
 
     }
 
-    set activeTransition(value: string) {
-        this._activeTransition = value;
+    set firedTransitions(value: string) {
+        this._firedTransitions.push(value);
+    }
+
+    get firedTransitions(): string[]{
+        return this._firedTransitions;
 
     }
 
@@ -81,6 +78,14 @@ export class State {
         return this._level;
     }
 
+    transferParents(array: Array<State>) {
+
+        this._parents = array;
+    }
+    
+   
+
+
     drawState() {
         const svgElement = document.getElementById('canvas');
     
@@ -89,7 +94,7 @@ export class State {
         circle.setAttribute('id', this._iteration.toString() + this._id.toString());
         circle.setAttribute('cx', this._x.toString()); 
         circle.setAttribute('cy', this._y.toString()); 
-        circle.setAttribute('r', '18');
+        circle.setAttribute('r', '10');
         circle.setAttribute('fill', 'black');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', '2');
@@ -97,53 +102,72 @@ export class State {
     
         this._svgCircle = circle;
     
+        this.drawTransition()
+    }
+
+    drawTransition(){
+
+        const svgElement = document.getElementById('canvas');
+
+
         if (this._parents !== undefined && this._parents.length > 0) {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', this._parents[0].x.toString());
-            line.setAttribute('y1', this._parents[0].y.toString());
-            line.setAttribute('x2', this._x.toString());
-            line.setAttribute('y2', this._y.toString());
-            line.setAttribute('stroke', 'red');
-            line.setAttribute('stroke-width', '1');
-            line.setAttribute('fill', 'transparent');
-            if (svgElement) {
-                if (svgElement.firstChild) {
-                    svgElement.insertBefore(line, svgElement.firstChild);
+                
+            for (let i = 0; i < this._parents.length; i++){
+
+            
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', this._parents[i].x.toString());
+                line.setAttribute('y1', this._parents[i].y.toString());
+                line.setAttribute('x2', this._x.toString());
+                line.setAttribute('y2', this._y.toString());
+                line.setAttribute('stroke', 'red');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('fill', 'transparent');
+                if (svgElement) {
+                    if (svgElement.firstChild) {
+                        svgElement.insertBefore(line, svgElement.firstChild);
+                    }
                 }
-                // Add text to the line
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', ((this._parents[0].x + this._x) / 2).toString());
-            text.setAttribute('y', ((this._parents[0].y + this._y) / 2).toString());
-            text.setAttribute('fill', 'black');
-            text.setAttribute('font-size', '15');
-            text.textContent = this._activeTransition!;
-
-            svgElement?.appendChild(text);
-
-            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-            marker.setAttribute('id', `arrowhead-${this._id}`);
-            marker.setAttribute('markerWidth', '10');
-            marker.setAttribute('markerHeight', '10');
-            marker.setAttribute('refX', '28');
-            marker.setAttribute('refY', '5');
-            marker.setAttribute('orient', 'auto-start-reverse');
-            marker.setAttribute('markerUnits', 'strokeWidth');
+                    // Add text to the line
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', ((this._parents[i].x + this._x) / 2).toString());
+                text.setAttribute('y', ((this._parents[i].y + this._y) / 2).toString());
+                text.setAttribute('fill', 'black');
+                text.setAttribute('font-size', '15');
+                let id = this._firedTransitions[i];
+                text.textContent = id;
     
-            
-            const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
-            arrowhead.setAttribute('fill', 'red');
+                svgElement?.appendChild(text);
     
-            marker.appendChild(arrowhead);
-            svgElement?.appendChild(marker); 
-            
-            const markerId = `url(#arrowhead-${this._id})`;
-            line.setAttribute('marker-end', markerId);
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', `arrowhead-${this._id}`);
+                marker.setAttribute('markerWidth', '10');
+                marker.setAttribute('markerHeight', '10');
+                marker.setAttribute('refX', '20');
+                marker.setAttribute('refY', '5');
+                marker.setAttribute('orient', 'auto-start-reverse');
+                marker.setAttribute('markerUnits', 'strokeWidth');
+        
+                
+                const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
+                arrowhead.setAttribute('fill', 'red');
+        
+                marker.appendChild(arrowhead);
+                svgElement?.appendChild(marker); 
+                
+                const markerId = `url(#arrowhead-${this._id})`;
+                line.setAttribute('marker-end', markerId);
+
+            }
+
         }
+
+        
     }
 
 }
+    
 
 
-}
 

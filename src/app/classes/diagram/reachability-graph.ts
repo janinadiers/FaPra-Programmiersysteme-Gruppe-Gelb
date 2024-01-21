@@ -33,9 +33,8 @@ export class ReachabilityGraph {
         do {
             this.exploreStates();
           } while (this._currentState.length > 0 || this._newStates.length > 0);
-
+         
           this.moveNodes();
-          this.removeRedundantStates();
           this.drawGraph();
           
     }
@@ -73,6 +72,7 @@ export class ReachabilityGraph {
                     this.fireTransition(activeTransition);
                 }
             }   
+            this.removeRedundantStates();
             this.separateNodes();
             this.setVisited();     
         }  
@@ -157,12 +157,10 @@ export class ReachabilityGraph {
         
         this.id++;
         let newState = new State(this.iteration, this.id, state);
-        newState.activeTransition = activeTransition.id;
+        newState.firedTransitions = activeTransition.id;
         this._newStates.push(newState);
 
         newState.parents = currentState;
-        currentState.children = newState ;
-
         newState.level = (currentState.level) + 1;
 
         newState.x = this._currentState[0].x + 140;
@@ -264,38 +262,45 @@ export class ReachabilityGraph {
     }
 
 
-    removeRedundantStates(){
-
-        for (let i = 0; i < this._visited.length; i++){
-
-                let currentState = this._visited[i];
-
-                for (let y = i + 1; y < this._visited.length; y++){
-
-                    let state = this._visited[y];
-
-                    if(currentState.level === state.level){
-                        if (this.areMapsEqual(currentState.state, state.state )){
-
-                            state.parents.forEach(state => {
-                               let newParent = state.parents.shift();
-                               currentState.parents = newParent!;
-                              });
-
-                            state.children.forEach(state => {
-                                let newChild = state.children.shift();
-                                currentState.children = newChild!;
-                               });
-                            
-                            this._visited.splice(y , 1);
-                
-                        }
-                    }
-
-                }
+    removeRedundantStates() {
+        if (this._newStates.length < 2) {
+            return;
         }
+    
+        const statesToRemove: number[] = [];
+    
+        for (let i = 0; i < this._newStates.length; i++) {
+            const currentState = this._newStates[i];
+    
+            for (let y = i + 1; y < this._newStates.length; y++) {
+                const state = this._newStates[y];
+    
+                if (
+                    currentState.level === state.level &&
+                    this.areMapsEqual(currentState.state, state.state)
+                ) {
+                    // Transfer parents from 'state' to 'currentState'
+                    currentState.transferParents([...currentState.parents, ...state.parents]);
 
+                    let newTransition = state.firedTransitions.shift();
+                    let array = currentState.firedTransitions;
+                    array.push(newTransition!);
+                    
+                    // Mark the redundant state for removal
+                    statesToRemove.push(y);
+                }
+            }
+        }
+    
+        // Remove redundant states
+        for (let i = statesToRemove.length - 1; i >= 0; i--) {
+            this._newStates.splice(statesToRemove[i], 1);
+        }
+    
+        // Remove states without parents
+        this._newStates = this._newStates.filter(state => state.parents.length > 0);
     }
+
 
 
     areMapsEqual(map1: Map<string, number>, map2: Map<string, number>): boolean {
