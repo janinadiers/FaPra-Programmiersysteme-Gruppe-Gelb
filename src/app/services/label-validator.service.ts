@@ -16,12 +16,17 @@ export class LabelValidatorService {
     }
 
     public createLabelEventListener(element: Transition | Place) {
+        // Letztes text-Element aus dem SVG-Element ermitteln. last-child ist notwendig, da place zwei Text-Elemente besitzt
+        // und das zweite für das Label verantwortlich ist
         const textElementSelector = element.svgElement?.querySelector('text:last-child');
 
         if (textElementSelector) {
+            // Event-Listener registrieren
             textElementSelector.addEventListener('click', () => {
+                // Eingabefeld für das Label
                 const editedLabel = prompt(this.EDIT_LABEL_TEXT, element.label);
 
+                // Validieren
                 if (editedLabel !== null && editedLabel !== undefined && this.isLabelValid(editedLabel, element)) {
                     element.label = editedLabel;
                     textElementSelector.textContent = editedLabel;
@@ -35,6 +40,7 @@ export class LabelValidatorService {
     }
 
     private isLabelValid(newLabel: string, originElement: Transition | Place): boolean {
+        // Trimmen
         const trimmedLabel = newLabel?.trim();
 
         if(!trimmedLabel || trimmedLabel.length === 0) {
