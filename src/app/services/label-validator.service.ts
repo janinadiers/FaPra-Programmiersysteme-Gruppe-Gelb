@@ -31,6 +31,8 @@ export class LabelValidatorService {
                     element.label = editedLabel;
                     textElementSelector.textContent = editedLabel;
                 } else if (editedLabel !== null && editedLabel !== undefined) {
+                    // ein reines else reicht hier nicht. else if ist notwendig,
+                    // da sonst auch bei einem Klick auf Abbrechen die Fehlermeldung ausgegeben wird
                     alert(this.INVALID_LABEL);
                 }
             });
