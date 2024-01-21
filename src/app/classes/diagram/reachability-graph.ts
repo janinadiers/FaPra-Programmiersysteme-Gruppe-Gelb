@@ -34,6 +34,8 @@ export class ReachabilityGraph {
             this.exploreStates();
           } while (this._currentState.length > 0 || this._newStates.length > 0);
 
+          this.moveNodes();
+          this.removeRedundantStates();
           this.drawGraph();
           
     }
@@ -48,6 +50,7 @@ export class ReachabilityGraph {
           
           let currentState = new State (this.iteration, this.id, initialState);
           this._currentState.push(currentState);
+          currentState.level = 0;
           currentState.x = 50;
           currentState.y = 180;
     }
@@ -70,7 +73,7 @@ export class ReachabilityGraph {
                     this.fireTransition(activeTransition);
                 }
             }   
-            this.seperateNodes();
+            this.separateNodes();
             this.setVisited();     
         }  
         else{
@@ -160,6 +163,8 @@ export class ReachabilityGraph {
         newState.parents = currentState;
         currentState.children = newState ;
 
+        newState.level = (currentState.level) + 1;
+
         newState.x = this._currentState[0].x + 140;
         newState.y = this._currentState[0].y;
         this.sameLevel.push(newState);
@@ -183,7 +188,7 @@ export class ReachabilityGraph {
           });
     }
 
-    seperateNodes(){
+    separateNodes(){
         // Aufeinander liegende SVG Kreise verschieben
         let offset: number = 40;  
 
@@ -195,7 +200,7 @@ export class ReachabilityGraph {
                 
                 let m: number = 1;
                 if (i == m){
-                    offset = offset + 40;
+                    offset = offset + 120;
                      m = m +2
                 }   
             }  
@@ -215,6 +220,96 @@ export class ReachabilityGraph {
             }
         }
        this.sameLevel.splice(0, this.sameLevel.length);
+    }
+
+
+    moveNodes(){
+
+        let count: number = 0;
+
+        for (let i = 1; i < this._visited.length; i++){
+
+           let currentX = this._visited[i].x;
+           let currentY = this._visited[i].y;
+
+            for (let k = 0; k < i; k++){
+
+              let x = this._visited[k].x;
+              let y = this._visited[k].y;
+
+              if (currentX === x && currentY === y && currentY < 180 ){
+                
+                this._visited[i].y = this._visited[i].y - 40;
+
+                count++;
+
+              }
+              else if(currentX === x && currentY === y && currentY > 180 ){
+
+                this._visited[i].y = this._visited[i].y + 40;
+
+                count++;
+              }
+
+
+            }
+
+
+        }
+        if (count > 0 ){
+
+            this.moveNodes();
+        }
 
     }
+
+
+    removeRedundantStates(){
+
+        for (let i = 0; i < this._visited.length; i++){
+
+                let currentState = this._visited[i];
+
+                for (let y = i + 1; y < this._visited.length; y++){
+
+                    let state = this._visited[y];
+
+                    if(currentState.level === state.level){
+                        if (this.areMapsEqual(currentState.state, state.state )){
+
+                            state.parents.forEach(state => {
+                               let newParent = state.parents.shift();
+                               currentState.parents = newParent!;
+                              });
+
+                            state.children.forEach(state => {
+                                let newChild = state.children.shift();
+                                currentState.children = newChild!;
+                               });
+                            
+                            this._visited.splice(y , 1);
+                
+                        }
+                    }
+
+                }
+        }
+
+    }
+
+
+    areMapsEqual(map1: Map<string, number>, map2: Map<string, number>): boolean {
+        if (map1.size !== map2.size) {
+          return false;
+        }
+      
+        for (const [key, value] of map1) {
+          if (!map2.has(key) || map2.get(key) !== value) {
+            return false;
+          }
+        }
+      
+        return true;
+      }
+
 }

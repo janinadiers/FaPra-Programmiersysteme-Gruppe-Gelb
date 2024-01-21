@@ -9,6 +9,7 @@ export class State {
     private _x: number;
     private _y: number;
     private _activeTransition: string | undefined;
+    private _level: number = 0;
     
     constructor(iteration: number, id: number, state: Map<string, number>) {
       this._iteration = iteration;
@@ -69,6 +70,15 @@ export class State {
     set activeTransition(value: string) {
         this._activeTransition = value;
 
+    }
+
+    set level (value: number){
+        this._level = value;
+    }
+
+    get level(): number {
+
+        return this._level;
     }
 
     drawState() {
