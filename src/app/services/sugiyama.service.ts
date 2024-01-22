@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import { Diagram } from 'src/app/classes/diagram/diagram';
-
+import { Line } from '../classes/diagram/line';
 
 @Injectable({
     providedIn: 'root',
@@ -9,25 +9,42 @@ import { Diagram } from 'src/app/classes/diagram/diagram';
 export class SugiyamaService {
     diagram: Diagram = new Diagram([], []);
     layers: Element[][] = [];
+    removedLines: Line[] = [];
 
     public begin(diagram: Diagram) {
         this.diagram = diagram;
+        this.removedLines = [];
+
+        this.removeLoops();
         this.addLayers();
-        this.removeLowerDirectedLines();//TODO
+        this.removeLowerDirectedLines();
+        this.revertLoops();
         this.reduceCrossings();
-        this.routeEdges(); //TODO
+        // this.routeEdges(); //TODO
         this.assignCoordinates();
     }
+    
+    //Step 1: Temporarely remove lines which result in a loop and save them for later push within removedLines
+    removeLoops() {
+        let stack = new Set<Element>();
+        let marked = new Set<Element>();
 
-    // Step 1: BFS (Breadth-first search) for layer assignment
+        let elements = this.diagram.places.map((place) => place as unknown as Element);
+        elements.concat(this.diagram.transitions.map((transition) => transition as unknown as Element));
+        
+        //loop through every element and call dfsRemove
+        elements.forEach((element) => {
+            this.dfsRemove(element, stack, marked)
+        })
+    }
+
+    // Step 2: BFS (Breadth-first search) for layer assignment
     addLayers() {
         this.layers = []; 
         let visited = new Set<Element>(); // To keep track of visited nodes
         let queue: Element[] = [];
 
         //Convert initialLayer of Place[] to Element[]
-        //let initialLayer: Element[] = this.diagram.lines.filter((line) => line.target.id == 't1').map(line => line.source as unknown as Element); // Assumption that a Petrinet's first Transition is t1
-        //let initialLayer: Element[] = this.diagram.places.filter((place) => place.id == this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].id).map(place => place as unknown as Element);  // Assumption that a Petrinet is starting with the lowest place.id
         let initialLayer: Element[] = this.diagram.places.filter((place) => place.parents.length == 0).map(place => place as unknown as Element); // Assumption that a Petrinet is starting with a place and does not have any parents
 
         this.layers.push(initialLayer);
@@ -61,60 +78,51 @@ export class SugiyamaService {
         }
     }
 
-    // Step 2: Reorder layers based on connections
+    // Step 3: Reorder layers based on connections
     removeLowerDirectedLines() {
         // check if line is directed towards lower layer, if yes -> set target on layer above (loop)
+        let visited = new Set<Element[]>();
 
-        // while loop
-        // loop through layer-Elements and 
-        let reset: boolean = false;
-        let counter = 0;
-        while(!reset) {
-            reset = false;
-            for (let i = 0; i < this.layers.length; i++) {
-                let layer = this.layers[i];
-                for (let j = 0; j < layer.length; j++) {
-                    console.log('i: ' + i + ' - j: ' + j);
-                    // check attached outgoing lines
-                    let elementID = layer[j].id;
-                    let currentLines = this.diagram.lines.filter((line) => line.source.id == elementID);
-                    currentLines.forEach(currentLine => {
-                        if (i > 0) {
-                            // if target is on lower layer -> set target on layer above (+1) 
-                            let target = this.layers[i-1].find((target) => target.id == currentLine?.target.id);
-                            if (target) {
-                                let movedLayer: boolean = false;
-                                if (this.layers[i+1]) {
-                                    //add target to layer[i+1]
-                                    this.layers[i+1].push(target);
-                                    
-                                    reset = true;
-                                    // movedLayer = true;
-                                } else {
-                                    //create new layer and add target to layer[i+1]
-                                    let newLayer: Element[] = [];
-                                    newLayer.push(target);
-                                    this.layers.push(newLayer);
-    
-                                    reset = true;
-                                    // movedLayer = true;
-                                }
-                                // if (movedLayer) {
-                                //     // layer.splice(j, 1);
-                                //     // layer.splice(j);
-                                //     //remove target from layer[i-1]
-                                //     //reset and start from first layer again
-                                //     reset = true;
-                                // }
+        for (let i = 0; i < this.layers.length; i++) {
+            let layer = this.layers[i];
+            for (let j = 0; j < layer.length; j++) {
+                // check attached outgoing lines
+                let elementID = layer[j].id;
+                let currentLines = this.diagram.lines.filter((line) => line.source.id == elementID);
+
+                currentLines.forEach(currentLine => {
+                    if (i > 0) {
+                        // if target is on lower layer -> set target on layer above (+1) 
+                        let target = this.layers[i-1].find((target) => target.id == currentLine?.target.id) as Element;                        
+                        if (target ) {
+                            if (this.layers[i+1]) {
+                                //add target to layer[i+1]
+                                this.layers[i+1].push(target);
+
+                                this.layers[i-1].splice(this.layers[i-1].indexOf(target, 0), 1);
+                            } else {
+                                //create new layer and add target to layer[i+1]
+                                let newLayer: Element[] = [];
+                                newLayer.push(target);
+                                this.layers.push(newLayer);
+
+                                this.layers[i-1].splice(this.layers[i-1].indexOf(target, 0), 1);
                             }
                         }
-                    })
-                }
+                    }
+                })
             }
         }
     }
 
-    // Step 3: Reduce crossings using the barycenter heuristic - nN. for basic petrinet
+    // Step 4: Add previously removed lines to avoid breaking the petrinet
+    revertLoops() {
+        this.removedLines.forEach((line) => {
+            this.diagram.lines.push(line);
+        })
+    }
+
+    // Step 5: Reduce crossings using the barycenter heuristic - nN. for basic petrinet
     reduceCrossings() {
         let improved = true;
         let iterationCount = 0;
@@ -135,12 +143,12 @@ export class SugiyamaService {
         }
     }
 
-    // Step 4: Edge Routing
+    // Step 6: Edge Routing
     routeEdges() {
         // Route edges as PolyLine (add line-points on Layer)
     }
 
-    // Step 5: Assign coordinates to each element
+    // Step 7: Assign coordinates to each element
     assignCoordinates() {
         const layerWidth  = 100;
         const nodeHeight  = 100;
@@ -164,10 +172,35 @@ export class SugiyamaService {
         }
     }
 
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    private dfsRemove(element: Element, stack: Set<Element>, marked: Set<Element>) {
+        //if element already visited, return and break recursive call
+        if (marked.has(element))
+            return;
+
+        marked.add(element);
+        stack.add(element);
+
+        //fetch all outgoing lines from element
+        let lines = this.diagram.lines.filter((line) => line.source.id == element.id);
+
+        lines.forEach((line) => {
+            if (stack.has(line.target as unknown as Element)) {
+                //if element in stack, removeLine from diagram
+                this.removedLines.push(line);
+                this.diagram.lines.splice(this.diagram.lines.indexOf(line, 0), 1);
+            } else if (!marked.has(line.target as unknown as Element)) {
+                //if target of element was not already visited, recursive call
+                this.dfsRemove(line.target as unknown as Element, stack, marked);
+            }
+        })
+        stack.delete(element);
+    }
+
     private getConnectedElements(elem: Element): Element[] {
         // This will hold the connected elements
         let connectedElements: Element[] = [];
-
 
         // Go through each line and check for connections
         this.diagram.lines.forEach(line => {
@@ -210,103 +243,8 @@ export class SugiyamaService {
                 currentLayer[i] = newOrder[i];
             }
         }
-
         return hasChanged;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // addLayers(diagram: Diagram) {
-    //     const lines = diagram.lines;
-    //     const places = diagram.places;
-    //     const transitions = diagram.transitions;
-
-
-    //     const element = [...places, ...transitions];
-    //     element.sort((a,b) => a.id < b.id ? -1 : 1);
-
-
-
-
-
-
-    //     places.sort((a,b) => a.id < b.id ? -1 : 1);
-    //     transitions.sort((a,b) => a.id < b.id ? -1 : 1);
-
-
-    //     places.forEach((place) => {
-    //         const sourceLinePlaces = lines.filter((line) => line.source == place);
-    //         place.layer++;
-    //         // sourceLinePlaces.forEach((sourcePlace) => {
-    //         //     sourcePlace.source.layer++;
-    //         // });
-    //     });
-    //     transitions.forEach((transition) => {
-
-
-    //     });
-
-
-
-
-
-
-
-
-    //     lines.sort((a,b) => a.source.id < b.source.id ? -1 : 1);
-
-
-    //     const sourceLinePlaces = lines.filter((line) => line.source.svgElement?.childNodes[0] instanceof SVGCircleElement);
-    //     const sourceLineTransitions = lines.filter((line) => line.source.svgElement?.childNodes[0] instanceof SVGRectElement);
-
-
-
-
-
-
-    //     return diagram;
-    // }
-
-
-
-
-
-
-    // removeBackwardEdges(diagram: Diagram) {
-    //     // if (lines == undefined) 
-    //     //     return;
-
-
-    //     const lines = diagram.lines;
-    //     lines.forEach( (line) => {
-    //         const targetIsTransitions = lines.filter((line) => line.target.svgElement?.childNodes[0] instanceof SVGRectElement);
-    //         targetIsTransitions.forEach( (targetIsTransition) => {
-    //             const sourceIsPlace = lines.filter((line) => line.target.svgElement?.childNodes[0] instanceof SVGCircleElement);
-    //             // if (targetIsTransition.target == )
-    //         } )
-    //     });
-    //     return diagram;
-    // }
-
-
 }
 
 

@@ -426,17 +426,5 @@ export class Line {
             circle.setAttribute('fill', 'gray');
         });
     }
-
-    // Might be needed for "Markenspiel"
-    // public registerSvg(svg: SVGElement) {
-    //     this._svgElement = svg;
-    //     this._svgElement.onmousedown = (event) => {
-    //         this.processMouseDown(event);
-    //     };
-    //     this._svgElement.onmouseup = (event) => {
-    //         this.processMouseUp(event);
-    //     };
-    // }
-
 }
 
