@@ -90,7 +90,6 @@ export class DrawingService {
             this.activeCircleId = circle.id;
             this.changeTokenButtonColor('red');
 
-            // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
             this.deselectPlacesAndLines();
             circle.svgElement!.children[0].setAttribute('stroke', 'red');
             circle.svgElement!.children[2].setAttribute('stroke', 'red');
@@ -101,7 +100,6 @@ export class DrawingService {
             this.circleActive = false;
             this.changeTokenButtonColor('black');
 
-            // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
             this.deselectPlacesAndLines();
             circle.svgElement!.children[0].setAttribute('stroke', 'black');
             circle.svgElement!.children[2].setAttribute('stroke', 'black');
