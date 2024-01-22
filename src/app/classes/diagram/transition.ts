@@ -93,7 +93,12 @@ export class Transition extends Element {
         text.setAttribute('alignment-baseline', 'central');
         text.setAttribute('dy', `${this.height + 25}`);
         text.setAttribute('dx', `${this.width / 2}`);
-        text.textContent = this._label.toString();
+        if(!this._label || this.label.trim().length === 0) {
+            this.label = this.id;
+            text.textContent = this.id;
+        } else {
+            text.textContent = this._label.toString();
+        }
         group.appendChild(text);
 
 
