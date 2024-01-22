@@ -75,9 +75,6 @@ export class DrawingService {
 
     onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
-        if(!this.drawingActive){
-            return;
-        }
 
         if(!this.drawingActive){
             return;
@@ -185,7 +182,7 @@ export class DrawingService {
     }
 
     public setSimulationStatus(status: number) {
-        if(status == 0){
+        if(status == 0){  // verhindert, dass im Simulationsmodus Linien/Kreise angeklickt werden können
             this.drawingActive = true;
         } else {
             this.drawingActive = false;
