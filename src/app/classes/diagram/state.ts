@@ -18,6 +18,7 @@ export class State {
       this._firedTransitions = [];
       this._x = 0;
       this._y = 0;
+      this._svgCircle = undefined;
     }
   
     get iteration(): number {
@@ -31,8 +32,6 @@ export class State {
     get state(): Map<string, number> {
         return this._state;
     }
-
-   
 
     set parents(object: State) {
         this._parents.push(object);
@@ -57,7 +56,6 @@ export class State {
 
     set y(value: number) {
         this._y = value;
-
     }
 
     set firedTransitions(value: string) {
@@ -78,14 +76,15 @@ export class State {
         return this._level;
     }
 
+    set svgCircle(circle :SVGElement){
+        this._svgCircle = circle;
+    }
+
     transferParents(array: Array<State>) {
 
         this._parents = array;
     }
     
-   
-
-
     drawState() {
         const svgElement = document.getElementById('canvas');
     
@@ -109,12 +108,10 @@ export class State {
 
         const svgElement = document.getElementById('canvas');
 
-
         if (this._parents !== undefined && this._parents.length > 0) {
                 
             for (let i = 0; i < this._parents.length; i++){
-
-            
+                // line
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', this._parents[i].x.toString());
                 line.setAttribute('y1', this._parents[i].y.toString());
@@ -128,17 +125,27 @@ export class State {
                         svgElement.insertBefore(line, svgElement.firstChild);
                     }
                 }
-                    // Add text to the line
+
+                // background circle
+                const backgroundCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                backgroundCircle.setAttribute('cx',(( ((this._parents[i].x) + ((this._parents[i].x + this._x) / 2)) /2 ).toString()));
+                backgroundCircle.setAttribute('cy', (( ((this._parents[i].y) + ((this._parents[i].y + this._y) / 2)) /2  ).toString()));
+                backgroundCircle.setAttribute('r', '5');
+                backgroundCircle.setAttribute('fill', 'white');
+                svgElement?.appendChild(backgroundCircle);
+                // text
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', ((this._parents[i].x + this._x) / 2).toString());
-                text.setAttribute('y', ((this._parents[i].y + this._y) / 2).toString());
-                text.setAttribute('fill', 'black');
-                text.setAttribute('font-size', '15');
+                text.setAttribute('x',(( ((this._parents[i].x) + ((this._parents[i].x + this._x) / 2)) /2 ).toString()));
+                text.setAttribute('y',(( ((this._parents[i].y) + ((this._parents[i].y + this._y) / 2)) /2  ).toString()));
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dy', '.3em');
+                text.setAttribute('font-size', '14px');
+                text.setAttribute('font-weight', 'bold'); 
                 let id = this._firedTransitions[i];
                 text.textContent = id;
-    
                 svgElement?.appendChild(text);
-    
+
+                // marker
                 const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
                 marker.setAttribute('id', `arrowhead-${this._id}`);
                 marker.setAttribute('markerWidth', '10');
@@ -148,7 +155,7 @@ export class State {
                 marker.setAttribute('orient', 'auto-start-reverse');
                 marker.setAttribute('markerUnits', 'strokeWidth');
         
-                
+                //arrowhead
                 const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
                 arrowhead.setAttribute('fill', 'red');
@@ -160,12 +167,8 @@ export class State {
                 line.setAttribute('marker-end', markerId);
 
             }
-
         }
-
-        
     }
-
 }
     
 

@@ -3,7 +3,6 @@ import { Transition } from './transition';
 import { State } from './state';
 import { Line } from './line';
 
-
 export class ReachabilityGraph {
 
     private readonly _diagram: Diagram;
@@ -36,6 +35,7 @@ export class ReachabilityGraph {
          
           this.moveNodes();
           this.drawGraph();
+          console.log(this._visited);
           
     }
   
@@ -168,6 +168,7 @@ export class ReachabilityGraph {
         this.sameLevel.push(newState);
     }
   
+
     setVisited(){
 
         if(this._currentState.length > 0 ){
@@ -222,9 +223,8 @@ export class ReachabilityGraph {
 
 
     moveNodes(){
-
+        // Nochmal aufeinander liegende SVG Kreise verschieben
         let count: number = 0;
-
         for (let i = 1; i < this._visited.length; i++){
 
            let currentX = this._visited[i].x;
@@ -238,27 +238,18 @@ export class ReachabilityGraph {
               if (currentX === x && currentY === y && currentY < 180 ){
                 
                 this._visited[i].y = this._visited[i].y - 40;
-
                 count++;
-
               }
               else if(currentX === x && currentY === y && currentY > 180 ){
 
                 this._visited[i].y = this._visited[i].y + 40;
-
                 count++;
               }
-
-
             }
-
-
         }
         if (count > 0 ){
-
             this.moveNodes();
         }
-
     }
 
 
@@ -270,34 +261,35 @@ export class ReachabilityGraph {
         const statesToRemove: number[] = [];
     
         for (let i = 0; i < this._newStates.length; i++) {
+
             const currentState = this._newStates[i];
     
             for (let y = i + 1; y < this._newStates.length; y++) {
+
                 const state = this._newStates[y];
-    
                 if (
                     currentState.level === state.level &&
-                    this.areMapsEqual(currentState.state, state.state)
+                    this.areMapsEqual(currentState.state, state.state) // Gleiche Maps sind gleiche Zustände
                 ) {
-                    // Transfer parents from 'state' to 'currentState'
+                    // Transferiere parents von redundanten Zustand zu bleibenden Zustand
                     currentState.transferParents([...currentState.parents, ...state.parents]);
-
+                    // Transferiere firedTransition zum bleibenden Zustand
                     let newTransition = state.firedTransitions.shift();
                     let array = currentState.firedTransitions;
                     array.push(newTransition!);
                     
-                    // Mark the redundant state for removal
+                    // Markiere redundanten Zustand für das Entfernen
                     statesToRemove.push(y);
                 }
             }
         }
     
-        // Remove redundant states
+        // Entferne redundante Zustände
         for (let i = statesToRemove.length - 1; i >= 0; i--) {
             this._newStates.splice(statesToRemove[i], 1);
         }
     
-        // Remove states without parents
+        // Enferne Zustände ohne parents
         this._newStates = this._newStates.filter(state => state.parents.length > 0);
     }
 
@@ -315,6 +307,6 @@ export class ReachabilityGraph {
         }
       
         return true;
-      }
+    }
 
 }
