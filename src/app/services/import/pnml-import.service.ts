@@ -97,7 +97,7 @@ export class PnmlImportService {
             const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
             arcElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onLineSelect(arcElement);
-            });
+            }); // Linien mit dem Kantengewicht 1 sind bei "queriSelctor('text') nicht anklickbar
 
             lines.push(arcElement);
         });

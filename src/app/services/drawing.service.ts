@@ -79,6 +79,10 @@ export class DrawingService {
             return;
         }
 
+        if(!this.drawingActive){
+            return;
+        }
+
         if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
             return;
         }
