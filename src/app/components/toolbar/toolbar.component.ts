@@ -218,7 +218,7 @@ export class ToolbarComponent {
         else{
             this._activeButtonService.sendButtonClick(buttonId);
         }
-    
+
 
     }
 
@@ -227,7 +227,7 @@ export class ToolbarComponent {
         if (this._diagram?.places.some(place => place.amountToken > 0)) {
             return true;
           }
-  
+
         else{
             return false;
         }
@@ -249,7 +249,7 @@ export class ToolbarComponent {
 
     }
 
-    
+
 
     export(fileType: string): void {
         let exportContent;
@@ -325,8 +325,6 @@ export class ToolbarComponent {
             return;
     }
 
-
-
     toggleSimulation() {
 
     if(this.reachabilityActiveColor){
@@ -337,6 +335,7 @@ export class ToolbarComponent {
         // Zeichenmodus (Status 0)
         if(this.simulationStatus == 0){
             simulationButton.style.color = 'black';
+
             this._drawingService.setSimulationStatus(this.simulationStatus);
             this.simulationActive = false;
 
@@ -351,6 +350,7 @@ export class ToolbarComponent {
         // Einfaches Markenspiel (Status 1)
         else if (this.simulationStatus == 1) {
             simulationButton.style.color = 'green';
+
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
             this.simulationActive = true;
@@ -370,13 +370,7 @@ export class ToolbarComponent {
             this._drawingService.setSimulationStatus(this.simulationStatus);
             this.simulationActive = true;
 
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'violet');
-            });
-
-            this._markenspielService.showStep(startTransitions);
+            this._markenspielService.showStep();
 
             this.simulationStatus = 0;
         }

@@ -98,9 +98,9 @@ export class PnmlImportService {
 
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
             const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
-            arcElement.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
+            arcElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onLineSelect(arcElement);
-            });
+            }); // Linien mit dem Kantengewicht 1 sind bei "queriSelctor('text') nicht anklickbar
 
             lines.push(arcElement);
         });

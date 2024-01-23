@@ -20,14 +20,14 @@ export class DrawingService {
     private simulationActive: boolean = false;
     private simulationStatus: number = 0;
 
-    constructor(private diplayService: DisplayService,
+    constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
                 private _markenspielService: MarkenspielService,
                 private _labelValidator: LabelValidatorService)
     {
 
-        this.diplayService.diagram$.subscribe(diagram => {
+        this.displayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
         });
@@ -46,6 +46,12 @@ export class DrawingService {
             }
         }));
     }
+
+    circleActive: boolean = false;
+    activeCircleId: String = "";
+    lineActive: boolean = false;
+    activeLineId: String = "";
+    drawingActive: boolean = true;
 
     // Kreise zeichnen bzw. Stellen anlegen
     drawCircle(mouseX: number, mouseY: number) {
@@ -70,18 +76,38 @@ export class DrawingService {
 
     onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
-        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
-            return
+
+        if(!this.drawingActive){
+            return;
         }
 
-        this.changeTokenButtonColor('red');
+        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
+            return;
+        }
 
-        // Farben setzen: alle mit schwarzer Umrandung, danach ausgewählter rot
-        this.deselectPlacesAndLines();
-        circle.svgElement!.children[0].setAttribute('stroke', 'red');
-        circle.svgElement!.children[2].setAttribute('stroke', 'red');
-        circle.svgElement!.children[0].setAttribute('stroke-width', '2');
-        circle.svgElement!.children[1].setAttribute('stroke', 'red');
+        this.circleActive = !this.circleActive;
+
+        if(this.circleActive || this.activeCircleId != circle.id){
+            this.circleActive = true;
+            this.activeCircleId = circle.id;
+            this.changeTokenButtonColor('red');
+
+            this.deselectPlacesAndLines();
+            circle.svgElement!.children[0].setAttribute('stroke', 'red');
+            circle.svgElement!.children[2].setAttribute('stroke', 'red');
+            circle.svgElement!.children[0].setAttribute('stroke-width', '2');
+            circle.svgElement!.children[1].setAttribute('stroke', 'red');
+        } else {
+            this.activeCircleId = circle.id;
+            this.circleActive = false;
+            this.changeTokenButtonColor('black');
+
+            this.deselectPlacesAndLines();
+            circle.svgElement!.children[0].setAttribute('stroke', 'black');
+            circle.svgElement!.children[2].setAttribute('stroke', 'black');
+            circle.svgElement!.children[0].setAttribute('stroke-width', '2');
+            circle.svgElement!.children[1].setAttribute('stroke', 'black');
+        }
 
         if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
@@ -146,20 +172,8 @@ export class DrawingService {
         }
 
         if(this.simulationStatus == 2){
-
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'violet');
-            });
-
-            const activeTransitions = this._markenspielService.showStep(startTransitions);
-
-            activeTransitions.forEach((transition) => {
-                this._markenspielService.fireSingleTransition(transition);
-            });
-
-            this._markenspielService.showStep(this._markenspielService.getPossibleActiveTransitions());
+           this._markenspielService.fireStep();
+           this._markenspielService.showStep();
         }
     }
 
@@ -174,6 +188,11 @@ export class DrawingService {
     }
 
     public setSimulationStatus(status: number) {
+        if(status == 0){  // verhindert, dass im Simulationsmodus Linien/Kreise angeklickt werden können
+            this.drawingActive = true;
+        } else {
+            this.drawingActive = false;
+        }
         this.simulationStatus = status;
         return;
     }
@@ -247,25 +266,51 @@ export class DrawingService {
 
         this._diagram!.selectedLine = line;
 
+        if(!this.drawingActive){
+            return;
+        }
+
+        this.lineActive = !this.lineActive
+
         if (Diagram.drawingIsActive) {
             return
         }
-        this.changeTokenButtonColor('blue');
 
-        // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
-        this.deselectPlacesAndLines();
+        if(this.lineActive || line.id != this.activeLineId){
+            this.lineActive = true;
+            this.activeLineId = line.id
 
-        line.svgElement!.querySelector('text')!.setAttribute('stroke', 'blue');
-        line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'blue');
-        line.svgElement!.querySelector('path')!.setAttribute('fill', 'blue');
-        // line.svgElement!.children[2].setAttribute('stroke', 'blue');
-        // line.svgElement!.children[2].setAttribute('stroke-width', '2');
+            this.changeTokenButtonColor('blue');
+            // Farben setzen: alle Element schwarz setzen, danach das ausgewählte blau
+            this.deselectPlacesAndLines();
+
+            line.svgElement!.querySelector('text')!.setAttribute('stroke', 'blue');
+            line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'blue');
+            line.svgElement!.querySelector('path')!.setAttribute('fill', 'blue');
+            // line.svgElement!.children[2].setAttribute('stroke', 'blue');
+            // line.svgElement!.children[2].setAttribute('stroke-width', '2');
+        }
+        else {
+            this.lineActive = false;
+            this.activeLineId = line.id;
+
+            this.changeTokenButtonColor('black');
+            this.deselectPlacesAndLines();
+
+            line.svgElement!.querySelector('text')!.setAttribute('stroke', 'black');
+            line.svgElement!.querySelector('polyline')!.setAttribute('stroke', 'black');
+            line.svgElement!.querySelector('path')!.setAttribute('fill', 'black');
+        }
 
         return;
     }
 
     // Farbänderungen in der Toolbar
     changeTokenButtonColor(color: string) {
+        if(this.simulationStatus == 1 || this.simulationStatus == 2){
+            return;
+        }
+
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = color;
