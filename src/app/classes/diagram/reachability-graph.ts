@@ -3,7 +3,6 @@ import { Transition } from './transition';
 import { State } from './state';
 import { Line } from './line';
 
-
 export class ReachabilityGraph {
 
     private readonly _diagram: Diagram;
@@ -29,13 +28,19 @@ export class ReachabilityGraph {
         if(this.iteration === 0){
             this.getInitialState();
         }
-
         do {
             this.exploreStates();
-          } while (this._currentState.length > 0 || this._newStates.length > 0);
+        } while ((this._currentState.length > 0 || this._newStates.length > 0) && this._visited.length <  150);
 
-          this.drawGraph();
-          
+        if (this._visited.length < 150) {
+            this.moveNodes();
+            this.drawGraph();
+            //console.log(this._visited);
+        }
+        else{
+            alert("The number of states has exceeded a threshold of 150!")
+            //console.log(this._visited);
+        }
     }
   
     getInitialState(){
@@ -48,6 +53,7 @@ export class ReachabilityGraph {
           
           let currentState = new State (this.iteration, this.id, initialState);
           this._currentState.push(currentState);
+          currentState.level = 0;
           currentState.x = 50;
           currentState.y = 180;
     }
@@ -70,7 +76,8 @@ export class ReachabilityGraph {
                     this.fireTransition(activeTransition);
                 }
             }   
-            this.seperateNodes();
+            this.removeRedundantStates();
+            this.separateNodes();
             this.setVisited();     
         }  
         else{
@@ -154,16 +161,18 @@ export class ReachabilityGraph {
         
         this.id++;
         let newState = new State(this.iteration, this.id, state);
+        newState.firedTransitions = activeTransition.id;
         this._newStates.push(newState);
 
         newState.parents = currentState;
-        currentState.children = newState ;
+        newState.level = (currentState.level) + 1;
 
         newState.x = this._currentState[0].x + 140;
         newState.y = this._currentState[0].y;
         this.sameLevel.push(newState);
     }
   
+
     setVisited(){
 
         if(this._currentState.length > 0 ){
@@ -182,7 +191,7 @@ export class ReachabilityGraph {
           });
     }
 
-    seperateNodes(){
+    separateNodes(){
         // Aufeinander liegende SVG Kreise verschieben
         let offset: number = 40;  
 
@@ -194,7 +203,7 @@ export class ReachabilityGraph {
                 
                 let m: number = 1;
                 if (i == m){
-                    offset = offset + 40;
+                    offset = offset + 120;
                      m = m +2
                 }   
             }  
@@ -214,6 +223,94 @@ export class ReachabilityGraph {
             }
         }
        this.sameLevel.splice(0, this.sameLevel.length);
-
     }
+
+
+    moveNodes(){
+        // Nochmal aufeinander liegende SVG Kreise verschieben
+        let count: number = 0;
+        for (let i = 1; i < this._visited.length; i++){
+
+           let currentX = this._visited[i].x;
+           let currentY = this._visited[i].y;
+
+            for (let k = 0; k < i; k++){
+
+              let x = this._visited[k].x;
+              let y = this._visited[k].y;
+
+              if (currentX === x && currentY === y && currentY < 180 ){
+                
+                this._visited[i].y = this._visited[i].y - 40;
+                count++;
+              }
+              else if(currentX === x && currentY === y && currentY > 180 ){
+
+                this._visited[i].y = this._visited[i].y + 40;
+                count++;
+              }
+            }
+        }
+        if (count > 0 ){
+            this.moveNodes();
+        }
+    }
+
+
+    removeRedundantStates() {
+        if (this._newStates.length < 2) {
+            return;
+        }
+    
+        const statesToRemove: number[] = [];
+    
+        for (let i = 0; i < this._newStates.length; i++) {
+
+            const currentState = this._newStates[i];
+    
+            for (let y = i + 1; y < this._newStates.length; y++) {
+
+                const state = this._newStates[y];
+                if (
+                    currentState.level === state.level &&
+                    this.areMapsEqual(currentState.state, state.state) // Gleiche Maps sind gleiche Zustände
+                ) {
+                    // Transferiere parents von redundanten Zustand zu bleibenden Zustand
+                    currentState.transferParents([...currentState.parents, ...state.parents]);
+                    // Transferiere firedTransition zum bleibenden Zustand
+                    let newTransition = state.firedTransitions.shift();
+                    let array = currentState.firedTransitions;
+                    array.push(newTransition!);
+                    
+                    // Markiere redundanten Zustand für das Entfernen
+                    statesToRemove.push(y);
+                }
+            }
+        }
+    
+        // Entferne redundante Zustände
+        for (let i = statesToRemove.length - 1; i >= 0; i--) {
+            this._newStates.splice(statesToRemove[i], 1);
+        }
+    
+        // Enferne Zustände ohne parents
+        this._newStates = this._newStates.filter(state => state.parents.length > 0);
+    }
+
+
+
+    areMapsEqual(map1: Map<string, number>, map2: Map<string, number>): boolean {
+        if (map1.size !== map2.size) {
+          return false;
+        }
+      
+        for (const [key, value] of map1) {
+          if (!map2.has(key) || map2.get(key) !== value) {
+            return false;
+          }
+        }
+      
+        return true;
+    }
+
 }
