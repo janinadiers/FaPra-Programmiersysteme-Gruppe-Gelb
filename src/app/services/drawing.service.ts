@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from "../classes/diagram/diagram";
-import {Subscription} from "rxjs";
 import {DisplayService} from "./display.service";
 import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
@@ -8,7 +7,8 @@ import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
 import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
-import {transition} from "@angular/animations";
+import {LabelValidatorService} from "./label-validator.service";
+import {Element} from "../classes/diagram/element";
 
 @Injectable({
     providedIn: 'root'
@@ -23,10 +23,10 @@ export class DrawingService {
     constructor(private diplayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
-                private _markenspielService: MarkenspielService
-                )
+                private _markenspielService: MarkenspielService,
+                private _labelValidator: LabelValidatorService)
     {
-    
+
         this.diplayService.diagram$.subscribe(diagram => {
 
             this._diagram = diagram;
@@ -57,7 +57,8 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
-        
+        this._labelValidator.createLabelEventListener(circleObject);
+
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         circleObject.svgElement!.addEventListener('click', () => {
@@ -99,6 +100,10 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         rectObject.createSVG();
+
+        // Erstellung eines Label-Validators inklusive Event-Listener
+        this._labelValidator.createLabelEventListener(rectObject);
+
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement!.addEventListener('click', () => {
@@ -111,6 +116,8 @@ export class DrawingService {
 
         return rectObject
     }
+
+
 
     public startSimulation(rectObject: Transition) {
         if (!rectObject!.svgElement ||
@@ -202,7 +209,7 @@ export class DrawingService {
                     }
                 }
                 svgLine?.addEventListener(('click'), () => {
-                    if(svgLine){              
+                    if(svgLine){
                         this.onLineSelect(lineObject!);
                     }
                 });
@@ -222,7 +229,7 @@ export class DrawingService {
                     if (svgElement.firstChild) {
                         svgElement.insertBefore(svgLine!, svgElement.firstChild);
                     }
-                }           
+                }
                 svgLine?.addEventListener(('click'), () => {
                     if (svgLine != undefined) {
                         this.onLineSelect(lineObject!);
@@ -237,7 +244,7 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
-        
+
         this._diagram!.selectedLine = line;
 
         if (Diagram.drawingIsActive) {
