@@ -7,6 +7,7 @@ import { Transition } from '../../classes/diagram/transition';
 import { Line } from '../../classes/diagram/line';
 import { Coords } from '../../classes/json-petri-net';
 import {DrawingService} from "../drawing.service";
+import {LabelValidatorService} from "../label-validator.service";
 
 
 @Injectable({
@@ -14,7 +15,7 @@ import {DrawingService} from "../drawing.service";
 })
 export class PnmlImportService {
 
-    constructor(private _drawingService: DrawingService) {
+    constructor(private _drawingService: DrawingService, private _labelValidator: LabelValidatorService) {
     }
 
     import(content: string): Diagram | undefined {
@@ -51,6 +52,7 @@ export class PnmlImportService {
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
+            this._labelValidator.createLabelEventListener(placeElement);
 
             result.push(placeElement);
         });
@@ -76,6 +78,7 @@ export class PnmlImportService {
             transitionElement.svgElement?.addEventListener(('dblclick'), () => {
                 this._drawingService.startSimulation(transitionElement);
             });
+            this._labelValidator.createLabelEventListener(transitionElement);
             result.push(transitionElement);
         });
 

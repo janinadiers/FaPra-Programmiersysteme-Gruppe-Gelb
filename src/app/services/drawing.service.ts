@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from "../classes/diagram/diagram";
-import {Subscription} from "rxjs";
 import {DisplayService} from "./display.service";
 import {Place} from "../classes/diagram/place";
 import {Transition} from "../classes/diagram/transition";
@@ -8,7 +7,8 @@ import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
 import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
-import {transition} from "@angular/animations";
+import {LabelValidatorService} from "./label-validator.service";
+import {Element} from "../classes/diagram/element";
 
 @Injectable({
     providedIn: 'root'
@@ -23,8 +23,8 @@ export class DrawingService {
     constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
-                private _markenspielService: MarkenspielService
-                )
+                private _markenspielService: MarkenspielService,
+                private _labelValidator: LabelValidatorService)
     {
 
         this.displayService.diagram$.subscribe(diagram => {
@@ -63,6 +63,7 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
+        this._labelValidator.createLabelEventListener(circleObject);
 
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
@@ -111,9 +112,8 @@ export class DrawingService {
         if (this._diagram!.selectedRect) {
             let circleIsTarget: boolean = true;
             this.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, circleIsTarget);
-        } else{
+        } else
             return;
-        }
     }
 
     // Rechtecke zeichnen bzw. Transitionen anlegen
@@ -126,6 +126,10 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         rectObject.createSVG();
+
+        // Erstellung eines Label-Validators inklusive Event-Listener
+        this._labelValidator.createLabelEventListener(rectObject);
+
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
         rectObject.svgElement!.addEventListener('click', () => {
@@ -138,6 +142,8 @@ export class DrawingService {
 
         return rectObject
     }
+
+
 
     public startSimulation(rectObject: Transition) {
         if (!rectObject!.svgElement ||
@@ -257,6 +263,7 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
+
         this._diagram!.selectedLine = line;
 
         if(!this.drawingActive){
