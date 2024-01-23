@@ -28,15 +28,19 @@ export class ReachabilityGraph {
         if(this.iteration === 0){
             this.getInitialState();
         }
-
         do {
             this.exploreStates();
-          } while (this._currentState.length > 0 || this._newStates.length > 0);
-         
-          this.moveNodes();
-          this.drawGraph();
-          console.log(this._visited);
-          
+        } while ((this._currentState.length > 0 || this._newStates.length > 0) && this._visited.length <  150);
+
+        if (this._visited.length < 150) {
+            this.moveNodes();
+            this.drawGraph();
+            //console.log(this._visited);
+        }
+        else{
+            alert("The number of states has exceeded a threshold of 150!")
+            //console.log(this._visited);
+        }
     }
   
     getInitialState(){
