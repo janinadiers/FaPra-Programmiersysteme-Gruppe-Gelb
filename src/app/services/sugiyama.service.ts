@@ -19,8 +19,8 @@ export class SugiyamaService {
         this.addLayers();
         this.removeLowerDirectedLines();
         this.revertLoops();
-        this.reduceCrossings();
         // this.routeEdges(); //TODO
+        this.reduceCrossings();
         this.assignCoordinates();
     }
     
@@ -45,7 +45,10 @@ export class SugiyamaService {
         let queue: Element[] = [];
 
         //Convert initialLayer of Place[] to Element[]
-        let initialLayer: Element[] = this.diagram.places.filter((place) => place.parents.length == 0).map(place => place as unknown as Element); // Assumption that a Petrinet is starting with a place and does not have any parents
+        let initialLayer: Element[] = [];
+        initialLayer = this.diagram.places.filter((place) => place.parents.length == 0).map(place => place as unknown as Element); // Assumption that a Petrinet is starting with a place and does not have any parents
+        if (initialLayer.length === 0)
+            initialLayer = this.diagram.places.filter((place) => place.id == this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].id).map(place => place as unknown as Element);  // Assumption that a Petrinet is starting with the lowest place.id
 
         this.layers.push(initialLayer);
         initialLayer.forEach(elem => {
@@ -246,8 +249,3 @@ export class SugiyamaService {
         return hasChanged;
     }
 }
-
-
-
-
-
