@@ -98,5 +98,10 @@
     margin: 1rem;
 
 }
+.selected {
+  background-color: #f4f4f4;
+}
+
+
 
 

@@ -69,25 +69,29 @@
                     class="hover-class tooltip"
                     (click)="onButtonClick('deleteLast')">
                     <span class="tooltiptext">delete last</span>
-                <mat-icon>delete</mat-icon>
+                <mat-icon>history</mat-icon>
                 </button>
 
                 <button mat-icon-button *ngIf="!simulationActive"
                         class="hover-class tooltip"
                         (click)="onButtonClick('clear')">
                     <span class="tooltiptext">clear all</span>
-                    <mat-icon>clear</mat-icon>
+                    <mat-icon>delete</mat-icon>
                 </button>
-
 
     </div>
         <div class="center-toolbar">
-            <label for="algorithm-select">Algorithmus: </label>
-            <select name="algorithm" id="algorithm-select" (change)="onAlgorithmSelect()">
-                <option value="free">Free</option>
-                <option value="spring-embedder">Spring Embedder</option>
-                <option value="sugiyama">Sugiyama</option>
-            </select>
+            <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="algorithmSelectMenu">
+                <span class="tooltiptext">Select Algorithm</span>
+                <mat-icon>visibility</mat-icon>
+            </button>
+           
+            <mat-menu class="hover-class" #algorithmSelectMenu="matMenu">
+                <button mat-menu-item class='free selected' (click)="onAlgorithmSelect('free')">Free</button>
+                <button mat-menu-item class='spring-embedder' (click)="onAlgorithmSelect('spring-embedder')">Spring-Embedder</button>
+                <button mat-menu-item class="sugiyama" (click)="onAlgorithmSelect('sugiyama')">Sugiyama</button>
+            </mat-menu>
+           
         </div>
         <div class="right-toolbar">
             <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
