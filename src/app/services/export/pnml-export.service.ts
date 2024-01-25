@@ -28,7 +28,7 @@ export class PnmlExportService {
         let pnmlString =
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<pnml>\n<net id="" type="http://www.pnml.org/version-2009/grammar/ptnet">\n<name>\n<text>ILovePetriNets.pnml</text>\n</name>\n<page id="p1">';
         for (const place of this.getPlaces()) {
-            pnmlString += `<place id="${place.id}">\n<name>\n<text>${place.label}</text>\n</name>\n<graphics>\n<position x="${place.x}" y="${place.y}"/>\n</graphics>\n<initialMarking>\n<text>${place.amountToken}</text>\n</initialMarking>\n</place>`;
+            pnmlString += `<place id="${place.id}">\n<name>\n</name>\n<graphics>\n<position x="${place.x}" y="${place.y}"/>\n</graphics>\n<initialMarking>\n<text>${place.amountToken}</text>\n</initialMarking>\n</place>`;
         }
 
         for (const transition of this.getTransitions()) {

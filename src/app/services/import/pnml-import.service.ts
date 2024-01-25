@@ -52,7 +52,6 @@ export class PnmlImportService {
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
-            this._labelValidator.createLabelEventListener(placeElement);
 
             result.push(placeElement);
         });
@@ -180,7 +179,6 @@ export class PnmlImportService {
         place.x = x;
         place.y = y;
         place.amountToken = parseInt(amountToken);
-        place.label = label;
         place.svgElement = place.createSVG();
         return place;
 

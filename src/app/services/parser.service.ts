@@ -63,7 +63,6 @@ export class ParserService {
                 place.svgElement?.addEventListener(('click'), () => {
                     this._drawingService.onCircleSelect(place);
                 });
-                this._labelValidator.createLabelEventListener(place);
                 places.push(place)
 
             }

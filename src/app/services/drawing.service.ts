@@ -63,7 +63,6 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
-        this._labelValidator.createLabelEventListener(circleObject);
 
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
@@ -323,7 +322,6 @@ export class DrawingService {
             element.svgElement!.querySelector('text')!.setAttribute('stroke', 'black'); // Farbe des Tokens
             element.svgElement!.querySelector('circle')!.setAttribute('stroke', 'black'); // Farbe des Kreisrandes
             // element.svgElement?.children[0].setAttribute('stroke', 'black'); // Farbe des Kreisrandes
-            element.svgElement?.children[2].setAttribute('stroke', 'black'); // Farbe des Labels
         });
         this._diagram?.lines.forEach((element) => {
             element.svgElement!.querySelector('text')!.setAttribute('stroke', 'black');

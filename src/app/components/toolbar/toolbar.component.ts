@@ -12,10 +12,11 @@ import {SvgService} from "../../services/export/svg.service";
 import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
-import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
+import {FreiAlgorithmusService} from 'src/app/services/frei-algorithmus.service';
 import {transition} from "@angular/animations";
 import {Transition} from "../../classes/diagram/transition";
 import {template} from "lodash";
+import {LabelValidatorService} from "../../services/label-validator.service";
 
 @Component({
     selector: 'app-toolbar',
@@ -53,7 +54,8 @@ export class ToolbarComponent {
                 public _markenspielService: MarkenspielService,
                 private _springEmbedderService: SpringEmbedderService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
-                private _drawingService: DrawingService
+                private _drawingService: DrawingService,
+                private _labelValidator: LabelValidatorService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
@@ -91,7 +93,7 @@ export class ToolbarComponent {
     }
 
     toggleRectangleButton() {
-        if(this.reachabilityActiveColor){
+        if (this.reachabilityActiveColor) {
             return;
         }
         this.circleActiveColor = false;
@@ -105,7 +107,7 @@ export class ToolbarComponent {
     }
 
     toggleCircleButton() {
-        if(this.reachabilityActiveColor){
+        if (this.reachabilityActiveColor) {
             return;
         }
         this.rectActiveColor = false;
@@ -118,7 +120,7 @@ export class ToolbarComponent {
     }
 
     toggleArrowButton() {
-        if(this.reachabilityActiveColor){
+        if (this.reachabilityActiveColor) {
             return;
         }
         this.circleActiveColor = false;
@@ -133,7 +135,7 @@ export class ToolbarComponent {
     }
 
     toggleBoltButton() {
-        if(this.reachabilityActiveColor){
+        if (this.reachabilityActiveColor) {
             return;
         }
         this.circleActiveColor = false;
@@ -149,11 +151,11 @@ export class ToolbarComponent {
     }
 
 
-    toggleReachabilityButton(){
+    toggleReachabilityButton() {
         this.circleActiveColor = false;
         this.rectActiveColor = false;
         this.arrowActiveColor = false;
-        this.boltActiveColor =  false;
+        this.boltActiveColor = false;
         this.reachabilityActiveColor = !this.reachabilityActiveColor;
     }
 
@@ -164,16 +166,14 @@ export class ToolbarComponent {
 
         this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
-        if(selectedAlgorithm === 'spring-embedder'){
+        if (selectedAlgorithm === 'spring-embedder') {
             this._freiAlgorithmusService.start()
             this._springEmbedderService.start()
 
-        }
-        else if(selectedAlgorithm === 'sugiyama'){
+        } else if (selectedAlgorithm === 'sugiyama') {
             this._springEmbedderService.teardown();
 
-        }
-        else{
+        } else {
             this._springEmbedderService.teardown();
             this._freiAlgorithmusService.start()
         }
@@ -205,50 +205,44 @@ export class ToolbarComponent {
     }
 
     onButtonClick(buttonId: string) {
-        if (buttonId === "reachabilityGraph"){
-            if(this.checkValidity()){
-            this.toggleReachabilityButton();
-            this._activeButtonService.reachabilityButtonActive();
-            this._activeButtonService.sendButtonClick(buttonId);
-            }
-            else{
+        if (buttonId === "reachabilityGraph") {
+            if (this.checkValidity()) {
+                this.toggleReachabilityButton();
+                this._activeButtonService.reachabilityButtonActive();
+                this._activeButtonService.sendButtonClick(buttonId);
+            } else {
                 alert("A marked petri net is required!");
             }
-        }
-        else{
+        } else {
             this._activeButtonService.sendButtonClick(buttonId);
         }
 
 
     }
 
-    checkValidity(){
+    checkValidity() {
 
         if (this._diagram?.places.some(place => place.amountToken > 0)) {
             return true;
-          }
-
-        else{
+        } else {
             return false;
         }
 
     }
 
-    removeToken(){
+    removeToken() {
 
-        if(Diagram.drawingIsActive){
+        if (Diagram.drawingIsActive) {
             return
         }
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
-        if(addTokenButton.style.color == 'red'){
+        if (addTokenButton.style.color == 'red') {
             this._markenspielService.removeCircleToken();
-        }
-        else if(addTokenButton.style.color == 'blue'){
+        } else if (addTokenButton.style.color == 'blue') {
             this._markenspielService.removeLineToken();
         }
 
     }
-
 
 
     export(fileType: string): void {
@@ -286,7 +280,7 @@ export class ToolbarComponent {
         this.input?.nativeElement.click();
     }
 
-    importFromFile(e:any): void {
+    importFromFile(e: any): void {
 
         const selectedFile = e.target as HTMLInputElement;
         if (selectedFile.files && selectedFile.files.length > 0) {
@@ -307,7 +301,7 @@ export class ToolbarComponent {
         this._activeButtonService.zoomButtonClick(id);
     }
 
-    deselectAddAndRemoveTokenButtons(){
+    deselectAddAndRemoveTokenButtons() {
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         removeTokenButton!.style.color = 'black';
@@ -315,28 +309,28 @@ export class ToolbarComponent {
     }
 
     markenspielText() {
-        if(this.simulationStatus == 2) {
+        if (this.simulationStatus == 2) {
             return "Markenspiel";
         }
-        if(this.simulationStatus == 0){
+        if (this.simulationStatus == 0) {
             return "Markenspiel mit Schritten";
-        }
-        else
+        } else
             return;
     }
 
     toggleSimulation() {
 
-    if(this.reachabilityActiveColor){
-        return;
-    }
+        if (this.reachabilityActiveColor) {
+            return;
+        }
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
         // Zeichenmodus (Status 0)
-        if(this.simulationStatus == 0){
+        if (this.simulationStatus == 0) {
             simulationButton.style.color = 'black';
 
             this._drawingService.setSimulationStatus(this.simulationStatus);
+            this._labelValidator.enableLabelEventListeners(this._diagram!.transitions);
             this.simulationActive = false;
 
             this._diagram?.transitions.forEach((transition) => {
@@ -353,6 +347,7 @@ export class ToolbarComponent {
 
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
+            this._labelValidator.disableLabelEventListeners(this._diagram!.transitions);
             this.simulationActive = true;
 
             const startTransitions = this._markenspielService.getPossibleActiveTransitions();
@@ -368,6 +363,7 @@ export class ToolbarComponent {
             simulationButton.style.color = 'violet';
             this._drawingService.deselectPlacesAndLines();
             this._drawingService.setSimulationStatus(this.simulationStatus);
+            this._labelValidator.disableLabelEventListeners(this._diagram!.transitions);
             this.simulationActive = true;
 
             this._markenspielService.showStep();
