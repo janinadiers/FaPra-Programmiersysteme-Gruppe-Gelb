@@ -78,7 +78,7 @@ export class ReachabilityGraph {
                 }
             }   
             this.removeRedundantStates();
-            //this.compareWithCurrentState();
+            this.compareWithCurrentState();
             this.compareWithVisitedStates();
             this.separateNodes();
             this.setVisited();     
@@ -300,7 +300,7 @@ export class ReachabilityGraph {
     }
 
 
-    /* compareWithCurrentState(){
+    compareWithCurrentState(){
 
         const statesToRemove: number[] = [];
 
@@ -330,7 +330,7 @@ export class ReachabilityGraph {
         // Enferne Zustände ohne parents
         this._newStates = this._newStates.filter(state => state.parents.length > 0);
     }
-    */
+    
 
 
 
