@@ -15,12 +15,13 @@ export class ReachabilityGraph {
     private sameLevel: Array<State> = [];
     
    
-    constructor(diagram: Diagram) {
+    constructor(diagram: Diagram, private _springEmbedderService: any) {
       this._diagram = diagram;
       this._currentState = [];
       this._newStates = [];
       this._activeTransitions = [];
       this._visited = [];
+      this._springEmbedderService = _springEmbedderService;
     }
 
     createReachabilityGraph(){
@@ -35,11 +36,11 @@ export class ReachabilityGraph {
         if (this._visited.length < 150) {
             this.moveNodes();
             this.drawGraph();
-            //console.log(this._visited);
+            this._springEmbedderService.apply(this._visited);
+            
         }
         else{
             alert("The number of states has exceeded a threshold of 150!")
-            //console.log(this._visited);
         }
     }
   
@@ -160,7 +161,7 @@ export class ReachabilityGraph {
         connectedLines.splice(0, connectedLines.length);
         
         this.id++;
-        let newState = new State(this.iteration, this.id, state);
+        let newState = new State(this.iteration, this.id + Math.random(), state);
         newState.firedTransitions = activeTransition.id;
         this._newStates.push(newState);
 
