@@ -22,7 +22,7 @@ export class MarkenspielService {
         });
     }
 
-    currentActiveTransitions: Array<Transition> = [];
+    currentChosenTransitions: Array<Transition> = [];
 
     // Marken und Gewichte setzen
     public addCircleToken() {
@@ -165,7 +165,7 @@ export class MarkenspielService {
     // Markenspiel mit Schritten
     // Aufräumen: Lokalen Array der gerade aktiven Transitionen leeren und alle Transitionen auf false setzen
     private cleanUp() {
-        this.currentActiveTransitions = [];
+        this.currentChosenTransitions = [];
         this._diagram?.transitions.forEach((transition) => {
             transition.isActive = false;
             this.setTransitionColor(transition, 'black');
@@ -191,17 +191,30 @@ export class MarkenspielService {
 
             // Prüfen, ob die Stelle im Vorbereich schon von einer anderen Transition benutzt wurde
             if(!sourcePlaceIds.includes(currentSourceID)){
-                this.currentActiveTransitions.push(transition);
+                this.currentChosenTransitions.push(transition);
                 sourcePlaceIds.push(currentSourceID);
             }
         });
 
         // 4. Zeigen des Schrittes
-        this.currentActiveTransitions?.forEach((transition) => {
+        this.currentChosenTransitions?.forEach((transition) => {
             lines?.find(line => line.source.id === transition.id);
             transition.isActive = true;
             this.setTransitionColor(transition, 'violet');
         });
+
+        return;
+    }
+
+    public editStep() {
+        let currentActiveTransitions = this.getPossibleActiveTransitions();
+
+        console.log(currentActiveTransitions);
+
+        currentActiveTransitions.forEach((element) => {
+           this.setTransitionColor(element,'green');
+        });
+
 
         return;
     }
@@ -229,7 +242,7 @@ export class MarkenspielService {
     }
 
     public fireStep() {
-        this.currentActiveTransitions.forEach((transition) => {
+        this.currentChosenTransitions.forEach((transition) => {
             this.fireSingleTransition(transition);
         });
     }

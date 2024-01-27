@@ -35,7 +35,7 @@
                 (click)="fireStep()"
                 [disabled] = "!stepsActive">
             <div class="fire-step-button">
-                <span class="tooltiptext">Show Random Step</span>
+                <span class="tooltiptext">Fire Step</span>
                 <mat-icon style="color:gray">fast_forward</mat-icon>
             </div>
         </button>
@@ -43,7 +43,7 @@
         <button mat-icon-button *ngIf="simulationActive"
                 class="fire-step tooltip"
                 (click)="returnToDrawing()">
-                <span class="tooltiptext">Show Random Step</span>
+                <span class="tooltiptext">Return To Drawing</span>
                 <mat-icon>keyboard_return</mat-icon>
         </button>
 

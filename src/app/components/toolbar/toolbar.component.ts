@@ -340,56 +340,12 @@ export class ToolbarComponent {
         }
 
         this._drawingService.deselectPlacesAndLines();
-        this._drawingService.setSimulationStatus(this.simulationStatus);
+        this._drawingService.setSimulationStatus(1);
 
         const startTransitions = this._markenspielService.getPossibleActiveTransitions();
         startTransitions.forEach((transition) => {
             this._markenspielService.setTransitionColor(transition, 'green');
         });
-
-    /*
-        // Zeichenmodus (Status 0)
-        if(this.simulationStatus == 0){
-            simulationButton.style.color = 'black';
-
-            this._drawingService.setSimulationStatus(this.simulationStatus);
-            this.simulationActive = false;
-
-            this._diagram?.transitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'black');
-                transition.isActive = false;
-            });
-
-            this.simulationStatus = 1;
-            // Statusvariable hochzählen, damit beim nächsten Mal weiter geschaltet wird
-        }
-        // Einfaches Markenspiel (Status 1)
-        else if (this.simulationStatus == 1) {
-            simulationButton.style.color = 'green';
-
-            this._drawingService.deselectPlacesAndLines();
-            this._drawingService.setSimulationStatus(this.simulationStatus);
-            this.simulationActive = true;
-
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'green');
-            });
-
-            this.simulationStatus = 2;
-        }
-        // Markenspiel mit Schritten (Status 2)
-        else if (this.simulationStatus == 2) {
-
-            simulationButton.style.color = 'violet';
-            this._drawingService.deselectPlacesAndLines();
-            this._drawingService.setSimulationStatus(this.simulationStatus);
-            this.simulationActive = true;
-
-            this._markenspielService.showStep();
-
-            this.simulationStatus = 0;
-        } */
     }
 
     editStep() {
@@ -405,6 +361,8 @@ export class ToolbarComponent {
         playButton.style.color = 'black';
         mergeButton.style.color = 'black';
         fireButton.style.color = 'black';
+
+        this._markenspielService.editStep();
     }
 
 
@@ -439,6 +397,7 @@ export class ToolbarComponent {
     returnToDrawing() {
         this.simulationActive = false;
         this.stepsActive = false;
+        this._drawingService.drawingActive = true;
 
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
 
@@ -448,7 +407,5 @@ export class ToolbarComponent {
             this._markenspielService.setTransitionColor(transition, 'black');
             transition.isActive = false;
         });
-
     }
-
 }
