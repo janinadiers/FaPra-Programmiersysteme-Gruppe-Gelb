@@ -50,6 +50,16 @@
 
  }
 
+ .inactive {
+  background-color: rgb(139, 136, 136); 
+  color: rgb(0, 0, 0); 
+}
+
+  .inactive:hover{
+  background-color: rgb(139, 136, 136) !important; 
+
+  } 
+
  .tooltip {
     position: relative;
     display: inline-block;

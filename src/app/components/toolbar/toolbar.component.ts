@@ -155,6 +155,11 @@ export class ToolbarComponent {
         this.arrowActiveColor = false;
         this.boltActiveColor =  false;
         this.reachabilityActiveColor = !this.reachabilityActiveColor;
+        if(this.simulationActive == false){
+            this._drawingService.deselectPlacesAndLines();
+            this.deselectAddAndRemoveTokenButtons();
+        }
+        
     }
 
     onAlgorithmSelect() {
@@ -212,7 +217,7 @@ export class ToolbarComponent {
             this._activeButtonService.sendButtonClick(buttonId);
             }
             else{
-                alert("A marked petri net is required!");
+                alert("Please provide a petri net with marks!");
             }
         }
         else{
