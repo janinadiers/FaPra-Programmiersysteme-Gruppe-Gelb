@@ -351,6 +351,7 @@ export class ToolbarComponent {
     editStep() {
         this.stepsActive = true;
         this._drawingService.drawingActive = false;
+        this._drawingService.setSimulationStatus(2);
 
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
@@ -363,12 +364,14 @@ export class ToolbarComponent {
         fireButton.style.color = 'black';
 
         this._markenspielService.editStep();
+
     }
 
 
     showRandomMaximumStep() {
         this.stepsActive = true;
         this._drawingService.drawingActive = false;
+        this._drawingService.setSimulationStatus(2);
 
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -391,6 +394,8 @@ export class ToolbarComponent {
 
         if(mergeButton.style.color == 'violet'){
             this._markenspielService.showStep();
+        } else {
+            this.editStep();
         }
     }
 
@@ -398,6 +403,7 @@ export class ToolbarComponent {
         this.simulationActive = false;
         this.stepsActive = false;
         this._drawingService.drawingActive = true;
+        this._drawingService.setSimulationStatus(0);
 
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
 

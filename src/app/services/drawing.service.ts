@@ -19,6 +19,9 @@ export class DrawingService {
     private _diagram: Diagram | undefined;
     private simulationActive: boolean = false;
     private simulationStatus: number = 0;
+    // 0 - Zeichnen/ DrawingActive
+    // 1 - Einfaches Markenspiel/ Simple Game - Event Listener für dblclick auf Rect
+    // 2 - Markenspiel mit Schritten
 
     constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
@@ -136,14 +139,12 @@ export class DrawingService {
             this.onRectSelect(rectObject!);
         });
 
-        rectObject.svgElement!.addEventListener(('dblclick'), () => {
+        rectObject.svgElement!.addEventListener(('dblclick'),  () => {
             this.startSimulation(rectObject!);
         });
 
         return rectObject
     }
-
-
 
     public startSimulation(rectObject: Transition) {
         if (!rectObject!.svgElement ||
@@ -172,8 +173,7 @@ export class DrawingService {
         }
 
         if(this.simulationStatus == 2){
-           this._markenspielService.fireStep();
-           this._markenspielService.showStep();
+           console.log("edit Step");
         }
     }
 

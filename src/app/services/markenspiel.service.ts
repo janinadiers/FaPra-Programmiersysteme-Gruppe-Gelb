@@ -14,6 +14,8 @@ import {Line} from "../classes/diagram/line";
 export class MarkenspielService {
 
     private _diagram: Diagram | undefined;
+    private currentActiveTransitions = new Map;
+    private alreadUsedParents = new Map;
 
     constructor(
         private diplayService: DisplayService) {
@@ -166,6 +168,7 @@ export class MarkenspielService {
     // Aufräumen: Lokalen Array der gerade aktiven Transitionen leeren und alle Transitionen auf false setzen
     private cleanUp() {
         this.currentChosenTransitions = [];
+        this.alreadUsedParents.clear();
         this._diagram?.transitions.forEach((transition) => {
             transition.isActive = false;
             this.setTransitionColor(transition, 'black');
@@ -207,16 +210,104 @@ export class MarkenspielService {
     }
 
     public editStep() {
-        let currentActiveTransitions = this.getPossibleActiveTransitions();
+        this.cleanUp();
+        let currentTransitions = this.getPossibleActiveTransitions();
 
-        console.log(currentActiveTransitions);
-
-        currentActiveTransitions.forEach((element) => {
-           this.setTransitionColor(element,'green');
+        currentTransitions.forEach((element) => {
+           this.currentActiveTransitions.set(element.id,element);
         });
 
+        this.currentActiveTransitions.forEach((element) => {
+           this.setTransitionColor(element,'green');
+           element.svgElement?.addEventListener(('dblclick'),  () => {
+               this.choseElement(element);
+           });
+        });
 
         return;
+    }
+
+    private choseElement(element: Transition) {
+        if(this.checkConsequences(element)){
+            this.currentChosenTransitions.push(element);
+            this.setTransitionColor(element,'violet');
+        }
+    }
+
+    checkConsequences(element: Transition) {
+        let noConflicts = false;
+
+        let parents = element.parents;
+        let lines = this._diagram!.lines;
+
+
+        parents.forEach( (parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let idString = result!.id.split(',')![0];
+            console.log("Line: "+idString);
+            console.log("Parent: "+parent.id);
+            console.log("Token: "+parent.amountToken);
+
+            if(!this.alreadUsedParents.has(idString)){
+                console.log(this.alreadUsedParents.get(idString));
+                noConflicts = true;
+                this.alreadUsedParents.set(idString, parent.amountToken);
+                console.log(noConflicts);
+            } else {
+                console.log(this.alreadUsedParents.get(idString));
+                noConflicts = false;
+                console.log(noConflicts);
+            }
+
+            console.log(result);
+
+        }); // result: erst p1t1, dann p1t2
+
+        console.log(this.alreadUsedParents);
+
+        return noConflicts;
+
+    }
+
+    private test(element: Transition) {
+        const lines = this._diagram?.lines; // alle Kanten holen
+        let sourcePlaceIds: String[] = []; // Array für die schon verwendeten Stellen zur Prüfung im Wettbewerbskonflikt
+
+        // gewähltes Element dem "ChosenStepArray" hinzufügen und aus der Map herausnehmen (?)
+        this.currentChosenTransitions.push(element);
+
+        // alle Transitionen auc schwarz setzen
+        this._diagram?.transitions.forEach((element) => {
+            this.setTransitionColor(element,'black');
+        });
+
+        let currentTransitions = this.getPossibleActiveTransitions();
+
+        // Map aktualisieren
+        currentTransitions.forEach((element) => {
+            this.currentActiveTransitions.set(element.id,element);
+        });
+
+        // Konflikte?
+        currentTransitions.forEach((transition) => {
+            const line = lines?.find(line => line.target.id === transition.id);
+            let currentSourceID = line!.source.id;
+
+            // Prüfen, ob die Stelle im Vorbereich schon von einer anderen Transition benutzt wurde
+            if(!sourcePlaceIds.includes(currentSourceID)){
+                this.currentChosenTransitions.push(transition);
+                this.currentActiveTransitions.delete(element.id);
+                sourcePlaceIds.push(currentSourceID);
+            }
+        });
+
+        this.currentActiveTransitions.forEach((element) => {
+            this.setTransitionColor(element,'green');
+        });
+
+        this.currentChosenTransitions.forEach((element) => {
+            this.setTransitionColor(element, 'violet');
+        });
     }
 
     private fireSingleTransition(element: Transition) {
