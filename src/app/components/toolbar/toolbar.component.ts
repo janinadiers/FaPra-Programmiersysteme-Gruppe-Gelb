@@ -74,12 +74,10 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    stepsActive: boolean = false;
 
     ngOnInit() {
-        let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
         this.simulationStatus = 0;
-
-        simulationButton.style.color = 'black';
         this._drawingService.setSimulationStatus(this.simulationStatus);
 
         this._diagram?.transitions.forEach((transition) => {
@@ -326,12 +324,35 @@ export class ToolbarComponent {
     }
 
     toggleSimulation() {
+        this.stepsActive = false;
 
-    if(this.reachabilityActiveColor){
-        return;
-    }
-        let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
+        let simulationButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
+        let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+        let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
 
+        simulationButton.style.color = 'green';
+
+        if(editButton != null) {
+            editButton.style.color = 'black';
+        }
+        if(mergeButton != null) {
+            mergeButton.style.color = 'black';
+        }
+        if(fireButton != null) {
+            fireButton.style.color = 'gray';
+        }
+
+        this._drawingService.deselectPlacesAndLines();
+        this._drawingService.setSimulationStatus(this.simulationStatus);
+        this.simulationActive = true;
+
+        const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+        startTransitions.forEach((transition) => {
+            this._markenspielService.setTransitionColor(transition, 'green');
+        });
+
+    /*
         // Zeichenmodus (Status 0)
         if(this.simulationStatus == 0){
             simulationButton.style.color = 'black';
@@ -373,6 +394,65 @@ export class ToolbarComponent {
             this._markenspielService.showStep();
 
             this.simulationStatus = 0;
+        } */
+    }
+
+    editStep() {
+        this.stepsActive = true;
+
+        let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
+        let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+        let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
+
+        editButton.style.color = 'violet';
+        playButton.style.color = 'black';
+        mergeButton.style.color = 'black';
+        fireButton.style.color = 'black';
+    }
+
+
+    showRandomMaximumStep() {
+        this.stepsActive = true;
+
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+        let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
+        let playButton =  document.querySelector('.play-button > mat-icon') as HTMLElement;
+        let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
+
+        mergeButton.style.color = 'violet';
+        editButton.style.color = 'black';
+        playButton.style.color = 'black';
+        fireButton.style.color = 'black';
+
+        this._markenspielService.showStep();
+
+    }
+
+    fireStep() {
+        console.log("fire Step");
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+
+        this._markenspielService.fireStep();
+
+        if(mergeButton.style.color == 'violet'){
+            this._markenspielService.showStep();
         }
     }
+
+    returnToDrawing() {
+        this.simulationActive = false;
+        this.stepsActive = false;
+
+        let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
+
+        playButton.style.color = 'black';
+
+        this._diagram?.transitions.forEach((transition) => {
+            this._markenspielService.setTransitionColor(transition, 'black');
+            transition.isActive = false;
+        });
+
+    }
+
 }

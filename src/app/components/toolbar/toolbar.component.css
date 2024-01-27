@@ -45,17 +45,17 @@
  }
 
  .active {
-    background-color: red; 
-    color: white; 
+    background-color: red;
+    color: white;
 
  }
 
  .tooltip {
     position: relative;
     display: inline-block;
-   
+
   }
-  
+
   .tooltip .tooltiptext {
     visibility: hidden;
     width: 120px;
@@ -73,7 +73,7 @@
     transition: opacity 0.3s;
     font-size: small;
   }
-  
+
   .tooltip .tooltiptext::after {
     content: "";
     position: absolute;
@@ -84,7 +84,7 @@
     border-style: solid;
     border-color: #555 transparent transparent transparent;
   }
-  
+
   .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
@@ -93,10 +93,34 @@
   .vertical-line {
     height: 30px;
     width: 1px;
-    background-color: rgb(211, 211, 211); 
+    background-color: rgb(211, 211, 211);
     border-radius: 6rem;
     margin: 1rem;
 
 }
 
+.edit-button {
+    color: violet;
+    color: green;
+    color: black;
+}
+
+.merge-type-button {
+    color: violet;
+    color: green;
+    color: black;
+}
+
+.play-button {
+    color: violet;
+    color: green;
+    color: black;
+}
+
+.fire-step-button {
+    color: violet;
+    color: green;
+    color: black;
+    color: gray;
+}
 

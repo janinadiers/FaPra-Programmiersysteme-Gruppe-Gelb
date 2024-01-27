@@ -1,14 +1,52 @@
 <mat-toolbar class="toolbar">
     <div class="left-toolbar">
-        
-        <button mat-icon-button 
-                class="play tooltip" 
-                (click)="toggleSimulation()">
+
+        <button mat-icon-button
+                class="play tooltip"
+                (click)="toggleSimulation()"
+                color="violet">
+            <div class="play-button">
                 <span class="tooltiptext">start simulation</span>
                 <mat-icon>play_circle</mat-icon>
+            </div>
         </button>
 
-        <button mat-icon-button 
+        <button mat-icon-button *ngIf="simulationActive"
+                class="edit tooltip"
+                (click)="editStep()">
+            <div class="edit-button">
+                <span class="tooltiptext">Edit Step</span>
+                <mat-icon style="color:black">edit</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="create tooltip"
+                (click)="showRandomMaximumStep()">
+            <div class="merge-type-button">
+                <span class="tooltiptext">Show Random Step</span>
+                <mat-icon style="color:black">merge_type</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="fire-step tooltip"
+                (click)="fireStep()"
+                [disabled] = "!stepsActive">
+            <div class="fire-step-button">
+                <span class="tooltiptext">Show Random Step</span>
+                <mat-icon style="color:gray">fast_forward</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="fire-step tooltip"
+                (click)="returnToDrawing()">
+                <span class="tooltiptext">Show Random Step</span>
+                <mat-icon>keyboard_return</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="!simulationActive"
                 class="hover-class tooltip"
                 [class.active]="reachabilityActiveColor"
                 (click)="onButtonClick('reachabilityGraph')">
