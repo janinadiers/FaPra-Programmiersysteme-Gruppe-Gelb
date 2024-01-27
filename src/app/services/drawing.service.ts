@@ -188,10 +188,10 @@ export class DrawingService {
     }
 
     public setSimulationStatus(status: number) {
-        if(status == 0){  // verhindert, dass im Simulationsmodus Linien/Kreise angeklickt werden können
-            this.drawingActive = true;
-        } else {
+        if(status != 0){  // verhindert, dass im Simulationsmodus Linien/Kreise angeklickt werden können
             this.drawingActive = false;
+        } else {
+            this.drawingActive = true;
         }
         this.simulationStatus = status;
         return;
@@ -307,7 +307,7 @@ export class DrawingService {
 
     // Farbänderungen in der Toolbar
     changeTokenButtonColor(color: string) {
-        if(this.simulationStatus == 1 || this.simulationStatus == 2){
+        if(!this.drawingActive){
             return;
         }
 

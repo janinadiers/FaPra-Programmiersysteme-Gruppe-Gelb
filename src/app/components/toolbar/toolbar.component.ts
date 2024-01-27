@@ -84,8 +84,6 @@ export class ToolbarComponent {
             this._markenspielService.setTransitionColor(transition, 'black');
             transition.isActive = false;
         });
-
-        this.simulationStatus = 1;
     }
 
     toggleRectangleButton() {
@@ -313,18 +311,16 @@ export class ToolbarComponent {
     }
 
     markenspielText() {
-        if(this.simulationStatus == 2) {
-            return "Markenspiel";
-        }
-        if(this.simulationStatus == 0){
+        if(this.stepsActive) {
             return "Markenspiel mit Schritten";
-        }
-        else
-            return;
+        } else
+            return "Markenspiel";
     }
 
     toggleSimulation() {
         this.stepsActive = false;
+        this.simulationActive = true;
+        this._drawingService.drawingActive = false;
 
         let simulationButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -345,7 +341,6 @@ export class ToolbarComponent {
 
         this._drawingService.deselectPlacesAndLines();
         this._drawingService.setSimulationStatus(this.simulationStatus);
-        this.simulationActive = true;
 
         const startTransitions = this._markenspielService.getPossibleActiveTransitions();
         startTransitions.forEach((transition) => {
@@ -399,6 +394,7 @@ export class ToolbarComponent {
 
     editStep() {
         this.stepsActive = true;
+        this._drawingService.drawingActive = false;
 
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
@@ -414,6 +410,7 @@ export class ToolbarComponent {
 
     showRandomMaximumStep() {
         this.stepsActive = true;
+        this._drawingService.drawingActive = false;
 
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -430,7 +427,6 @@ export class ToolbarComponent {
     }
 
     fireStep() {
-        console.log("fire Step");
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
 
         this._markenspielService.fireStep();

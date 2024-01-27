@@ -6,7 +6,8 @@
                 (click)="toggleSimulation()"
                 color="violet">
             <div class="play-button">
-                <span class="tooltiptext">start simulation</span>
+                <span class="tooltiptext">Start Simulation</span>
+                <span class="tooltiptext" *ngIf="stepsActive">Simple Game</span>
                 <mat-icon>play_circle</mat-icon>
             </div>
         </button>
