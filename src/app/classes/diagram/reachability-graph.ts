@@ -37,6 +37,7 @@ export class ReachabilityGraph {
             this.moveNodes();
             this.drawGraph();
             this._springEmbedderService.apply(this._visited);
+            //console.log(this._visited);
             
         }
         else{
@@ -117,7 +118,7 @@ export class ReachabilityGraph {
                 if(placesWithEnoughTokens === connectedLines.length){
                     this._activeTransitions.push(transitions[i]);
                 }
-
+              
                 connectedLines.splice(0, connectedLines.length);
                 placesWithEnoughTokens = 0;
             }
@@ -141,10 +142,11 @@ export class ReachabilityGraph {
         // Tokens im Vorbereich abziehen
         connectedLines.forEach(line => {
             let placeID = line.source.id;
-            let placeToken = currentState.state.get(placeID);
+            let placeToken = state.get(placeID);
             placeToken = placeToken! - line.tokens;
             state.set(placeID, placeToken);
         });
+        
         connectedLines.splice(0, connectedLines.length);
 
         lines.forEach(line => {
@@ -155,10 +157,9 @@ export class ReachabilityGraph {
         // Tokens im Nachbereich hinzufügen
        connectedLines.forEach(line => {
             let placeID = line.target.id;
-            let placeToken = currentState.state.get(placeID);
-            
+            let placeToken = state.get(placeID);
             placeToken = placeToken! + line.tokens;
-            state.set(placeID, placeToken);    
+            state.set(placeID, placeToken);   
         });
         connectedLines.splice(0, connectedLines.length);
         
@@ -333,7 +334,6 @@ export class ReachabilityGraph {
     
 
 
-
     compareWithVisitedStates(){
 
         const statesToRemove: number[] = [];
@@ -368,6 +368,7 @@ export class ReachabilityGraph {
         // Enferne Zustände ohne parents
         this._newStates = this._newStates.filter(state => state.parents.length > 0);
     }
+
 
 
 
