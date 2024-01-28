@@ -74,6 +74,7 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    pdfSrc: string = 'assets/manual.pdf';
 
     ngOnInit() {
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
@@ -375,4 +376,10 @@ export class ToolbarComponent {
             this.simulationStatus = 0;
         }
     }
+
+    openPdf() {
+        
+        window.open(this.pdfSrc, '_blank');
+      }
+
 }
