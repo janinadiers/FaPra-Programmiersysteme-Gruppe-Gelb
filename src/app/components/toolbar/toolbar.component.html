@@ -122,11 +122,12 @@
     </div>
         <div class="center-toolbar">
             <label for="algorithm-select">Algorithmus: </label>
-            <select name="algorithm" id="algorithm-select" (change)="onAlgorithmSelect()">
+            <select name="algorithm" id="algorithm-select" (change)="onAlgorithmSelect()" *ngIf="!simulationActive">
                 <option value="free">Free</option>
                 <option value="spring-embedder">Spring Embedder</option>
                 <option value="sugiyama">Sugiyama</option>
             </select>
+            <label *ngIf="simulationActive">Free</label>
         </div>
         <div class="right-toolbar">
             <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">

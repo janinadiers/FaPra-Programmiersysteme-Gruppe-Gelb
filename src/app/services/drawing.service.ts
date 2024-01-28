@@ -171,10 +171,10 @@ export class DrawingService {
                 transition.isActive = true;
             }));
         }
-
+        /*
         if(this.simulationStatus == 2){
-           console.log("edit Step");
-        }
+            console.log("edit step");
+        }*/
     }
 
     onRectSelect(rect: Transition) {
