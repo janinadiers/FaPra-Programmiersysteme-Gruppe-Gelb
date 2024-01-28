@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
 import { Diagram } from 'src/app/classes/diagram/diagram';
 import { Line } from '../classes/diagram/line';
+import { Coords } from '../classes/json-petri-net';
+import { Place } from '../classes/diagram/place';
+import { Transition } from '../classes/diagram/transition';
 
 @Injectable({
     providedIn: 'root',
@@ -10,6 +13,9 @@ export class SugiyamaService {
     diagram: Diagram = new Diagram([], []);
     layers: Element[][] = [];
     removedLines: Line[] = [];
+    
+    layerWidth = 100;
+    nodeHeight = 100;
 
     public begin(diagram: Diagram) {
         this.diagram = diagram;
@@ -19,8 +25,11 @@ export class SugiyamaService {
         this.addLayers();
         this.removeLowerDirectedLines();
         this.revertLoops();
-        // this.routeEdges(); //TODO
-        this.reduceCrossings();
+        this.removeAllIntermediateCoords();
+        this.assignCoordinates();
+        this.routeEdges(); 
+        this.minimizeCrossings();
+        // this.reduceCrossings();
         this.assignCoordinates();
     }
     
@@ -125,7 +134,80 @@ export class SugiyamaService {
         })
     }
 
-    // Step 5: Reduce crossings using the barycenter heuristic - nN. for basic petrinet
+    // Step 5: Remove all intermediate Coords
+    removeAllIntermediateCoords() {
+        this.diagram.lines.forEach((line) => {
+            if (line.coords)
+                line.coords = [];
+        });
+    }
+
+    // Step 6: Edge Routing
+    routeEdges() {
+        // Route edges as PolyLine (add line-points on Layer)
+        for (let i = 0; i < this.layers.length; i++) {
+            let layer = this.layers[i];
+            for (let j = 0; j < layer.length; j++) {
+                let elementID = layer[j].id;
+                let currentLines = this.diagram.lines.filter((line) => line.source.id == elementID);
+
+                currentLines.forEach(currentLine => {
+                    const targetLayer = this.layers.findIndex(s => s.some(o => o.id === currentLine.target.id));
+                    if (i + 1 != targetLayer && i - 1 != targetLayer) {
+                        let nextLayerLength = this.layers[i+1].length + 1;
+                        let intermediateLayers = targetLayer -  i;
+
+                        let coords: Coords[] = [];
+                        let place: Place = this.diagram.places.find((place) => place.id == elementID) as Place;
+                        let transition: Transition = this.diagram.transitions.find((transition) => transition.id == elementID) as Transition;
+
+                        if (intermediateLayers > 0) {
+                            for (let c = 1; c < intermediateLayers; c++) {
+                                let xCoord = (currentLine.source.x) + c * this.layerWidth;
+                                let yCoord = (currentLine.source.y);
+                                if (layer.length + 1 == nextLayerLength)
+                                    yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
+    
+                                coords.push({ 
+                                    x: xCoord, 
+                                    y: yCoord
+                                });
+                            }
+                        } else {
+                            intermediateLayers = i - targetLayer;
+                            for (let c = 1; c < intermediateLayers; c++) {
+                                let xCoord = (currentLine.source.x) - c * this.layerWidth;
+                                let yCoord = (currentLine.source.y);
+                                if (layer.length + 1 == nextLayerLength)
+                                    yCoord = (currentLine.source.y) - 1 * this.nodeHeight;+
+    
+                                coords.push({ 
+                                    x: xCoord, 
+                                    y: yCoord
+                                });
+                            }
+                        }
+                        currentLine.coords = coords;
+                    }
+                })
+            }
+        }
+    }
+
+    // Step 7: Reduce crossings using the barycenter heuristic
+    minimizeCrossings() {
+        let changed = true;
+        while (changed) {
+            const prevElements = this.diagram.places.map(element => { element.position }).concat(this.diagram.transitions.map(element => { element.position }));
+            this.orderByBarycenter('place');
+            this.orderByBarycenter('transition');
+            const newElements = this.diagram.places.map(element => { element.position }).concat(this.diagram.transitions.map(element => { element.position }));
+
+            changed = !prevElements.every((pos, idx) => pos === newElements[idx]);
+        }
+    }
+
+    // Step 7: Reduce crossings using the barycenter heuristic
     reduceCrossings() {
         let improved = true;
         let iterationCount = 0;
@@ -146,36 +228,69 @@ export class SugiyamaService {
         }
     }
 
-    // Step 6: Edge Routing
-    routeEdges() {
-        // Route edges as PolyLine (add line-points on Layer)
-    }
-
-    // Step 7: Assign coordinates to each element
+    // Step 8: Assign coordinates to each element
     assignCoordinates() {
-        const layerWidth  = 100;
-        const nodeHeight  = 100;
-
         for (let i = 0; i < this.layers.length; i++) {
             let layer = this.layers[i];
             for (let j = 0; j < layer.length; j++) {
                 let elementID = layer[j].id;
                 this.diagram.places.find((place) => place.id == elementID)?.
                     updateGroup({
-                        x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
-                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight
+                        x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * this.layerWidth, 
+                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * this.nodeHeight
                     });
                 
                 this.diagram.transitions.find((transition) => transition.id == elementID)?.
                     updateGroup({
-                        x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * layerWidth, 
-                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * nodeHeight
+                        x: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].x) + i * this.layerWidth, 
+                        y: (this.diagram.places.sort((a,b) => a.id < b.id ? -1 : 1)[0].y) + j * this.nodeHeight
                     });
             }
         }
     }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    orderByBarycenter(nodeType: 'place' | 'transition') {
+        const barycenters = this.calculateBarycenters(nodeType);
+        for (const layer of this.layers) {
+            if (nodeType == 'place') {
+                const elementsOfType = layer.filter(element => element instanceof Place);
+                elementsOfType.sort((a, b) => (barycenters.get(a.id) || 0) - (barycenters.get(b.id) || 0));
+                const places = elementsOfType.map(element => element as unknown as Place);
+                places.forEach((place, idx) => place.position = idx); // Update positions after sorting
+            } else {
+                const elementsOfType = layer.filter(element => element instanceof Transition);
+                elementsOfType.sort((a, b) => (barycenters.get(a.id) || 0) - (barycenters.get(b.id) || 0));
+                const transitions = elementsOfType.map(element => element as unknown as Transition);
+                transitions.forEach((transition, idx) => transition.position = idx); // Update positions after sorting
+            }
+        }
+    }
+
+    calculateBarycenters(nodeType: 'place' | 'transition'): Map<string, number> {
+        const barycenters = new Map<string, number>();
+        if (nodeType == 'place') {
+            let places = this.diagram.places.map((place) => place as Place);
+            for (const element of places) {
+                let neighbors = element.children.concat(element.parents);
+                const neighborPositions = neighbors.map(neighbor => this.diagram.transitions.find((transition) => transition.id === neighbor.id)?.position || 0);
+                
+                const barycenter = neighborPositions.reduce((a, b) => a + b, 0) / neighborPositions.length;
+                barycenters.set(element.id, isNaN(barycenter) ? element.position : barycenter);
+            }
+        } else {
+            let transitions = this.diagram.transitions.map((transition) => transition as Transition);
+            for (const element of transitions) {
+                let neighbors = element.children.concat(element.parents);
+                const neighborPositions = neighbors.map(neighbor => this.diagram.transitions.find((transition) => transition.id === neighbor.id)?.position || 0);
+                
+                const barycenter = neighborPositions.reduce((a, b) => a + b, 0) / neighborPositions.length;
+                barycenters.set(element.id, isNaN(barycenter) ? element.position : barycenter);
+            }
+        }
+        return barycenters;
+    }
 
     private dfsRemove(element: Element, stack: Set<Element>, marked: Set<Element>) {
         //if element already visited, return and break recursive call
