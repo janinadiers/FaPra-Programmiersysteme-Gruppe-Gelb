@@ -74,6 +74,7 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    initialState: Map<string, number> = new Map<string, number>();
 
     ngOnInit() {
         let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
@@ -334,6 +335,8 @@ export class ToolbarComponent {
 
         // Zeichenmodus (Status 0)
         if(this.simulationStatus == 0){
+            // Initale Markeirung setzen
+            this.setInitialState();
             simulationButton.style.color = 'black';
 
             this._drawingService.setSimulationStatus(this.simulationStatus);
@@ -349,6 +352,9 @@ export class ToolbarComponent {
         }
         // Einfaches Markenspiel (Status 1)
         else if (this.simulationStatus == 1) {
+
+            // Initiale Markierung speichern
+            this.getInitialState();
             simulationButton.style.color = 'green';
 
             this._drawingService.deselectPlacesAndLines();
@@ -375,4 +381,27 @@ export class ToolbarComponent {
             this.simulationStatus = 0;
         }
     }
+
+    getInitialState(){
+    
+        this._diagram?.places.forEach(place => {
+            this.initialState.set(place.id, place.amountToken);
+            });
+    }
+
+    setInitialState(){
+
+        this._diagram?.places.forEach(place => {
+           let token = this.initialState.get(place.id);
+           place.amountToken = token!;
+           if(place.amountToken === 0){
+            place.svgElement!.children[1].textContent = null;
+           }
+           else{
+            place.svgElement!.children[1].textContent = 
+            place.amountToken.toString();
+           }
+        });
+    }
+    
 }
