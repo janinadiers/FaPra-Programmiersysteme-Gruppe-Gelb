@@ -100,7 +100,7 @@
             </select>
         </div>
         <div class="right-toolbar">
-            <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
+            <button *ngIf="!reachabilityActiveColor"  class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
                 <mat-icon>import_export</mat-icon>
             </button>
