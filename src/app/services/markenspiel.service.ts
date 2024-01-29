@@ -191,10 +191,6 @@ export class MarkenspielService {
 
         // 3. Prüfen auf Konflikte
         transitions.forEach((transition) => {
-            if(this.checkConsequences(transition)){
-                this.currentChosenTransitions.push(transition);
-            }
-            /*
             const line = lines?.find(line => line.target.id === transition.id);
             let currentSourceID = line!.source.id;
 
@@ -202,7 +198,7 @@ export class MarkenspielService {
             if(!sourcePlaceIds.includes(currentSourceID)){
                 this.currentChosenTransitions.push(transition);
                 sourcePlaceIds.push(currentSourceID);
-            }*/
+            }
         });
 
         // 4. Zeigen des Schrittes
@@ -218,6 +214,7 @@ export class MarkenspielService {
     public editStep() {
         this.cleanUp();
         let currentTransitions = this.getPossibleActiveTransitions();
+
 
         currentTransitions.forEach((element) => {
            this.currentActiveTransitions.set(element.id,element);
@@ -238,6 +235,8 @@ export class MarkenspielService {
             this.currentChosenTransitions.push(element);
             this.setTransitionColor(element,'violet');
         }
+
+        // nur Überprüfung der parents, bei nicht aktiv auf false setzen
     }
 
     checkConsequences(element: Transition) {
@@ -250,11 +249,37 @@ export class MarkenspielService {
             let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
             let idString = result!.id.split(',')![0];
 
+        // Überprüfung ggf vom Setzen der alreadUsedParents trennen
             if(!this.alreadUsedParents.has(idString)){
                 noConflicts = true;
                 this.alreadUsedParents.set(idString, parent.amountToken);
             } else {
                 if(parent.amountToken - result!.tokens > 0){
+                    noConflicts = true;
+                } else {
+                    noConflicts = false;
+                }
+            }
+        });
+
+        return noConflicts;
+    }
+
+    checkParents(element: Transition) {
+        let noConflicts = false;
+
+        let parents = element.parents;
+        let lines = this._diagram!.lines;
+
+        parents.forEach( (parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let idString = result!.id.split(',')![0];
+
+            // Überprüfung ggf vom Setzen der alreadUsedParents trennen
+            if (!this.alreadUsedParents.has(idString)) {
+                noConflicts = true;
+            } else {
+                if (parent.amountToken - result!.tokens > 0) {
                     noConflicts = true;
                 } else {
                     noConflicts = false;
