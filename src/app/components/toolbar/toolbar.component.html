@@ -80,20 +80,32 @@
                 </button>
 
     </div>
+    <div class="vertical-line"></div>
         <div class="center-toolbar">
-            <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="algorithmSelectMenu">
-                <span class="tooltiptext">Select Algorithm</span>
-                <mat-icon>visibility</mat-icon>
+            
+            <button class="hover-class tooltip free" mat-icon-button  (click)="onAlgorithmSelect('free')">
+                <span class="tooltiptext" (click)="onAlgorithmSelect('free')">Free</span>
+                <mat-icon class="selected">pan_tool</mat-icon>
             </button>
-           
-            <mat-menu class="hover-class" #algorithmSelectMenu="matMenu">
+            <button class="hover-class tooltip spring-embedder" mat-icon-button (click)="onAlgorithmSelect('spring-embedder')" >
+                <span class="tooltiptext">Spring-Embedder</span>
+                <mat-icon>account_tree</mat-icon>
+            </button>
+            <button class="hover-class tooltip sugiyama" mat-icon-button (click)="onAlgorithmSelect('sugiyama')" >
+                <span class="tooltiptext">Sugiyama</span>
+                <mat-icon>schema</mat-icon>
+            </button>
+            
+            <!-- <mat-menu class="hover-class" #algorithmSelectMenu="matMenu">
                 <button mat-menu-item class='free selected' (click)="onAlgorithmSelect('free')">Free</button>
                 <button mat-menu-item class='spring-embedder' (click)="onAlgorithmSelect('spring-embedder')">Spring-Embedder</button>
                 <button mat-menu-item class="sugiyama" (click)="onAlgorithmSelect('sugiyama')">Sugiyama</button>
-            </mat-menu>
+            </mat-menu> -->
            
         </div>
+        <div class="vertical-line"></div>
         <div class="right-toolbar">
+            
             <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
                 <mat-icon>import_export</mat-icon>

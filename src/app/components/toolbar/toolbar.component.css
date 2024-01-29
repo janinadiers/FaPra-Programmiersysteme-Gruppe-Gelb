@@ -12,20 +12,21 @@
 
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
 }
 
 .right-toolbar {
 
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     width: 100%;
 }
 
 .center-toolbar {
 
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   width: 100%;
   font-size: 1.1rem;
 }
@@ -43,6 +44,11 @@
 
     background-color: red;
  }
+
+ /* .hover-class-2:hover {
+
+  background-color: rgb(210, 210, 210);;
+} */
 
  .active {
     background-color: red; 
@@ -99,7 +105,12 @@
 
 }
 .selected {
-  background-color: #f4f4f4;
+  background-color: red
+
+}
+
+button{
+  text-align: center;
 }
 
 
