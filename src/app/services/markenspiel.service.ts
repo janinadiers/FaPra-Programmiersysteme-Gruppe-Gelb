@@ -285,6 +285,13 @@ export class MarkenspielService {
                     let deleteElement = this.currentChosenTransitions.indexOf(element);
                     this.currentChosenTransitions.splice(deleteElement);
 
+                    let possibleTransitions = this.getPossibleActiveTransitions();
+                    if(possibleTransitions.includes(element)){
+                        this.setTransitionColor(element, 'green');
+                    } else {
+                        this.setTransitionColor(element,'black');
+                    }
+
                     deleteCount--;
                 }
             }

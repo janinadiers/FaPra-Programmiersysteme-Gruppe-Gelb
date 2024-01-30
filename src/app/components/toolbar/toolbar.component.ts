@@ -76,6 +76,7 @@ export class ToolbarComponent {
     simulationStatus: number = 0;
     stepsActive: boolean = false;
     multitasking: boolean = false;
+    randomStep: boolean = false;
 
     ngOnInit() {
         this.simulationStatus = 0;
@@ -323,6 +324,7 @@ export class ToolbarComponent {
         this.simulationActive = true;
         this._drawingService.drawingActive = false;
         this._markenspielService.processChosing = false;
+        this.randomStep = false;
 
         let simulationButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -355,6 +357,7 @@ export class ToolbarComponent {
         this._drawingService.drawingActive = false;
         this._drawingService.setSimulationStatus(2);
         this._markenspielService.processChosing = true;
+        this.randomStep = false;
 
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
@@ -376,6 +379,7 @@ export class ToolbarComponent {
         this._drawingService.drawingActive = false;
         this._drawingService.setSimulationStatus(2);
         this._markenspielService.processChosing = false;
+        this.randomStep = true;
 
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -410,7 +414,7 @@ export class ToolbarComponent {
         let refreshButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
 
         if(this.multitasking) {
-            refreshButton.style.color = 'red';
+            refreshButton.style.color = 'violet';
         } else {
             refreshButton.style.color = 'black';
         }

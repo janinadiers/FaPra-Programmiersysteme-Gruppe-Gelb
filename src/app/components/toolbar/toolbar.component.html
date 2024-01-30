@@ -40,7 +40,7 @@
             </div>
         </button>
 
-        <button mat-icon-button *ngIf="simulationActive"
+        <button mat-icon-button *ngIf="simulationActive && !randomStep"
                 class="multitasking tooltip"
                 (click)="activateMultitaskingTransitions()">
             <span class="tooltiptext">Multitasking</span>
