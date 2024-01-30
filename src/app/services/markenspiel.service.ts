@@ -55,6 +55,8 @@ export class MarkenspielService {
     }
 
     public addLineToken() {
+        console.log('add line token');
+        
         if (!this._diagram?.selectedLine) {
             return;
         }
