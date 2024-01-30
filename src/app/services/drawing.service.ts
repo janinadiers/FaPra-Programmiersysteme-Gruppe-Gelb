@@ -171,10 +171,19 @@ export class DrawingService {
                 transition.isActive = true;
             }));
         }
-        /*
-        if(this.simulationStatus == 2){
-            console.log("edit step");
-        }*/
+
+        if(this.simulationStatus == 2 && !this._markenspielService.processChosing){
+            const transitions = this._markenspielService.showAll();
+            if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
+                rectObject!.isActive = false;
+                this._markenspielService.setTransitionColor(rectObject!, 'black');
+            }
+
+            transitions.forEach((transition => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+                transition.isActive = true;
+            }));
+        }
     }
 
     onRectSelect(rect: Transition) {

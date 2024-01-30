@@ -75,6 +75,7 @@ export class ToolbarComponent {
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
     stepsActive: boolean = false;
+    multitasking: boolean = false;
 
     ngOnInit() {
         this.simulationStatus = 0;
@@ -321,6 +322,7 @@ export class ToolbarComponent {
         this.stepsActive = false;
         this.simulationActive = true;
         this._drawingService.drawingActive = false;
+        this._markenspielService.processChosing = false;
 
         let simulationButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -352,6 +354,7 @@ export class ToolbarComponent {
         this.stepsActive = true;
         this._drawingService.drawingActive = false;
         this._drawingService.setSimulationStatus(2);
+        this._markenspielService.processChosing = true;
 
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
@@ -372,6 +375,7 @@ export class ToolbarComponent {
         this.stepsActive = true;
         this._drawingService.drawingActive = false;
         this._drawingService.setSimulationStatus(2);
+        this._markenspielService.processChosing = false;
 
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
@@ -399,11 +403,26 @@ export class ToolbarComponent {
         }
     }
 
+    activateMultitaskingTransitions() {
+        this.multitasking = !this.multitasking;
+        this._markenspielService.multitaskingTransitions(this.multitasking);
+
+        let refreshButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
+
+        if(this.multitasking) {
+            refreshButton.style.color = 'red';
+        } else {
+            refreshButton.style.color = 'black';
+        }
+    }
+
     returnToDrawing() {
         this.simulationActive = false;
         this.stepsActive = false;
         this._drawingService.drawingActive = true;
         this._drawingService.setSimulationStatus(0);
+        this._markenspielService.multitaskingTransitions(false);
+        this._markenspielService.processChosing = false;
 
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
 

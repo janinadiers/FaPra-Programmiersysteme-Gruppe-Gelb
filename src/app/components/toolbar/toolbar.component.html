@@ -41,6 +41,13 @@
         </button>
 
         <button mat-icon-button *ngIf="simulationActive"
+                class="multitasking tooltip"
+                (click)="activateMultitaskingTransitions()">
+            <span class="tooltiptext">Multitasking</span>
+            <mat-icon>done_all</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
                 class="fire-step tooltip"
                 (click)="returnToDrawing()">
                 <span class="tooltiptext">Return To Drawing</span>
