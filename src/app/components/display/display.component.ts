@@ -353,6 +353,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
+        event.stopPropagation(); // Event nicht an Eltern-Elemente weitergeben
         if (this.activeButtonService.isBoltButtonActive) {
 
             this._diagram?.resetSelectedElements();
@@ -389,7 +390,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
               });
 
               this._diagram!.lines.forEach(line => {
-                let svgLine = line.createSVG();
+                let svgLine = line.svgElement;
                 svgElement?.insertBefore(svgLine!,svgElement.firstChild);
               });
 

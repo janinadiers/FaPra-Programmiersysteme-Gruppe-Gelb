@@ -19,6 +19,7 @@ export interface JsonPetriNet {
 export interface Coords {
     x: number,
     y: number,
-    isVirtual?: boolean
 }
+
+
 
