@@ -330,9 +330,13 @@ export class ToolbarComponent {
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
         let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
+        let multiButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
 
         simulationButton.style.color = 'green';
 
+        if(multiButton != null){
+            multiButton.style.color = 'gray';
+        }
         if(editButton != null) {
             editButton.style.color = 'black';
         }
@@ -363,11 +367,13 @@ export class ToolbarComponent {
         let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
         let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
         let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
+        let multiButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
 
         editButton.style.color = 'violet';
         playButton.style.color = 'black';
         mergeButton.style.color = 'black';
         fireButton.style.color = 'black';
+        multiButton.style.color = 'black';
 
         this._markenspielService.editStep();
 
@@ -412,8 +418,11 @@ export class ToolbarComponent {
         this._markenspielService.multitaskingTransitions(this.multitasking);
 
         let refreshButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
+        let randomButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
 
-        if(this.multitasking) {
+        randomButton.style.color = 'gray';
+
+        if(this.multitasking && this.stepsActive) {
             refreshButton.style.color = 'violet';
         } else {
             refreshButton.style.color = 'black';
