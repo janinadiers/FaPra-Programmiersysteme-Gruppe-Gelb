@@ -40,9 +40,9 @@ export class Line {
             
         });
 
-        this._intermediatePoints$.subscribe((intermediatePoints) => {
-            
+        this._intermediatePoints$.subscribe(() => {
             this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+            
         });
         
 
@@ -104,11 +104,12 @@ export class Line {
 
 
     get coords(): Coords[] | undefined {
-        return this.intermediatePoints?.map(c => {return {x: c.x, y: c.y}});
+        return this.intermediatePoints?.filter(i => !i.isVirtual).map(c => {return {x: c.x, y: c.y}});
     }
 
     set coords(coords: Coords[]) {
         this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
+        this.addVirtualPoints();
     }
 
     
@@ -395,8 +396,8 @@ export class Line {
 
     addVirtualPoints() {
         
-        let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y};
-            
+        let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y}; 
+
             if(this.intermediatePoints.length > 0){
                 this.updateIntermediatePoints(this.intermediatePoints.filter(i => !i.isVirtual));
                 
@@ -404,7 +405,6 @@ export class Line {
                     
                     let midPoint = new IntermediatePoint((last_coord.x + intermediatePoint.x) / 2, (last_coord.y + intermediatePoint.y) / 2, true);
                     this.updateIntermediatePoints(this.intermediatePoints.reduce((acc, curr, i) => {  
-                        
                         
                         if (i === this.intermediatePoints.indexOf(intermediatePoint)) {
                             acc.push(midPoint);
@@ -428,13 +428,13 @@ export class Line {
             
             this.updateIntermediatePoints([new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)])
          }
+         
          // add intermediatePoints to svgElement
         this.intermediatePoints?.forEach((intermediatePoint) => {
             
             if(intermediatePoint.svg && this._svgElement) this._svgElement.appendChild(intermediatePoint.svg);
-        });
+        });       
         // add eventListeners to intermediatePoints
-
          this.intermediatePoints.forEach((intermediatePoint) => {
             this.addEventListenerForIntermediatePoints(intermediatePoint);
          });

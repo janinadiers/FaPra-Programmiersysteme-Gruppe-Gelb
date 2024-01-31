@@ -7,8 +7,6 @@ export class IntermediatePoint {
     private _circle: SVGCircleElement | undefined = undefined;
 
     constructor(x:number, y: number, isVirtual: boolean) {
-        console.log('IntermediatePoint constructor', x, y, isVirtual);
-        
         this._x = x;
         this._y = y;
         this._isVirtual = isVirtual;
@@ -37,8 +35,6 @@ export class IntermediatePoint {
 
 
     private createCircle(){
-        
-        
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', this.x.toString());
         circle.setAttribute('cy', this.y.toString());
@@ -46,22 +42,15 @@ export class IntermediatePoint {
         circle.setAttribute('fill', 'transparent');
         circle.style.cursor = 'move';
         this._circle = circle;
-        console.log('createCircle');
-       
-
     }
 
     public remove(): void {
-        console.log('remove');
-        
         if(this._circle) {
             this._circle.remove();
         }
     }
 
     public update(x:number, y:number): void {
-        console.log('update');
-        
         this._x = x;
         this._y = y;
         if(this._circle) {
