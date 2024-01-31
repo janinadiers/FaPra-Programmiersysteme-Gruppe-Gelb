@@ -145,6 +145,8 @@ export class SugiyamaService {
     // Step 6: Edge Routing
     routeEdges() {
         // Route edges as PolyLine (add line-points on Layer)
+        let usedEdges: Coords[] = [];
+
         for (let i = 0; i < this.layers.length; i++) {
             let layer = this.layers[i];
             for (let j = 0; j < layer.length; j++) {
@@ -158,8 +160,6 @@ export class SugiyamaService {
                         let intermediateLayers = targetLayer -  i;
 
                         let coords: Coords[] = [];
-                        let place: Place = this.diagram.places.find((place) => place.id == elementID) as Place;
-                        let transition: Transition = this.diagram.transitions.find((transition) => transition.id == elementID) as Transition;
 
                         if (intermediateLayers > 0) {
                             for (let c = 1; c < intermediateLayers; c++) {
@@ -168,10 +168,14 @@ export class SugiyamaService {
                                 if (layer.length + 1 == nextLayerLength)
                                     yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
     
-                                coords.push({ 
-                                    x: xCoord, 
-                                    y: yCoord
-                                });
+                                let coord = { x: xCoord, y: yCoord };
+                                if (usedEdges.find(edge => (edge.x == coord.x && edge.y == coord.y) || (edge.x == coord.y && edge.y == coord.x))) {
+                                    coord.y = (currentLine.source.y) + 1 * this.nodeHeight;
+                                    if (layer.length + 1 == nextLayerLength)
+                                        yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
+                                }
+                                coords.push(coord);
+                                usedEdges.push(coord);
                             }
                         } else {
                             intermediateLayers = i - targetLayer;
@@ -179,12 +183,16 @@ export class SugiyamaService {
                                 let xCoord = (currentLine.source.x) - c * this.layerWidth;
                                 let yCoord = (currentLine.source.y);
                                 if (layer.length + 1 == nextLayerLength)
-                                    yCoord = (currentLine.source.y) - 1 * this.nodeHeight;+
+                                    yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
     
-                                coords.push({ 
-                                    x: xCoord, 
-                                    y: yCoord
-                                });
+                                let coord = { x: xCoord, y: yCoord };
+                                if (usedEdges.find(edge => (edge.x == coord.x && edge.y == coord.y) || (edge.x == coord.y && edge.y == coord.x))) {
+                                    coord.y = (currentLine.source.y) + 1 * this.nodeHeight;
+                                    if (layer.length + 1 == nextLayerLength)
+                                        yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
+                                }
+                                coords.push(coord);
+                                usedEdges.push(coord);
                             }
                         }
                         currentLine.coords = coords;
