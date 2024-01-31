@@ -47,6 +47,7 @@ export class FreiAlgorithmusService {
         });
         window.addEventListener('mousemove', (event) => {
             event.stopPropagation();
+            
             if(!this._selectedNode) return;
             this.processMouseMove(event, this._selectedNode);
         })

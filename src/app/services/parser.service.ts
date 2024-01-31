@@ -129,7 +129,6 @@ export class ParserService {
                 }
             }
             lines.forEach(line => {
-                line.createSVG();
                 this.setChildrenAndParents(line);
                 line.svgElement?.addEventListener(('click'), () => {
                         this._drawingService.onLineSelect(line);
