@@ -10,21 +10,45 @@
   margin-bottom: 1rem;
 }
 
+.right-toolbar {
+
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.center-toolbar {
+
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+.center-toolbar > label {
+  margin: 0 1rem;
+}
+
+.center-toolbar > option {
+  font-family: "Courier New", sans-serif;
+}
+
+
 .hover-class:hover {
 
   background-color: red;
 }
 
 .active {
-  background-color: red; 
-  color: white; 
+  background-color: red;
+  color: white;
 
-}
+ }
 
 .tooltip {
   position: relative;
   display: inline-block;
- 
+
 }
 
 .tooltip .tooltiptext {
@@ -64,7 +88,7 @@
 .vertical-line {
   height: 30px;
   width: 1px;
-  background-color: rgb(211, 211, 211); 
+  background-color: rgb(211, 211, 211);
   border-radius: 6rem;
   margin: 1rem;
 
@@ -76,10 +100,40 @@
 .selected:hover {
   color: rgb(240, 240, 240);
 }
+.edit-button {
+    color: violet;
+    color: green;
+    color: black;
+}
+
+.merge-type-button {
+    color: violet;
+    color: green;
+    color: black;
+}
+
+.play-button {
+    color: violet;
+    color: green;
+    color: black;
+}
+
+.fire-step-button {
+    color: violet;
+    color: green;
+    color: black;
+    color: gray;
+}
+
+.multitasking-button {
+    colot: black;
+    color: violet;
+    color: gray;
+}
 
 .drawing{
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   background-color: rgb(240, 240, 240);
   border-radius: 50px;
   padding: 0 1.5rem;

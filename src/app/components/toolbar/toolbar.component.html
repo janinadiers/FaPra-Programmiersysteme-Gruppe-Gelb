@@ -1,13 +1,58 @@
 <mat-toolbar class="toolbar">
-        <button mat-icon-button 
-                class="hover-class play tooltip" 
+        <button mat-icon-button
+                class="hover-class play tooltip"
                 (click)="toggleSimulation()">
-                <span class="tooltiptext">start simulation</span>
-                <mat-icon>play_circle</mat-icon>
+            <div class="play-button">
+                <span class="tooltiptext">Start Simulation</span>
+                <span class="tooltiptext" *ngIf="stepsActive">Simple Game</span>
+                <mat-icon style="color: black">play_circle</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="edit tooltip"
+                (click)="editStep()">
+            <div class="edit-button">
+                <span class="tooltiptext">Edit Step</span>
+                <mat-icon style="color:black">edit</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="create tooltip"
+                (click)="showRandomMaximumStep()">
+            <div class="merge-type-button">
+                <span class="tooltiptext">Show Random Step</span>
+                <mat-icon style="color:black">merge_type</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="fire-step tooltip"
+                (click)="fireStep()"
+                [disabled] = "!stepsActive">
+            <div class="fire-step-button">
+                <span class="tooltiptext">Fire Step</span>
+                <mat-icon style="color:gray">fast_forward</mat-icon>
+            </div>
         </button>
 
         <div class="vertical-line"></div>
-        <button mat-icon-button 
+        <button mat-icon-button *ngIf="simulationActive && !randomStep"
+                class="multitasking tooltip"
+                (click)="activateMultitaskingTransitions()">
+            <span class="tooltiptext">Multitasking</span>
+            <mat-icon>done_all</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="fire-step tooltip"
+                (click)="returnToDrawing()">
+                <span class="tooltiptext">Return To Drawing</span>
+                <mat-icon>keyboard_return</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="!simulationActive"
                 class="hover-class tooltip"
                 [class.active]="reachabilityActiveColor"
                 (click)="onButtonClick('reachabilityGraph')">
@@ -15,7 +60,7 @@
             <mat-icon>share</mat-icon>
         </button>
 
-       
+
         <div class="drawing">
              <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
@@ -79,7 +124,7 @@
                 </button>
 
             </div>
- 
+
             <div>
                 <button class="hover-class tooltip free" mat-icon-button  (click)="onAlgorithmSelect('free')">
                     <span class="tooltiptext" (click)="onAlgorithmSelect('free')">Free</span>
@@ -94,9 +139,9 @@
                     <mat-icon>schema</mat-icon>
                 </button>
             </div>
-            
+
         <div class="vertical-line"></div>
-            
+
             <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
                 <mat-icon>import_export</mat-icon>
