@@ -3,12 +3,11 @@
 
         <button mat-icon-button
                 class="play tooltip"
-                (click)="toggleSimulation()"
-                color="violet">
+                (click)="toggleSimulation()">
             <div class="play-button">
                 <span class="tooltiptext">Start Simulation</span>
                 <span class="tooltiptext" *ngIf="stepsActive">Simple Game</span>
-                <mat-icon>play_circle</mat-icon>
+                <mat-icon style="color: black">play_circle</mat-icon>
             </div>
         </button>
 
