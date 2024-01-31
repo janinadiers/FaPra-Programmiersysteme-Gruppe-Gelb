@@ -444,6 +444,10 @@ export class Line {
     }
 
    
+    removeCoords(): void {
+        this.updateIntermediatePoints([]) ;
+        this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+    }
 
     removeCoord(intermediatePoint: IntermediatePoint){
         this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint)); 

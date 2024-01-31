@@ -194,10 +194,10 @@ export class ToolbarComponent {
                 sugiyamaButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
                 springEmbedderButton.classList?.remove('selected');
-                this._sugiyamaService.begin(this._diagram);
             }
 
             this._springEmbedderService.teardown();
+            this._sugiyamaService.begin(this._diagram);
 
         }
         else{
