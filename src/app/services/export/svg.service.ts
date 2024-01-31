@@ -39,7 +39,7 @@ export class SvgService {
 
         this.getLines().forEach((line) => {
             if (line) {
-                svgElement += line.createSVG().outerHTML;
+                svgElement += line.svgElement.outerHTML;
             }
         });
 

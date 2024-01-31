@@ -8,7 +8,6 @@ import {ActivebuttonService} from "./activebutton.service";
 import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
 import {LabelValidatorService} from "./label-validator.service";
-import {Element} from "../classes/diagram/element";
 
 @Injectable({
     providedIn: 'root'
@@ -73,6 +72,8 @@ export class DrawingService {
         circleObject.svgElement!.addEventListener('click', () => {
             this.onCircleSelect(circleObject!);
         });
+
+        this.enableFreiAlgorithmusBtn();
 
         return circleObject;
     }
@@ -142,6 +143,8 @@ export class DrawingService {
         rectObject.svgElement!.addEventListener(('dblclick'),  () => {
             this.startSimulation(rectObject!);
         });
+
+        this.enableFreiAlgorithmusBtn();
 
         return rectObject
     }
@@ -349,6 +352,12 @@ export class DrawingService {
         });
 
         // Welche Ansteuerung ist günstiger - die über die Position im Array oder die über der Queri-Selector?
+    }
+
+    enableFreiAlgorithmusBtn() {
+        const freeButton = document.querySelector('.free') as HTMLElement;
+        freeButton.classList.add('selected');
+
     }
 
 }

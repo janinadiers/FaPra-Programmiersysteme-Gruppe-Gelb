@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Output, Input, ViewChild} from '@angular/core';
 import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DisplayService} from "../../services/display.service";
 import {DownloadService} from "../../services/helper/download-service";
@@ -13,10 +13,6 @@ import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
-import {transition} from "@angular/animations";
-import {Transition} from "../../classes/diagram/transition";
-import {template} from "lodash";
-
 @Component({
     selector: 'app-toolbar',
     templateUrl: './toolbar.component.html',
@@ -86,6 +82,9 @@ export class ToolbarComponent {
             this._markenspielService.setTransitionColor(transition, 'black');
             transition.isActive = false;
         });
+
+        this.onAlgorithmSelect();
+
     }
 
     toggleRectangleButton() {
@@ -155,23 +154,41 @@ export class ToolbarComponent {
         this.reachabilityActiveColor = !this.reachabilityActiveColor;
     }
 
-    onAlgorithmSelect() {
+    onAlgorithmSelect(algorithm:string = 'free') {
 
-        const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        const selectedAlgorithm = selectElement?.value;
+        const freeButton = document.querySelector('.free') as HTMLElement;
+        const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
 
         this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
-        if(selectedAlgorithm === 'spring-embedder'){
+        if(algorithm === 'spring-embedder'){
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
+                springEmbedderButton.classList.add('selected');
+                freeButton.classList?.remove('selected');
+                sugiyamaButton.classList?.remove('selected');
+            }
             this._freiAlgorithmusService.start()
             this._springEmbedderService.start()
 
         }
-        else if(selectedAlgorithm === 'sugiyama'){
+        else if(algorithm === 'sugiyama'){
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
+                sugiyamaButton.classList.add('selected');
+                freeButton.classList?.remove('selected');
+                springEmbedderButton.classList?.remove('selected');
+            }
             this._springEmbedderService.teardown();
 
         }
         else{
+            console.log("free");
+
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
+                freeButton.classList.add('selected');
+                springEmbedderButton.classList?.remove('selected');
+                sugiyamaButton.classList?.remove('selected');
+            }
             this._springEmbedderService.teardown();
             this._freiAlgorithmusService.start()
         }
