@@ -84,6 +84,7 @@ export class Place extends Element {
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', '2');
+        circle.style.cursor = 'pointer';
         group.appendChild(circle);
 
         //Marker

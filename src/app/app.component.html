@@ -12,10 +12,10 @@
     <app-display class="padding full-size" (fileContent)="processSourceChange($event)"></app-display>
 
 
-    <div fxLayout="row" fxLayoutAlign="space-evenly start">
+    <div fxLayout="row" fxLayoutAlign="space-evenly start" style="margin-top: 1.5rem;">
         <app-example-file title="File" link="assets/example.json" description="An example .json Petri net"></app-example-file>
 
-        <mat-form-field appearance="outline"
+        <!-- <mat-form-field appearance="outline"
                         class="textarea">
             <mat-label>File content</mat-label>
             <textarea matInput
@@ -23,10 +23,10 @@
                       cdkAutosizeMinRows="10"
                       cdkAutosizeMaxRows="20"
                       [formControl]="textareaFc"></textarea>
-        </mat-form-field>
+        </mat-form-field> -->
     </div>
 
     <!--  Footer  -->
-    <hr>
+    <hr style="margin-top: 6rem; border: none; height: 1px; background-color: rgb(240, 240, 240);">
     <app-footer></app-footer>
 </div>
