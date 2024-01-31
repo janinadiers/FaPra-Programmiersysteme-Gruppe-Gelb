@@ -9,6 +9,7 @@ import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
 import {ReachabilityGraph} from 'src/app/classes/diagram/reachability-graph';
 import {MarkenspielService} from "../../services/markenspiel.service";
+import { SpringEmbedderService } from 'src/app/services/spring-embedder-for-reachability-graph.service';
 
 
 @Component({
@@ -31,7 +32,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
         private _fileReaderService: FileReaderService,
         private _http: HttpClient,
         private activeButtonService: ActivebuttonService,
-        private _drawingService: DrawingService) {
+        private _drawingService: DrawingService,
+        private _springEmbedderService: SpringEmbedderService) {
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
 
@@ -255,9 +257,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     onCanvasClick(event: MouseEvent) {
-        console.log("")
 
-        //console.log(this._diagram);
         // Koordinaten des Klick Events relativ zum SVG Element
         const svgElement = document.getElementById('canvas');
 
@@ -382,7 +382,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             this.clearDrawingArea();
 
-            let graph = new ReachabilityGraph(this._diagram!);
+            let graph = new ReachabilityGraph(this._diagram!, this._springEmbedderService);
 
             graph.createReachabilityGraph();
 
@@ -400,10 +400,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 svgElement?.appendChild(svgTransition);
             });
 
-            this._diagram!.lines.forEach(line => {
-                let svgLine = line.createSVG();
-                svgElement?.insertBefore(svgLine!, svgElement.firstChild);
-            });
+              this._diagram!.lines.forEach(line => {
+                let svgLine = line.svgElement;
+                svgElement?.insertBefore(svgLine!,svgElement.firstChild);
+              });
 
 
         }

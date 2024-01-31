@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Output, Input, ViewChild} from '@angular/core';
 import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DisplayService} from "../../services/display.service";
 import {DownloadService} from "../../services/helper/download-service";
@@ -13,10 +13,6 @@ import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
-import {transition} from "@angular/animations";
-import {Transition} from "../../classes/diagram/transition";
-import {template} from "lodash";
-
 @Component({
     selector: 'app-toolbar',
     templateUrl: './toolbar.component.html',
@@ -74,12 +70,13 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    pdfSrc: string = 'assets/manual.pdf';
+    stepsActive: boolean = false;
+    multitasking: boolean = false;
+    randomStep: boolean = false;
 
     ngOnInit() {
-        let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
         this.simulationStatus = 0;
-
-        simulationButton.style.color = 'black';
         this._drawingService.setSimulationStatus(this.simulationStatus);
 
         this._diagram?.transitions.forEach((transition) => {
@@ -87,7 +84,8 @@ export class ToolbarComponent {
             transition.isActive = false;
         });
 
-        this.simulationStatus = 1;
+        this.onAlgorithmSelect();
+
     }
 
     toggleRectangleButton() {
@@ -155,25 +153,48 @@ export class ToolbarComponent {
         this.arrowActiveColor = false;
         this.boltActiveColor =  false;
         this.reachabilityActiveColor = !this.reachabilityActiveColor;
+        if(this.simulationActive == false){
+            this._drawingService.deselectPlacesAndLines();
+            this.deselectAddAndRemoveTokenButtons();
+        }
+        
     }
 
-    onAlgorithmSelect() {
+    onAlgorithmSelect(algorithm:string = 'free') {
 
-        const selectElement = document.getElementById('algorithm-select') as HTMLSelectElement;
-        const selectedAlgorithm = selectElement?.value;
+        const freeButton = document.querySelector('.free') as HTMLElement;
+        const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
 
         this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
-        if(selectedAlgorithm === 'spring-embedder'){
+        if(algorithm === 'spring-embedder'){
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
+                springEmbedderButton.classList.add('selected');
+                freeButton.classList?.remove('selected');
+                sugiyamaButton.classList?.remove('selected');
+            }
             this._freiAlgorithmusService.start()
             this._springEmbedderService.start()
 
         }
-        else if(selectedAlgorithm === 'sugiyama'){
+        else if(algorithm === 'sugiyama'){
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
+                sugiyamaButton.classList.add('selected');
+                freeButton.classList?.remove('selected');
+                springEmbedderButton.classList?.remove('selected');
+            }
             this._springEmbedderService.teardown();
 
         }
         else{
+            console.log("free");
+
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
+                freeButton.classList.add('selected');
+                springEmbedderButton.classList?.remove('selected');
+                sugiyamaButton.classList?.remove('selected');
+            }
             this._springEmbedderService.teardown();
             this._freiAlgorithmusService.start()
         }
@@ -212,7 +233,7 @@ export class ToolbarComponent {
             this._activeButtonService.sendButtonClick(buttonId);
             }
             else{
-                alert("A marked petri net is required!");
+                alert("Please provide a petri net with marks!");
             }
         }
         else{
@@ -315,64 +336,142 @@ export class ToolbarComponent {
     }
 
     markenspielText() {
-        if(this.simulationStatus == 2) {
-            return "Markenspiel";
-        }
-        if(this.simulationStatus == 0){
+        if(this.stepsActive) {
             return "Markenspiel mit Schritten";
-        }
-        else
-            return;
+        } else
+            return "Markenspiel";
     }
 
     toggleSimulation() {
+        this.stepsActive = false;
+        this.simulationActive = true;
+        this._drawingService.drawingActive = false;
+        this._markenspielService.processChosing = false;
+        this.randomStep = false;
 
-    if(this.reachabilityActiveColor){
-        return;
+        let simulationButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
+        let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+        let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
+        let multiButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
+
+        simulationButton.style.color = 'green';
+
+        if(multiButton != null){
+            multiButton.style.color = 'gray';
+        }
+        if(editButton != null) {
+            editButton.style.color = 'black';
+        }
+        if(mergeButton != null) {
+            mergeButton.style.color = 'black';
+        }
+        if(fireButton != null) {
+            fireButton.style.color = 'gray';
+        }
+
+        this._drawingService.deselectPlacesAndLines();
+        this._drawingService.setSimulationStatus(1);
+
+        const startTransitions = this._markenspielService.getPossibleActiveTransitions();
+        startTransitions.forEach((transition) => {
+            this._markenspielService.setTransitionColor(transition, 'green');
+        });
     }
-        let simulationButton = document.querySelector('.play > mat-icon') as HTMLElement;
 
-        // Zeichenmodus (Status 0)
-        if(this.simulationStatus == 0){
-            simulationButton.style.color = 'black';
+    editStep() {
+        this.stepsActive = true;
+        this._drawingService.drawingActive = false;
+        this._drawingService.setSimulationStatus(2);
+        this._markenspielService.processChosing = true;
+        this.randomStep = false;
 
-            this._drawingService.setSimulationStatus(this.simulationStatus);
-            this.simulationActive = false;
+        let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
+        let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+        let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
+        let multiButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
 
-            this._diagram?.transitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'black');
-                transition.isActive = false;
-            });
+        editButton.style.color = 'violet';
+        playButton.style.color = 'black';
+        mergeButton.style.color = 'black';
+        fireButton.style.color = 'black';
+        multiButton.style.color = 'black';
 
-            this.simulationStatus = 1;
-            // Statusvariable hochzählen, damit beim nächsten Mal weiter geschaltet wird
-        }
-        // Einfaches Markenspiel (Status 1)
-        else if (this.simulationStatus == 1) {
-            simulationButton.style.color = 'green';
+        this._markenspielService.editStep();
 
-            this._drawingService.deselectPlacesAndLines();
-            this._drawingService.setSimulationStatus(this.simulationStatus);
-            this.simulationActive = true;
+    }
 
-            const startTransitions = this._markenspielService.getPossibleActiveTransitions();
-            startTransitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'green');
-            });
 
-            this.simulationStatus = 2;
-        }
-        // Markenspiel mit Schritten (Status 2)
-        else if (this.simulationStatus == 2) {
+    showRandomMaximumStep() {
+        this.stepsActive = true;
+        this._drawingService.drawingActive = false;
+        this._drawingService.setSimulationStatus(2);
+        this._markenspielService.processChosing = false;
+        this.randomStep = true;
 
-            simulationButton.style.color = 'violet';
-            this._drawingService.deselectPlacesAndLines();
-            this._drawingService.setSimulationStatus(this.simulationStatus);
-            this.simulationActive = true;
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+        let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
+        let playButton =  document.querySelector('.play-button > mat-icon') as HTMLElement;
+        let fireButton = document.querySelector('.fire-step-button > mat-icon') as HTMLElement;
 
+        mergeButton.style.color = 'violet';
+        editButton.style.color = 'black';
+        playButton.style.color = 'black';
+        fireButton.style.color = 'black';
+
+        this._markenspielService.showStep();
+
+    }
+
+    fireStep() {
+        let mergeButton = document.querySelector('.merge-type-button > mat-icon') as HTMLElement;
+
+        this._markenspielService.fireStep();
+
+        if(mergeButton.style.color == 'violet'){
             this._markenspielService.showStep();
-
-            this.simulationStatus = 0;
+        } else {
+            this.editStep();
         }
+    }
+
+    openPdf() {
+        
+        window.open(this.pdfSrc, '_blank');
+      }
+
+    activateMultitaskingTransitions() {
+        this.multitasking = !this.multitasking;
+        this._markenspielService.multitaskingTransitions(this.multitasking);
+
+        let refreshButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
+        let randomButton = document.querySelector('.multitasking > mat-icon') as HTMLElement;
+
+        randomButton.style.color = 'gray';
+
+        if(this.multitasking && this.stepsActive) {
+            refreshButton.style.color = 'violet';
+        } else {
+            refreshButton.style.color = 'black';
+        }
+    }
+
+    returnToDrawing() {
+        this.simulationActive = false;
+        this.stepsActive = false;
+        this._drawingService.drawingActive = true;
+        this._drawingService.setSimulationStatus(0);
+        this._markenspielService.multitaskingTransitions(false);
+        this._markenspielService.processChosing = false;
+
+        let playButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
+
+        playButton.style.color = 'black';
+
+        this._diagram?.transitions.forEach((transition) => {
+            this._markenspielService.setTransitionColor(transition, 'black');
+            transition.isActive = false;
+        });
     }
 }
