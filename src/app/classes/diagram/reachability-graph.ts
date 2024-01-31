@@ -15,12 +15,13 @@ export class ReachabilityGraph {
     private sameLevel: Array<State> = [];
     
    
-    constructor(diagram: Diagram) {
+    constructor(diagram: Diagram, private _springEmbedderService: any) {
       this._diagram = diagram;
       this._currentState = [];
       this._newStates = [];
       this._activeTransitions = [];
       this._visited = [];
+      this._springEmbedderService = _springEmbedderService;
     }
 
     createReachabilityGraph(){
@@ -35,11 +36,12 @@ export class ReachabilityGraph {
         if (this._visited.length < 150) {
             this.moveNodes();
             this.drawGraph();
+            this._springEmbedderService.apply(this._visited);
             //console.log(this._visited);
+            
         }
         else{
             alert("The number of states has exceeded a threshold of 150!")
-            //console.log(this._visited);
         }
     }
   
@@ -77,6 +79,8 @@ export class ReachabilityGraph {
                 }
             }   
             this.removeRedundantStates();
+            this.compareWithCurrentState();
+            this.compareWithVisitedStates();
             this.separateNodes();
             this.setVisited();     
         }  
@@ -114,7 +118,7 @@ export class ReachabilityGraph {
                 if(placesWithEnoughTokens === connectedLines.length){
                     this._activeTransitions.push(transitions[i]);
                 }
-
+              
                 connectedLines.splice(0, connectedLines.length);
                 placesWithEnoughTokens = 0;
             }
@@ -138,10 +142,11 @@ export class ReachabilityGraph {
         // Tokens im Vorbereich abziehen
         connectedLines.forEach(line => {
             let placeID = line.source.id;
-            let placeToken = currentState.state.get(placeID);
+            let placeToken = state.get(placeID);
             placeToken = placeToken! - line.tokens;
             state.set(placeID, placeToken);
         });
+        
         connectedLines.splice(0, connectedLines.length);
 
         lines.forEach(line => {
@@ -152,15 +157,14 @@ export class ReachabilityGraph {
         // Tokens im Nachbereich hinzufügen
        connectedLines.forEach(line => {
             let placeID = line.target.id;
-            let placeToken = currentState.state.get(placeID);
-            
+            let placeToken = state.get(placeID);
             placeToken = placeToken! + line.tokens;
-            state.set(placeID, placeToken);    
+            state.set(placeID, placeToken);   
         });
         connectedLines.splice(0, connectedLines.length);
         
         this.id++;
-        let newState = new State(this.iteration, this.id, state);
+        let newState = new State(this.iteration, this.id + Math.random(), state);
         newState.firedTransitions = activeTransition.id;
         this._newStates.push(newState);
 
@@ -287,7 +291,6 @@ export class ReachabilityGraph {
                 }
             }
         }
-    
         // Entferne redundante Zustände
         for (let i = statesToRemove.length - 1; i >= 0; i--) {
             this._newStates.splice(statesToRemove[i], 1);
@@ -296,6 +299,76 @@ export class ReachabilityGraph {
         // Enferne Zustände ohne parents
         this._newStates = this._newStates.filter(state => state.parents.length > 0);
     }
+
+
+    compareWithCurrentState(){
+
+        const statesToRemove: number[] = [];
+
+        for (let i = 0; i < this._newStates.length; i++){
+
+           let newState= this._newStates[i];
+           let currentState = this._currentState[0];
+
+           if(this.areMapsEqual(newState.state, currentState.state)){
+
+            currentState.transferParents([...currentState.parents, ...newState.parents]);
+
+            // Transferiere firedTransition zum bleibenden Zustand
+            let newTransition = newState.firedTransitions.shift();
+            let array = currentState.firedTransitions;
+            array.push(newTransition!);
+            
+            // Markiere redundanten Zustand für das Entfernen
+            statesToRemove.push(i);
+           }
+        }
+        // Entferne redundante Zustände
+        for (let i = statesToRemove.length - 1; i >= 0; i--) {
+            this._newStates.splice(statesToRemove[i], 1);
+        }
+    
+        // Enferne Zustände ohne parents
+        this._newStates = this._newStates.filter(state => state.parents.length > 0);
+    }
+    
+
+
+    compareWithVisitedStates(){
+
+        const statesToRemove: number[] = [];
+
+        for (let i = 0; i < this._newStates.length; i++){
+
+            let newState= this._newStates[i];
+
+            for (let y = 0; y < this._visited.length; y++) {
+
+                let visitedState = this._visited[y];
+
+                if(this.areMapsEqual(newState.state, visitedState.state)){
+
+                    visitedState.transferParents([...visitedState.parents, ...newState.parents]);
+                    
+                    // Transferiere firedTransition zum bleibenden Zustand
+                    let newTransition = newState.firedTransitions.shift();
+                    let array = visitedState.firedTransitions;
+                    array.push(newTransition!);
+            
+                    // Markiere redundanten Zustand für das Entfernen
+                    statesToRemove.push(i);
+                }
+            }
+
+        }
+        for (let i = statesToRemove.length - 1; i >= 0; i--) {
+            this._newStates.splice(statesToRemove[i], 1);
+        }
+    
+        // Enferne Zustände ohne parents
+        this._newStates = this._newStates.filter(state => state.parents.length > 0);
+    }
+
 
 
 
