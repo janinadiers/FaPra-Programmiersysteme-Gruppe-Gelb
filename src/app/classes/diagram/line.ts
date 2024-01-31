@@ -110,6 +110,7 @@ export class Line {
     set coords(coords: Coords[]) {
         this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
         this.addVirtualPoints();
+
     }
 
     
@@ -442,11 +443,10 @@ export class Line {
 
     }
 
+   
     removeCoords(): void {
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
-
-
     }
 
     removeCoord(intermediatePoint: IntermediatePoint){
@@ -506,6 +506,7 @@ export class Line {
 
     }
 
+
     private updateTarget(updatedPosition: Coords): void {
         
         if (this._svgElement) {
@@ -527,6 +528,5 @@ export class Line {
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
     }
-
 }
 

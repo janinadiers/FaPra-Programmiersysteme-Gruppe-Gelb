@@ -58,7 +58,7 @@ export class JsonExportService {
         this._displayService.diagram.lines.forEach(line => {
             petriNet.arcs![`${line.source.id},${line.target.id}`] = line.tokens;
             //if line has coords, save coords within given layout as array
-            if (line.coords) {
+            if (line.coords && line.coords.length > 0) {
                 const intermediates: Coords[] = [];
                 line.coords.forEach(coord => {
                     intermediates.push({x: coord.x, y: coord.y});
