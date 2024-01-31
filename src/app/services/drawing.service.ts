@@ -77,7 +77,7 @@ export class DrawingService {
     onCircleSelect(circle: Place) {
         this._diagram!.selectedCircle = circle;
 
-        if(!this.drawingActive){
+        if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
             return;
         }
 
@@ -178,6 +178,9 @@ export class DrawingService {
     }
 
     onRectSelect(rect: Transition) {
+        if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
+            return;
+        }
         this._diagram!.selectedRect = rect;
 
         if (this._diagram!.selectedCircle) {
