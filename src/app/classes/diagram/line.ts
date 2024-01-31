@@ -63,11 +63,55 @@ export class Line {
         });
     }
 
+    get intermediatePoints$(): Observable<IntermediatePoint[]> {
+        return this._intermediatePoints$.asObservable();
+    }
+
+    public get intermediatePoints(): IntermediatePoint[] {
+        return this._intermediatePoints$.getValue();
+    }
+
+    public updateIntermediatePoints(intermediatePoints: IntermediatePoint[]) {
+        this._intermediatePoints$.next(intermediatePoints);
+
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    get source(): Element {
+        return this._source;
+    }
+
+
+    get target(): Element {
+        return this._target;
+    }
+
+
+    get tokens(): number {
+        return this._tokens;
+    }
+
+    set tokens(value: number) {
+        this._tokens = value;
+    }
+
+    get svgElement(): SVGElement{
+        return this._svgElement
+    }
+
+
+    get coords(): Coords[] | undefined {
+        return this.intermediatePoints?.map(c => {return {x: c.x, y: c.y}});
+    }
+
+    set coords(coords: Coords[]) {
+        this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
+    }
+
     
-
-
-    
-
     //Iterate through found coords and return them as string
     private getCoordsString(): string {
         let result = '';
@@ -192,24 +236,19 @@ export class Line {
             token.textContent = this._tokens.toString();
         group.appendChild(token);
 
-        
-        
-
         window.addEventListener('mousemove', (event) => {
             
-            //event.stopPropagation();
-            
+            event.stopPropagation();
             if(!this._draggingCircle) return;
-            
             this.handleMouseMove(event);
-             
-            
+              
         });
             
         this.intermediatePoints?.forEach((intermediatePoint) => {
-            
             this.addEventListenerForIntermediatePoints(intermediatePoint);
         });
+
+        this._svgElement = group;
         
         return group;
         
@@ -261,30 +300,24 @@ export class Line {
             this._contextMenuOpen = true;
             event.preventDefault();
             event.stopPropagation();
-            const div = document.createElement('div');
-            div.innerHTML =`
-            <div style="position: fixed; z-index: 100; background-color: white; padding: 5px; cursor:pointer; left: ${event.clientX + 20}px; top: ${event.clientY + 5 }px; box-shadow: 1px 1px 22px -6px black" onMouseOver="this.style.background='gray'" onMouseOut="this.style.background='white'">
-                <div class="context-menu-item" id="delete">Delete point</div>
-            </div>
-            `
-          
-            document.body.appendChild(div);
+            const div = this.createContextmenu(event.clientX, event.clientY);
+
             window.addEventListener('click', (event) => {
                 event.stopPropagation();
-                
                 div.remove();
                 this._contextMenuOpen = false;
             });
-            div.addEventListener('click', (event) => {
-                
+            div.addEventListener('click', () => {
+
                 div.remove();
                 intermediatePoint.remove();
+
                 this.removeCoord(intermediatePoint);
-                
+
                 this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => { 
-                    
-                    
-                intermediatePoint.remove()});
+                    intermediatePoint.remove()
+                });
+
                 this.updateIntermediatePoints(this.intermediatePoints.filter(c => !c.isVirtual));
                 this._draggingCircle = null;
                 
@@ -296,6 +329,17 @@ export class Line {
   
         });
 
+    }
+
+    private createContextmenu(x:number, y:number): HTMLElement {
+        const div = document.createElement('div');
+            div.innerHTML =`
+            <div style="position: fixed; z-index: 100; background-color: white; padding: 5px; cursor:pointer; left: ${x + 20}px; top: ${y + 5 }px; box-shadow: 1px 1px 22px -6px black" onMouseOver="this.style.background='gray'" onMouseOut="this.style.background='white'">
+                <div class="context-menu-item" id="delete">Delete point</div>
+            </div>
+            `
+            document.body.appendChild(div);
+            return div;
     }
 
 
@@ -349,29 +393,6 @@ export class Line {
 
     }
 
-    addHoverEventForBackgroundCircle(backgroundCircle: SVGElement, token: SVGElement) {       
-        backgroundCircle.addEventListener('mouseover', () => {
-            
-            backgroundCircle.setAttribute('fill', 'blue');
-            token.setAttribute('fill', 'white');
-            token.setAttribute('stroke', 'white');
-        });
-
-        backgroundCircle.addEventListener('mouseout', () => {
-            token.setAttribute('fill', 'black');
-            token.setAttribute('stroke', 'black');
-            if (this._tokens > 1){
-                backgroundCircle.setAttribute('fill', 'white');
-            }
-            else{
-                if(!(backgroundCircle.getAttribute('stroke') === 'blue')){
-                    backgroundCircle.setAttribute('fill', 'transparent');
-                }
-            }
-        })
-        
-    }
-
     addVirtualPoints() {
         
         let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y};
@@ -398,8 +419,7 @@ export class Line {
                 });
               
                 
-                this.updateIntermediatePoints([...this.intermediatePoints, new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)])
-               
+                this.updateIntermediatePoints([...this.intermediatePoints, new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)]) 
                 
             }
                 
@@ -408,13 +428,11 @@ export class Line {
             
             this.updateIntermediatePoints([new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)])
          }
-
          // add intermediatePoints to svgElement
         this.intermediatePoints?.forEach((intermediatePoint) => {
             
             if(intermediatePoint.svg && this._svgElement) this._svgElement.appendChild(intermediatePoint.svg);
         });
-
         // add eventListeners to intermediatePoints
 
          this.intermediatePoints.forEach((intermediatePoint) => {
@@ -422,21 +440,6 @@ export class Line {
          });
            
 
-    }
-
-
-    addHoverEventForLine(line: SVGElement) {
-        line.addEventListener('mouseover', () => {
-            line.setAttribute('stroke', 'blue');
-            line.setAttribute('stroke-width', '2');
-            line.setAttribute('fill', 'transparent');
-        });
-
-        line.addEventListener('mouseout', () => {
-            line.setAttribute('stroke', 'black');
-            line.setAttribute('stroke-width', '1');
-           line.setAttribute('fill', 'transparent');
-        });
     }
 
     removeCoords(): void {
@@ -462,9 +465,7 @@ export class Line {
         this.updateIntermediatePoints(this.intermediatePoints);
         
         this.updateLineToken();
-        
-
-        
+           
     }
 
     private updateLineToken(){
@@ -526,57 +527,6 @@ export class Line {
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
     }
-
-    get intermediatePoints$(): Observable<IntermediatePoint[]> {
-        return this._intermediatePoints$.asObservable();
-    }
-
-    public get intermediatePoints(): IntermediatePoint[] {
-        return this._intermediatePoints$.getValue();
-    }
-
-    public updateIntermediatePoints(intermediatePoints: IntermediatePoint[]) {
-        this._intermediatePoints$.next(intermediatePoints);
-
-    }
-
-    get id(): string {
-        return this._id;
-    }
-
-    get source(): Element {
-        return this._source;
-    }
-
-
-    get target(): Element {
-        return this._target;
-    }
-
-
-    get tokens(): number {
-        return this._tokens;
-    }
-
-    set tokens(value: number) {
-        this._tokens = value;
-    }
-
-    get svgElement(): SVGElement{
-        return this._svgElement
-    }
-
-
-    get coords(): Coords[] | undefined {
-        return this.intermediatePoints?.map(c => {return {x: c.x, y: c.y}});
-    }
-
-    set coords(coords: Coords[]) {
-        this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
-    }
-            
-       
-    
 
 }
 
