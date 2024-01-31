@@ -7,6 +7,7 @@ import { Transition } from '../../classes/diagram/transition';
 import { Line } from '../../classes/diagram/line';
 import { Coords } from '../../classes/json-petri-net';
 import {DrawingService} from "../drawing.service";
+import {LabelValidatorService} from "../label-validator.service";
 
 
 @Injectable({
@@ -14,7 +15,7 @@ import {DrawingService} from "../drawing.service";
 })
 export class PnmlImportService {
 
-    constructor(private _drawingService: DrawingService) {
+    constructor(private _drawingService: DrawingService, private _labelValidator: LabelValidatorService) {
     }
 
     import(content: string): Diagram | undefined {
@@ -30,7 +31,7 @@ export class PnmlImportService {
         let arcs = this.importArcs(rawData, [...places, ...transitions]);
         // set children and parents for places and transitions
         this.setChildrenAndParents(arcs);
-        
+
         return new Diagram([...places], [...transitions], [...arcs]);
 
     }
@@ -51,7 +52,8 @@ export class PnmlImportService {
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
-            
+            this._labelValidator.createLabelEventListener(placeElement);
+
             result.push(placeElement);
         });
 
@@ -76,6 +78,7 @@ export class PnmlImportService {
             transitionElement.svgElement?.addEventListener(('dblclick'), () => {
                 this._drawingService.startSimulation(transitionElement);
             });
+            this._labelValidator.createLabelEventListener(transitionElement);
             result.push(transitionElement);
         });
 
@@ -89,16 +92,16 @@ export class PnmlImportService {
         arcs.forEach((arc) => {
 
             const arcId = arc.getAttribute('id');
-            const arcTokens = arc.querySelector('inscription')?.querySelector('text')?.textContent ?? '0'
+            const arcTokens = arc.querySelector('inscription')?.querySelector('text')?.textContent ?? '1'
             const sourceAndTargetObject = this.getSourceAndTargetElements(arc, elements);
             const positions = this.getArcPositions(arc);
 
             if(!arcId) throw new Error('Arc element misses id: ' + arc);
             const arcElement = this.createEdge(arcId, sourceAndTargetObject.sourceElement, sourceAndTargetObject.targetElement, positions, arcTokens);
-            arcElement.svgElement?.querySelector('text')?.addEventListener(('click'), () => {
+            arcElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onLineSelect(arcElement);
-            });
-           
+            }); // Linien mit dem Kantengewicht 1 sind bei "queriSelctor('text') nicht anklickbar
+
             lines.push(arcElement);
         });
        return lines;
@@ -209,18 +212,18 @@ export class PnmlImportService {
         lines.forEach((line) => {
             const source = line.source;
             const target = line.target;
-            
+
             if(source instanceof Place && target instanceof Transition){
                 source.children.push(target);
                 target.parents.push(source);
-            
+
             }
             if(source instanceof Transition && target instanceof Place){
                 source.children.push(target);
                 target.parents.push(source);
-            
+
             }
-            
+
         });
     }
 
