@@ -1,9 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from "../classes/diagram/diagram";
 import {DisplayService} from "./display.service";
-import {Subscription} from "rxjs";
 import {Transition} from "../classes/diagram/transition";
-import {transition} from "@angular/animations";
 import {Place} from "../classes/diagram/place";
 import {Line} from "../classes/diagram/line";
 
@@ -14,6 +12,9 @@ import {Line} from "../classes/diagram/line";
 export class MarkenspielService {
 
     private _diagram: Diagram | undefined;
+    private currentActiveTransitions = new Map;
+    private alreadUsedParents = new Map;
+    private multitasking: boolean = false;
 
     constructor(
         private diplayService: DisplayService) {
@@ -22,7 +23,8 @@ export class MarkenspielService {
         });
     }
 
-    currentActiveTransitions: Array<Transition> = [];
+    currentChosenTransitions: Array<Transition> = [];
+    processChosing: boolean = false;
 
     // Marken und Gewichte setzen
     public addCircleToken() {
@@ -55,6 +57,7 @@ export class MarkenspielService {
     }
 
     public addLineToken() {
+        
         if (!this._diagram?.selectedLine) {
             return;
         }
@@ -165,11 +168,31 @@ export class MarkenspielService {
     // Markenspiel mit Schritten
     // Aufräumen: Lokalen Array der gerade aktiven Transitionen leeren und alle Transitionen auf false setzen
     private cleanUp() {
-        this.currentActiveTransitions = [];
+        this.currentChosenTransitions.splice(0,this.currentChosenTransitions.length);
+        this.currentActiveTransitions.clear();
+        this.alreadUsedParents.clear();
+
         this._diagram?.transitions.forEach((transition) => {
             transition.isActive = false;
             this.setTransitionColor(transition, 'black');
         });
+    }
+
+    public showAll(){
+        // 1. Aufräumen und Hilfsvariablen erstellen
+        this.cleanUp();
+
+        let transitions = this.getPossibleActiveTransitions(); // alle schaltbaren Transitionen holen
+        const lines = this._diagram?.lines; // alle Kanten holen
+
+        // 2. Zeigen des Schrittes
+        transitions.forEach((transition) => {
+            lines?.find(line => line.source.id === transition.id);
+            transition.isActive = true;
+            this.setTransitionColor(transition, 'green');
+        });
+
+        return transitions;
     }
 
     // Zeigt alle in einem Schritt gleichzeitig möglichen Transitionen
@@ -191,19 +214,130 @@ export class MarkenspielService {
 
             // Prüfen, ob die Stelle im Vorbereich schon von einer anderen Transition benutzt wurde
             if(!sourcePlaceIds.includes(currentSourceID)){
-                this.currentActiveTransitions.push(transition);
+                this.currentChosenTransitions.push(transition);
                 sourcePlaceIds.push(currentSourceID);
             }
         });
 
         // 4. Zeigen des Schrittes
-        this.currentActiveTransitions?.forEach((transition) => {
+        this.currentChosenTransitions?.forEach((transition) => {
             lines?.find(line => line.source.id === transition.id);
             transition.isActive = true;
             this.setTransitionColor(transition, 'violet');
         });
 
         return;
+    }
+
+    public editStep() {
+        this.cleanUp();
+
+        let currentTransitions = this.getPossibleActiveTransitions();
+
+        currentTransitions.forEach((element) => {
+           this.currentActiveTransitions.set(element.id,element);
+        });
+
+        this.currentActiveTransitions.forEach((element) => {
+           this.setTransitionColor(element,'green');
+           element.svgElement?.addEventListener(('dblclick'),  () => {
+               this.choseElement(element);
+           });
+        });
+
+        return;
+    }
+
+    public multitaskingTransitions(multitasking: boolean) {
+        this.multitasking = multitasking;
+        this.editStep();
+        // Wenn in der Stelle vor der Transition genug Marken sind, kann die Transition so oft schalten, wie ihr
+        // kleinstes Parent Marken hat
+
+        // nochmal choseElement und checkConsequneces, aber Transition wird erst zu alreadyused parent hinzugefügt,
+        // wenn keine Marken mehr da sind
+        // vorher: Transitionen nach Anzahl der Marken sortieren
+    }
+
+    public choseElement(element: Transition) {
+        let parents = element.parents;
+
+        parents.sort(function(a,b) {
+            return a.amountToken - b.amountToken;
+        });
+
+        if(!this.multitasking){
+            if(this.checkConsequences(element) && this.processChosing){
+                if(!this.currentChosenTransitions.includes(element)){
+                    this.currentChosenTransitions.push(element);
+                }
+                this.setTransitionColor(element,'violet');
+            }
+        } else {
+
+            let deleteCount = parents[0].amountToken;
+            let isChosen: boolean = element.svgElement!.querySelector('rect')!.getAttribute('fill') == 'violet';
+
+            if(this.currentChosenTransitions.includes(element) && !isChosen){
+                while(deleteCount >= 0){
+                    let deleteElement = this.currentChosenTransitions.indexOf(element);
+                    this.currentChosenTransitions.splice(deleteElement);
+
+                    let possibleTransitions = this.getPossibleActiveTransitions();
+                    if(possibleTransitions.includes(element)){
+                        this.setTransitionColor(element, 'green');
+                    } else {
+                        this.setTransitionColor(element,'black');
+                    }
+
+                    deleteCount--;
+                }
+            }
+
+            // console.log(this.currentChosenTransitions);
+
+            let count = parents[0].amountToken;
+            let lines = this._diagram!.lines;
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parents[0].id);
+
+            while(count > 0){
+
+                if(this.checkConsequences(element) && this.processChosing){
+                    this.currentChosenTransitions.push(element);
+                    this.setTransitionColor(element,'violet');
+                }
+
+                count = count - result!.tokens;
+            }
+        }
+
+        // console.log(this.currentChosenTransitions);
+    }
+
+    checkConsequences(element: Transition) {
+        let noConflicts = false;
+
+        let parents = element.parents;
+        let lines = this._diagram!.lines;
+
+        parents.forEach((parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let idString = result!.id.split(',')![0];
+            // result: eingehende Kante
+            // idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
+
+            if(!this.alreadUsedParents.has(idString)){
+                noConflicts = true;
+                this.alreadUsedParents.set(idString, parent.amountToken);
+            } else if (parent.amountToken - result!.tokens >= 0) {
+                noConflicts = true;
+            }
+            else {
+                noConflicts = false;
+            }
+        });
+
+        return noConflicts;
     }
 
     private fireSingleTransition(element: Transition) {
@@ -229,7 +363,7 @@ export class MarkenspielService {
     }
 
     public fireStep() {
-        this.currentActiveTransitions.forEach((transition) => {
+        this.currentChosenTransitions.forEach((transition) => {
             this.fireSingleTransition(transition);
         });
     }
