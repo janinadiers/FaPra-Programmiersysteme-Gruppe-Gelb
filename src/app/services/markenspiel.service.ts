@@ -319,41 +319,22 @@ export class MarkenspielService {
         let parents = element.parents;
         let lines = this._diagram!.lines;
 
-        if(!this.multitasking){
-            // console.log("no multitasking");
-            parents.forEach( (parent) => {
-                let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
-                let idString = result!.id.split(',')![0];
+        parents.forEach((parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let idString = result!.id.split(',')![0];
+            // result: eingehende Kante
+            // idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
 
-                if(!this.alreadUsedParents.has(idString)){
-                    noConflicts = true;
-                    this.alreadUsedParents.set(idString,parent.amountToken);
-                } else if (parent.amountToken - result!.tokens >= 0) {
-                    noConflicts = true;
-                }
-                else {
-                    noConflicts = false;
-                }
-            });
-        } else {
-            // console.log("multitasking");
-            parents.forEach((parent) => {
-                let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
-                let idString = result!.id.split(',')![0];
-                // result: eingehende Kante
-                // idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
-
-                if(!this.alreadUsedParents.has(idString)){
-                    noConflicts = true;
-                    this.alreadUsedParents.set(idString, parent.amountToken);
-                } else if (parent.amountToken - result!.tokens >= 0) {
-                    noConflicts = true;
-                }
-                else {
-                    noConflicts = false;
-                }
-            });
-        }
+            if(!this.alreadUsedParents.has(idString)){
+                noConflicts = true;
+                this.alreadUsedParents.set(idString, parent.amountToken);
+            } else if (parent.amountToken - result!.tokens >= 0) {
+                noConflicts = true;
+            }
+            else {
+                noConflicts = false;
+            }
+        });
 
         return noConflicts;
     }
