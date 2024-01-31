@@ -19,6 +19,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import { ImportMenuComponent } from './import-menu/import-menu.component';
 import { ExportMenuComponent } from './export-menu/export-menu.component';
 import {MatCardModule} from "@angular/material/card";
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 
 
@@ -45,6 +46,7 @@ import {MatCardModule} from "@angular/material/card";
         MatToolbarModule,
         MatMenuModule,
         MatCardModule,
+        PdfViewerModule,
     ],
     providers: [
         {

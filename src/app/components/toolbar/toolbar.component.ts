@@ -70,6 +70,7 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    pdfSrc: string = 'assets/manual.pdf';
     stepsActive: boolean = false;
     multitasking: boolean = false;
     randomStep: boolean = false;
@@ -434,6 +435,11 @@ export class ToolbarComponent {
             this.editStep();
         }
     }
+
+    openPdf() {
+        
+        window.open(this.pdfSrc, '_blank');
+      }
 
     activateMultitaskingTransitions() {
         this.multitasking = !this.multitasking;
