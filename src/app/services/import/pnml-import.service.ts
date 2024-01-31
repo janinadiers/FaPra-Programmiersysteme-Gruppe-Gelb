@@ -200,10 +200,7 @@ export class PnmlImportService {
 
     private createEdge(id:string, source:Element, target:Element, coords: Coords[], amountToken:string): Line{
 
-        const line:Line = new Line(id, source, target);
-        line.coords = coords;
-        line.tokens = parseInt(amountToken);
-        line.createSVG();
+        const line:Line = new Line(id, source, target, coords, parseInt(amountToken));
         return line;
 
     }

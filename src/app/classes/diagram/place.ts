@@ -1,5 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Transition } from './transition';
+import { Coords } from '../json-petri-net';
 
 
 export class Place extends Element {
@@ -61,6 +62,13 @@ export class Place extends Element {
         this._parents.push(transition);
     }
 
+    updateGroup(newPosition: Coords) {
+        super.x = newPosition.x;
+        super.y = newPosition.y;
+
+        super.svgElement?.setAttribute('transform', `translate(${newPosition.x}, ${newPosition.y})`);
+    }
+
     override createSVG(){
         if (this.svgElement) {
             return this.svgElement;
@@ -76,6 +84,7 @@ export class Place extends Element {
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', '2');
+        circle.style.cursor = 'pointer';
         group.appendChild(circle);
 
         //Marker

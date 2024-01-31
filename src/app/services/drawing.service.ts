@@ -8,7 +8,6 @@ import {ActivebuttonService} from "./activebutton.service";
 import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
 import {LabelValidatorService} from "./label-validator.service";
-import {Element} from "../classes/diagram/element";
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +18,9 @@ export class DrawingService {
     private _diagram: Diagram | undefined;
     private simulationActive: boolean = false;
     private simulationStatus: number = 0;
+    // 0 - Zeichnen/ DrawingActive
+    // 1 - Einfaches Markenspiel/ Simple Game - Event Listener für dblclick auf Rect
+    // 2 - Markenspiel mit Schritten
 
     constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
@@ -70,6 +72,8 @@ export class DrawingService {
         circleObject.svgElement!.addEventListener('click', () => {
             this.onCircleSelect(circleObject!);
         });
+
+        this.enableFreiAlgorithmusBtn();
 
         return circleObject;
     }
@@ -136,14 +140,14 @@ export class DrawingService {
             this.onRectSelect(rectObject!);
         });
 
-        rectObject.svgElement!.addEventListener(('dblclick'), () => {
+        rectObject.svgElement!.addEventListener(('dblclick'),  () => {
             this.startSimulation(rectObject!);
         });
 
+        this.enableFreiAlgorithmusBtn();
+
         return rectObject
     }
-
-
 
     public startSimulation(rectObject: Transition) {
         if (!rectObject!.svgElement ||
@@ -171,9 +175,17 @@ export class DrawingService {
             }));
         }
 
-        if(this.simulationStatus == 2){
-           this._markenspielService.fireStep();
-           this._markenspielService.showStep();
+        if(this.simulationStatus == 2 && !this._markenspielService.processChosing){
+            const transitions = this._markenspielService.showAll();
+            if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
+                rectObject!.isActive = false;
+                this._markenspielService.setTransitionColor(rectObject!, 'black');
+            }
+
+            transitions.forEach((transition => {
+                this._markenspielService.setTransitionColor(transition, 'green');
+                transition.isActive = true;
+            }));
         }
     }
 
@@ -188,10 +200,10 @@ export class DrawingService {
     }
 
     public setSimulationStatus(status: number) {
-        if(status == 0){  // verhindert, dass im Simulationsmodus Linien/Kreise angeklickt werden können
-            this.drawingActive = true;
-        } else {
+        if(status != 0){  // verhindert, dass im Simulationsmodus Linien/Kreise angeklickt werden können
             this.drawingActive = false;
+        } else {
+            this.drawingActive = true;
         }
         this.simulationStatus = status;
         return;
@@ -307,7 +319,7 @@ export class DrawingService {
 
     // Farbänderungen in der Toolbar
     changeTokenButtonColor(color: string) {
-        if(this.simulationStatus == 1 || this.simulationStatus == 2){
+        if(!this.drawingActive){
             return;
         }
 
@@ -340,6 +352,12 @@ export class DrawingService {
         });
 
         // Welche Ansteuerung ist günstiger - die über die Position im Array oder die über der Queri-Selector?
+    }
+
+    enableFreiAlgorithmusBtn() {
+        const freeButton = document.querySelector('.free') as HTMLElement;
+        freeButton.classList.add('selected');
+
     }
 
 }

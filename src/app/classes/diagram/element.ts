@@ -9,13 +9,14 @@ export class Element  {
     private _positionChange$: BehaviorSubject<Coords>;
     private _isSelected = false;
     private _lastMouseMove = 0;
+    private _position: number;
 
     constructor(id: string, x: number , y: number) {
         this._id = id;
-        this._x = x
-        this._y = y
+        this._x = x;
+        this._y = y;
         this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
-        
+        this._position = 0;
     }
 
     updatePosition(newPosition: Coords) {
@@ -27,6 +28,14 @@ export class Element  {
     getPositionChangeObservable(): Observable<Coords> {
 
         return this._positionChange$.asObservable();
+    }
+
+    get position(): number {
+        return this._position;
+    }
+
+    set position(position: number) {
+        this._position = position;
     }
 
     get id(): string {

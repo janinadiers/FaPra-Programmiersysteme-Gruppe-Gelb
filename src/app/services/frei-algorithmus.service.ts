@@ -47,6 +47,7 @@ export class FreiAlgorithmusService {
         });
         window.addEventListener('mousemove', (event) => {
             event.stopPropagation();
+            
             if(!this._selectedNode) return;
             this.processMouseMove(event, this._selectedNode);
         })
@@ -98,7 +99,8 @@ export class FreiAlgorithmusService {
             const svgElement = document.getElementById('canvas');
             const svgContainer = svgElement?.getBoundingClientRect();
             // Berechnung der Maus Koordinanten relativ zum SVG Element
-            node.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
+            if ((document.getElementById('algorithm-select') as HTMLSelectElement).value !== 'sugiyama')
+                node.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
             node.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
             
             node.updateSVG();

@@ -1,14 +1,58 @@
 <mat-toolbar class="toolbar">
-    <div class="left-toolbar">
-        
-        <button mat-icon-button 
-                class="play tooltip" 
+        <button mat-icon-button
+                class="hover-class play tooltip"
                 (click)="toggleSimulation()">
-                <span class="tooltiptext">start simulation</span>
-                <mat-icon>play_circle</mat-icon>
+            <div class="play-button">
+                <span class="tooltiptext">Start Simulation</span>
+                <span class="tooltiptext" *ngIf="stepsActive">Simple Game</span>
+                <mat-icon style="color: black">play_circle</mat-icon>
+            </div>
         </button>
 
-        <button mat-icon-button 
+        <button mat-icon-button *ngIf="simulationActive"
+                class="edit tooltip"
+                (click)="editStep()">
+            <div class="edit-button">
+                <span class="tooltiptext">Edit Step</span>
+                <mat-icon style="color:black">edit</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="create tooltip"
+                (click)="showRandomMaximumStep()">
+            <div class="merge-type-button">
+                <span class="tooltiptext">Show Random Step</span>
+                <mat-icon style="color:black">merge_type</mat-icon>
+            </div>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="fire-step tooltip"
+                (click)="fireStep()"
+                [disabled] = "!stepsActive">
+            <div class="fire-step-button">
+                <span class="tooltiptext">Fire Step</span>
+                <mat-icon style="color:gray">fast_forward</mat-icon>
+            </div>
+        </button>
+
+        <div class="vertical-line"></div>
+        <button mat-icon-button *ngIf="simulationActive && !randomStep"
+                class="multitasking tooltip"
+                (click)="activateMultitaskingTransitions()">
+            <span class="tooltiptext">Multitasking</span>
+            <mat-icon>done_all</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="simulationActive"
+                class="fire-step tooltip"
+                (click)="returnToDrawing()">
+                <span class="tooltiptext">Return To Drawing</span>
+                <mat-icon>keyboard_return</mat-icon>
+        </button>
+
+        <button mat-icon-button *ngIf="!simulationActive"
                 class="hover-class tooltip"
                 [class.active]="reachabilityActiveColor"
                 (click)="onButtonClick('reachabilityGraph')">
@@ -16,11 +60,12 @@
             <mat-icon>share</mat-icon>
         </button>
 
-        <div class="vertical-line"></div>
 
+        <div class="drawing">
              <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="circleActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleCircleButton()">
                 <mat-icon>panorama_fish_eye</mat-icon>
             </button>
@@ -28,6 +73,7 @@
             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="rectActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleRectangleButton()">
                 <mat-icon>crop_portrait</mat-icon>
             </button>
@@ -35,6 +81,7 @@
             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="arrowActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleArrowButton()">
                 <mat-icon>north_east</mat-icon>
             </button>
@@ -42,12 +89,14 @@
             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="boltActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleBoltButton()">
                 <mat-icon>bolt</mat-icon>
             </button>
 
             <button mat-icon-button *ngIf="!simulationActive"
                 class="add-token tooltip"
+                [class.inactive] ="reachabilityActiveColor"
                 (click)="addToken()">
                 <span class="tooltiptext">add tokens</span>
                 <mat-icon>add_circle</mat-icon>
@@ -56,6 +105,7 @@
 
             <button mat-icon-button *ngIf="!simulationActive"
                     class="remove-token tooltip"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="removeToken()">
                 <span class="tooltiptext">remove tokens</span>
                 <mat-icon>remove_circle</mat-icon>
@@ -67,29 +117,39 @@
 
                 <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class tooltip"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="onButtonClick('deleteLast')">
                     <span class="tooltiptext">delete last</span>
-                <mat-icon>delete</mat-icon>
+                <mat-icon>undo</mat-icon>
                 </button>
 
                 <button mat-icon-button *ngIf="!simulationActive"
                         class="hover-class tooltip"
+                        [class.inactive] ="reachabilityActiveColor"
                         (click)="onButtonClick('clear')">
                     <span class="tooltiptext">clear all</span>
-                    <mat-icon>clear</mat-icon>
+                    <mat-icon>delete</mat-icon>
                 </button>
 
+            </div>
 
-    </div>
-        <div class="center-toolbar">
-            <label for="algorithm-select">Algorithmus: </label>
-            <select name="algorithm" id="algorithm-select" (change)="onAlgorithmSelect()">
-                <option value="free">Free</option>
-                <option value="spring-embedder">Spring Embedder</option>
-                <option value="sugiyama">Sugiyama</option>
-            </select>
-        </div>
-        <div class="right-toolbar">
+            <div>
+                <button class="hover-class tooltip free" mat-icon-button  (click)="onAlgorithmSelect('free')">
+                    <span class="tooltiptext" (click)="onAlgorithmSelect('free')">Free</span>
+                    <mat-icon>pan_tool</mat-icon>
+                </button>
+                <button class="hover-class tooltip spring-embedder" mat-icon-button (click)="onAlgorithmSelect('spring-embedder')" >
+                    <span class="tooltiptext">Spring-Embedder</span>
+                    <mat-icon>account_tree</mat-icon>
+                </button>
+                <button class="hover-class tooltip sugiyama" mat-icon-button (click)="onAlgorithmSelect('sugiyama')" >
+                    <span class="tooltiptext">Sugiyama</span>
+                    <mat-icon>schema</mat-icon>
+                </button>
+            </div>
+
+        <div class="vertical-line"></div>
+
             <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
                 <mat-icon>import_export</mat-icon>
@@ -109,6 +169,9 @@
             </mat-menu>
 
             <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
+
+            <div class="vertical-line"></div>
+
             <div class="zoom-button-wrapper">
                 <button mat-icon-button class="hover-class"
                         (click)="onZoomButtonClick('zoom-in')">
@@ -119,8 +182,14 @@
                     <mat-icon>zoom_out</mat-icon>
                 </button>
             </div>
-        </div>
+            <div>
+                <button mat-icon-button class="hover-class tooltip"
+                        (click)="openPdf()">
+                        <span class="tooltiptext">help</span>
+                        <mat-icon>help</mat-icon>
+                </button>
+            </div>
 
-
+        
 
 </mat-toolbar>
