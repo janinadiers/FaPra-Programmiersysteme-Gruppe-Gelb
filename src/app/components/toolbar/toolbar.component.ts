@@ -77,6 +77,7 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    pdfSrc: string = 'assets/manual.pdf';
     stepsActive: boolean = false;
     multitasking: boolean = false;
     randomStep: boolean = false;
@@ -158,6 +159,11 @@ export class ToolbarComponent {
         this.arrowActiveColor = false;
         this.boltActiveColor =  false;
         this.reachabilityActiveColor = !this.reachabilityActiveColor;
+        if(this.simulationActive == false){
+            this._drawingService.deselectPlacesAndLines();
+            this.deselectAddAndRemoveTokenButtons();
+        }
+        
     }
 
 
@@ -240,7 +246,7 @@ export class ToolbarComponent {
             this._activeButtonService.sendButtonClick(buttonId);
             }
             else{
-                alert("A marked petri net is required!");
+                alert("Please provide a petri net with marks!");
             }
         }
         else{
@@ -442,6 +448,11 @@ export class ToolbarComponent {
             this.editStep();
         }
     }
+
+    openPdf() {
+        
+        window.open(this.pdfSrc, '_blank');
+      }
 
     activateMultitaskingTransitions() {
         this.multitasking = !this.multitasking;

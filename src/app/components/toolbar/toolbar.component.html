@@ -65,6 +65,7 @@
              <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="circleActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleCircleButton()">
                 <mat-icon>panorama_fish_eye</mat-icon>
             </button>
@@ -72,6 +73,7 @@
             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="rectActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleRectangleButton()">
                 <mat-icon>crop_portrait</mat-icon>
             </button>
@@ -79,6 +81,7 @@
             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="arrowActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleArrowButton()">
                 <mat-icon>north_east</mat-icon>
             </button>
@@ -86,12 +89,14 @@
             <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="boltActiveColor"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleBoltButton()">
                 <mat-icon>bolt</mat-icon>
             </button>
 
             <button mat-icon-button *ngIf="!simulationActive"
                 class="add-token tooltip"
+                [class.inactive] ="reachabilityActiveColor"
                 (click)="addToken()">
                 <span class="tooltiptext">add tokens</span>
                 <mat-icon>add_circle</mat-icon>
@@ -100,6 +105,7 @@
 
             <button mat-icon-button *ngIf="!simulationActive"
                     class="remove-token tooltip"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="removeToken()">
                 <span class="tooltiptext">remove tokens</span>
                 <mat-icon>remove_circle</mat-icon>
@@ -111,6 +117,7 @@
 
                 <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class tooltip"
+                    [class.inactive] ="reachabilityActiveColor"
                     (click)="onButtonClick('deleteLast')">
                     <span class="tooltiptext">delete last</span>
                 <mat-icon>undo</mat-icon>
@@ -118,6 +125,7 @@
 
                 <button mat-icon-button *ngIf="!simulationActive"
                         class="hover-class tooltip"
+                        [class.inactive] ="reachabilityActiveColor"
                         (click)="onButtonClick('clear')">
                     <span class="tooltiptext">clear all</span>
                     <mat-icon>delete</mat-icon>
@@ -174,5 +182,14 @@
                     <mat-icon>zoom_out</mat-icon>
                 </button>
             </div>
+            <div>
+                <button mat-icon-button class="hover-class tooltip"
+                        (click)="openPdf()">
+                        <span class="tooltiptext">help</span>
+                        <mat-icon>help</mat-icon>
+                </button>
+            </div>
+
+        
 
 </mat-toolbar>
