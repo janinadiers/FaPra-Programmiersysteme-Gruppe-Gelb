@@ -1,6 +1,4 @@
 <mat-toolbar class="toolbar">
-    <div class="left-toolbar">
-        
         <button mat-icon-button 
                 class="play tooltip" 
                 (click)="toggleSimulation()">
@@ -17,7 +15,7 @@
         </button>
 
         <div class="vertical-line"></div>
-
+        
              <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="circleActiveColor"
@@ -79,13 +77,13 @@
                     <mat-icon>delete</mat-icon>
                 </button>
 
-    </div>
+    
     <div class="vertical-line"></div>
-        <div class="center-toolbar">
+        <!-- <div class="center-toolbar"> -->
             
             <button class="hover-class tooltip free" mat-icon-button  (click)="onAlgorithmSelect('free')">
                 <span class="tooltiptext" (click)="onAlgorithmSelect('free')">Free</span>
-                <mat-icon class="selected">pan_tool</mat-icon>
+                <mat-icon>pan_tool</mat-icon>
             </button>
             <button class="hover-class tooltip spring-embedder" mat-icon-button (click)="onAlgorithmSelect('spring-embedder')" >
                 <span class="tooltiptext">Spring-Embedder</span>
@@ -102,9 +100,9 @@
                 <button mat-menu-item class="sugiyama" (click)="onAlgorithmSelect('sugiyama')">Sugiyama</button>
             </mat-menu> -->
            
-        </div>
+        <!-- </div> -->
         <div class="vertical-line"></div>
-        <div class="right-toolbar">
+        <!-- <div class="right-toolbar"> -->
             
             <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
@@ -135,8 +133,5 @@
                     <mat-icon>zoom_out</mat-icon>
                 </button>
             </div>
-        </div>
-
-
 
 </mat-toolbar>

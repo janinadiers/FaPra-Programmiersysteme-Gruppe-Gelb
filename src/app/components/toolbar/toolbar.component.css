@@ -8,47 +8,12 @@
     font-family: "Courier New", sans-serif;
 }
 
-.left-toolbar {
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
-.right-toolbar {
-
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.center-toolbar {
-
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  font-size: 1.1rem;
-}
-
-.center-toolbar > label {
-  margin: 0 1rem;
-}
-
-.center-toolbar > option {
-  font-family: "Courier New", sans-serif;
-}
-
 
 .hover-class:hover {
 
     background-color: red;
+    color: black;
  }
-
- /* .hover-class-2:hover {
-
-  background-color: rgb(210, 210, 210);;
-} */
 
  .active {
     background-color: red; 
@@ -104,15 +69,14 @@
     margin: 1rem;
 
 }
+
+
 .selected {
-  background-color: red
+  color: red;
 
 }
 
 button{
   text-align: center;
 }
-
-
-
 

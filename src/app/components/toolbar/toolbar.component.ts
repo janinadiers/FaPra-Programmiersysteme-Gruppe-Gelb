@@ -84,6 +84,9 @@ export class ToolbarComponent {
         });
 
         this.simulationStatus = 1;
+
+        this.onAlgorithmSelect();
+        
     }
 
     toggleRectangleButton() {
@@ -162,7 +165,7 @@ export class ToolbarComponent {
         this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
         if(algorithm === 'spring-embedder'){
-            if(freeButton && springEmbedderButton && sugiyamaButton){
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 springEmbedderButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
                 sugiyamaButton.classList?.remove('selected');
@@ -172,7 +175,7 @@ export class ToolbarComponent {
 
         }
         else if(algorithm === 'sugiyama'){
-            if(freeButton && springEmbedderButton && sugiyamaButton){
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 sugiyamaButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
                 springEmbedderButton.classList?.remove('selected');
@@ -181,7 +184,9 @@ export class ToolbarComponent {
 
         }
         else{
-            if(freeButton && springEmbedderButton && sugiyamaButton){
+            console.log("free");
+            
+            if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 freeButton.classList.add('selected');
                 springEmbedderButton.classList?.remove('selected');
                 sugiyamaButton.classList?.remove('selected');
