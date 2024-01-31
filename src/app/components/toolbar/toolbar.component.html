@@ -1,14 +1,13 @@
 <mat-toolbar class="toolbar">
-    <div class="left-toolbar">
-        
         <button mat-icon-button 
-                class="play tooltip"
                 [class.inactive] ="reachabilityActiveColor"
+                class="hover-class play tooltip" 
                 (click)="toggleSimulation()">
                 <span class="tooltiptext">start simulation</span>
                 <mat-icon>play_circle</mat-icon>
         </button>
 
+        <div class="vertical-line"></div>
         <button mat-icon-button 
                 class="hover-class tooltip"
                 [class.active]="reachabilityActiveColor"
@@ -17,8 +16,8 @@
             <mat-icon>share</mat-icon>
         </button>
 
-        <div class="vertical-line"></div>
-
+       
+        <div class="drawing">
              <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class"
                     [class.active]="circleActiveColor"
@@ -77,7 +76,7 @@
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="onButtonClick('deleteLast')">
                     <span class="tooltiptext">delete last</span>
-                <mat-icon>delete</mat-icon>
+                <mat-icon>undo</mat-icon>
                 </button>
 
                 <button mat-icon-button *ngIf="!simulationActive"
@@ -85,22 +84,29 @@
                         [class.inactive] ="reachabilityActiveColor"
                         (click)="onButtonClick('clear')">
                     <span class="tooltiptext">clear all</span>
-                    <mat-icon>clear</mat-icon>
+                    <mat-icon>delete</mat-icon>
                 </button>
 
-
-    </div>
-        
-        <div *ngIf="!reachabilityActiveColor" class="center-toolbar">
-            <label for="algorithm-select">Algorithmus: </label>
-            <select name="algorithm" id="algorithm-select" (change)="onAlgorithmSelect()">
-                <option value="free">Free</option>
-                <option value="spring-embedder">Spring Embedder</option>
-                <option value="sugiyama">Sugiyama</option>
-            </select>
-        </div>
-        <div class="right-toolbar">
-            <button *ngIf="!reachabilityActiveColor"  class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
+            </div>
+ 
+            <div>
+                <button class="hover-class tooltip free" mat-icon-button  (click)="onAlgorithmSelect('free')">
+                    <span class="tooltiptext" (click)="onAlgorithmSelect('free')">Free</span>
+                    <mat-icon>pan_tool</mat-icon>
+                </button>
+                <button class="hover-class tooltip spring-embedder" mat-icon-button (click)="onAlgorithmSelect('spring-embedder')" >
+                    <span class="tooltiptext">Spring-Embedder</span>
+                    <mat-icon>account_tree</mat-icon>
+                </button>
+                <button class="hover-class tooltip sugiyama" mat-icon-button (click)="onAlgorithmSelect('sugiyama')" >
+                    <span class="tooltiptext">Sugiyama</span>
+                    <mat-icon>schema</mat-icon>
+                </button>
+            </div>
+            
+        <div class="vertical-line"></div>
+            
+            <button class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
                 <mat-icon>import_export</mat-icon>
             </button>
@@ -119,6 +125,9 @@
             </mat-menu>
 
             <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
+
+            <div class="vertical-line"></div>
+
             <div class="zoom-button-wrapper">
                 <button mat-icon-button class="hover-class"
                         (click)="onZoomButtonClick('zoom-in')">
@@ -129,8 +138,5 @@
                     <mat-icon>zoom_out</mat-icon>
                 </button>
             </div>
-    </div>
-
-
 
 </mat-toolbar>
