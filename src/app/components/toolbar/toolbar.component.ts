@@ -13,6 +13,14 @@ import {MarkenspielService} from "../../services/markenspiel.service";
 import {SpringEmbedderService} from "../../services/spring-embedder.service";
 import {DrawingService} from "../../services/drawing.service";
 import { FreiAlgorithmusService } from 'src/app/services/frei-algorithmus.service';
+
+import {transition} from "@angular/animations";
+import {Transition} from "../../classes/diagram/transition";
+
+import {SugiyamaService} from "../../services/sugiyama.service";
+
+import {template} from "lodash";
+
 @Component({
     selector: 'app-toolbar',
     templateUrl: './toolbar.component.html',
@@ -49,13 +57,12 @@ export class ToolbarComponent {
                 public _markenspielService: MarkenspielService,
                 private _springEmbedderService: SpringEmbedderService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
-                private _drawingService: DrawingService
+                private _drawingService: DrawingService,
+                private _sugiyamaService: SugiyamaService
     ) {
         this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
             this.onAlgorithmSelect();
-
-
         });
 
         this.fileContent = new EventEmitter<{ fileContent: string, fileExtension: string }>();
@@ -146,7 +153,6 @@ export class ToolbarComponent {
         this.deselectAddAndRemoveTokenButtons();
     }
 
-
     toggleReachabilityButton(){
         this.circleActiveColor = false;
         this.rectActiveColor = false;
@@ -160,11 +166,15 @@ export class ToolbarComponent {
         
     }
 
+
     onAlgorithmSelect(algorithm:string = 'free') {
+        if (this._diagram == undefined)
+            return;
 
         const freeButton = document.querySelector('.free') as HTMLElement;
         const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
         const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
+
 
         this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
@@ -178,13 +188,16 @@ export class ToolbarComponent {
             this._springEmbedderService.start()
 
         }
+
         else if(algorithm === 'sugiyama'){
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 sugiyamaButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
                 springEmbedderButton.classList?.remove('selected');
             }
+
             this._springEmbedderService.teardown();
+            this._sugiyamaService.begin(this._diagram);
 
         }
         else{

@@ -1,5 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Place } from './place';
+import { Coords } from '../json-petri-net';
 
 export class Transition extends Element {
 
@@ -76,6 +77,13 @@ export class Transition extends Element {
             y >= this.y - this.height / 2 &&
             y <= this.y + this.height / 2
         );
+    }
+
+    updateGroup(newPosition: Coords) {
+        super.x = newPosition.x;
+        super.y = newPosition.y;
+
+        super.svgElement?.setAttribute('transform', `translate(${newPosition.x - this.width / 2}, ${newPosition.y - this.height / 2})`);
     }
 
     override createSVG(){

@@ -37,7 +37,7 @@ export class PnmlExportService {
 
         for (const line of this.getLines()) {
             let graphics = '<graphics>\n';
-            if (line.coords) {
+            if (line.coords && line.coords.length > 0) {
                 for (const coord of line.coords) {
                     graphics += `<position x="${coord.x}" y="${coord.y}"/>\n`;
                 }

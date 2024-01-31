@@ -1,5 +1,6 @@
 import { Element } from 'src/app/classes/diagram/element';
 import { Transition } from './transition';
+import { Coords } from '../json-petri-net';
 
 
 export class Place extends Element {
@@ -65,6 +66,13 @@ export class Place extends Element {
     isClicked(x: number, y: number): boolean {
         const distance = Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
         return distance <= this._radius;
+    }
+
+    updateGroup(newPosition: Coords) {
+        super.x = newPosition.x;
+        super.y = newPosition.y;
+
+        super.svgElement?.setAttribute('transform', `translate(${newPosition.x}, ${newPosition.y})`);
     }
 
     override createSVG(){
