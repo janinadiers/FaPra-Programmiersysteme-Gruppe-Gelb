@@ -1,12 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from "../classes/diagram/diagram";
 import {DisplayService} from "./display.service";
-import {elementAt, Subscription} from "rxjs";
 import {Transition} from "../classes/diagram/transition";
-import {transition} from "@angular/animations";
 import {Place} from "../classes/diagram/place";
 import {Line} from "../classes/diagram/line";
-import {getMultipleValuesInSingleSelectionError} from "@angular/cdk/collections";
 
 @Injectable({
     providedIn: 'root'
