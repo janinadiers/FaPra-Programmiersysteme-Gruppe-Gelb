@@ -294,7 +294,6 @@ export class MarkenspielService {
                 }
             }
 
-            // console.log(this.currentChosenTransitions);
 
             let count = parents[0].amountToken;
             let lines = this._diagram!.lines;
@@ -311,7 +310,6 @@ export class MarkenspielService {
             }
         }
 
-        // console.log(this.currentChosenTransitions);
     }
 
     checkConsequences(element: Transition) {

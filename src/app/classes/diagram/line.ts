@@ -271,8 +271,8 @@ export class Line {
         const handleMouseUp = () => {
             Diagram.drawingIsActive = false;
             this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => { 
-                
-                intermediatePoint.remove()});
+                intermediatePoint.remove()
+            });
             this._draggingCircle = null;
             this.updateIntermediatePoints(this.intermediatePoints.filter(c => !c.isVirtual));
             this.addVirtualPoints();
@@ -442,11 +442,14 @@ export class Line {
            
 
     }
-
    
     removeCoords(): void {
+        this.intermediatePoints.forEach((intermediatePoint) => {
+            this.removeCoord(intermediatePoint);
+        });
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+        
     }
 
     removeCoord(intermediatePoint: IntermediatePoint){
@@ -501,6 +504,8 @@ export class Line {
             this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
             this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
             this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
+
+            this.removeCoords();
         }
 
 
@@ -527,6 +532,8 @@ export class Line {
         this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
+
+        this.removeCoords();
     }
 }
 

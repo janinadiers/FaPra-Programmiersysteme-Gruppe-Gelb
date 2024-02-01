@@ -179,6 +179,8 @@ export class ToolbarComponent {
         this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
         if(algorithm === 'spring-embedder'){
+            Diagram.algorithmIsActive = true;
+
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 springEmbedderButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
@@ -190,6 +192,7 @@ export class ToolbarComponent {
         }
 
         else if(algorithm === 'sugiyama'){
+            Diagram.algorithmIsActive = true;
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 sugiyamaButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
@@ -201,8 +204,8 @@ export class ToolbarComponent {
 
         }
         else{
-            console.log("free");
-
+            Diagram.algorithmIsActive = false;
+            
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 freeButton.classList.add('selected');
                 springEmbedderButton.classList?.remove('selected');
@@ -210,6 +213,9 @@ export class ToolbarComponent {
             }
             this._springEmbedderService.teardown();
             this._freiAlgorithmusService.start()
+            this._diagram?.lines.forEach((line) => {
+                line.addVirtualPoints();
+            });
         }
 
     }

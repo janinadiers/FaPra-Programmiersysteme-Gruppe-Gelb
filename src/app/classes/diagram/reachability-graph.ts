@@ -37,7 +37,6 @@ export class ReachabilityGraph {
             this.moveNodes();
             this.drawGraph();
             this._springEmbedderService.apply(this._visited);
-            //console.log(this._visited);
             
         }
         else{

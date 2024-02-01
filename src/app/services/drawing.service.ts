@@ -79,15 +79,14 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place) {
+        console.log("Circle selected", Diagram.algorithmIsActive);
+        
+
+        if(!this.drawingActive || this.activeButtonService.isBoltButtonActive || Diagram.algorithmIsActive){
+            return;
+        }
+
         this._diagram!.selectedCircle = circle;
-
-        if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
-            return;
-        }
-
-        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
-            return;
-        }
 
         this.circleActive = !this.circleActive;
 
@@ -278,6 +277,10 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
+
+        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
+            return;
+        }
 
         this._diagram!.selectedLine = line;
 
