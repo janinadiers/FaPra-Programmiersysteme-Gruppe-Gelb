@@ -10,6 +10,8 @@ import {DrawingService} from "../../services/drawing.service";
 import {ReachabilityGraph} from 'src/app/classes/diagram/reachability-graph';
 import {MarkenspielService} from "../../services/markenspiel.service";
 import { SpringEmbedderService } from 'src/app/services/spring-embedder-for-reachability-graph.service';
+import {Transition} from "../../classes/diagram/transition";
+import {Place} from "../../classes/diagram/place";
 
 
 @Component({
@@ -317,11 +319,19 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 // Aktualisieren Sie den ausgewählten Kreis
                 this._diagram!.selectedCircle = clickedPlace;
 
+                if(!this.lineAlreadyExists(clickedPlace, this._diagram!.selectedRect!, false)) {
+                    this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
+                }
+
                 this._diagram!.selectedRect = undefined;
                 this._diagram!.lightningCount = 1;
             } else if (clickedTransition) {
                 // Aktualisieren Sie die ausgewählte Transition
                 this._diagram!.selectedRect = clickedTransition;
+
+                if(!this.lineAlreadyExists(this._diagram!.selectedCircle!, clickedTransition, true)) {
+                    this._drawingService.connectElements(this._diagram!.selectedCircle!, clickedTransition, false);
+                }
 
                 this._diagram!.selectedCircle = undefined;
                 this._diagram!.lightningCount = 0;
@@ -363,6 +373,19 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }
             }
         }
+    }
+
+    lineAlreadyExists(selectedCircle: Place, selectedRect: Transition, circleClicked: boolean): boolean {
+        // Durchlaufen aller Kanten im Diagramm
+        for (const line of this._diagram!.lines) {
+            // Überprüfen, ob die Kante die ausgewählten Elemente bereits verbindet
+            if (line.isAlreadyConnected(selectedCircle, selectedRect, circleClicked)) {
+                // Eine Kante zwischen dem ausgewählten Kreis und der ausgewählten Transition wurde gefunden
+                return true;
+            }
+        }
+        // Keine Kante zwischen dem ausgewählten Kreis und der ausgewählten Transition gefunden
+        return false;
     }
 
     handleRightClick(event: MouseEvent) {
