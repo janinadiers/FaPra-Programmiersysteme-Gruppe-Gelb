@@ -153,11 +153,12 @@
 
 .drawing-inactive{
   
-  color: rgb(200, 200, 200);
+  color: rgb(200, 200, 200) !important;
 }
 
 .drawing-inactive:hover{
-  background-color: rgb(240, 240, 240);
+  background-color: rgb(240, 240, 240) !important;
+  color: rgb(240, 240, 240) !important;
 }
 
 mat-icon{

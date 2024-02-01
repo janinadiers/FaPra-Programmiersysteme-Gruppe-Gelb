@@ -59,9 +59,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram!.canvasElement = document.getElementById('canvas') as unknown as SVGElement;
         this.subscriptionOfToolbar = this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
             if (buttonId === "clear" && this.activeButtonService.isReachButtonActive == false) {
+                if(Diagram.algorithmIsActive) return
                 let clearElements: boolean = true;
                 this.clearDrawingArea(clearElements);
             } else if (buttonId === "deleteLast" && this.activeButtonService.isReachButtonActive == false) {
+                if(Diagram.algorithmIsActive) return
                 this.deleteLastElement();
             } else if (buttonId === "reachabilityGraph") {
 

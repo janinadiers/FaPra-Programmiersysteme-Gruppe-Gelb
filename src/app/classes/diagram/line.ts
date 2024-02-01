@@ -53,6 +53,7 @@ export class Line {
         
 
         source.getPositionChangeObservable().subscribe((source) => {
+            
             this.updateSource({x: source.x, y: source.y});
             // Update des Schnittpunkts von Linie und Transition
             let refX: number = this.updateMarker();
@@ -60,6 +61,7 @@ export class Line {
 
         });
         target.getPositionChangeObservable().subscribe((target) => {
+            
             this.updateTarget({x: target.x, y: target.y});
             // Update des Schnittpunkts von Linie und Transition
             let refX: number = this.updateMarker();
@@ -193,7 +195,7 @@ export class Line {
     }
 
     createSVG(): SVGElement {
-
+        
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
    
@@ -279,7 +281,7 @@ export class Line {
 
 
     private addEventListenerForIntermediatePoints(intermediatePoint: IntermediatePoint) {
-
+        
         const handleMouseDown = () => {
             this._draggingCircle = intermediatePoint;
             this._draggingCircle.isVirtual = false;
@@ -470,6 +472,7 @@ export class Line {
         this.intermediatePoints.forEach((intermediatePoint) => {
             this.removeCoord(intermediatePoint);
         });
+        
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
         
@@ -482,6 +485,7 @@ export class Line {
     }
 
     handleMouseMove(event: MouseEvent) {
+        
         const svgElement = document.getElementById('canvas');
         const svgContainer = svgElement?.getBoundingClientRect();
 
@@ -529,7 +533,10 @@ export class Line {
             this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
             this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
 
-           // this.removeCoords();
+            this.intermediatePoints?.forEach((intermediatePoint) => {
+                intermediatePoint.remove();
+            });
+        
         }
 
 
@@ -543,7 +550,7 @@ export class Line {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
-        }
+        
 
         // Markierungen für die Gewichte an die Kante hängen
         let tokenCircleCx = this.calcMidCoords().x.toString();
@@ -557,7 +564,11 @@ export class Line {
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
 
-       // this.removeCoords();
+        this.intermediatePoints?.forEach((intermediatePoint) => {
+            intermediatePoint.remove();
+        });
+
+    }
     }
 }
 
