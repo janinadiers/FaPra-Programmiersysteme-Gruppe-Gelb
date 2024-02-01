@@ -505,7 +505,7 @@ export class Line {
             this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
             this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
 
-            this.removeCoords();
+           // this.removeCoords();
         }
 
 
@@ -533,7 +533,7 @@ export class Line {
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
 
-        this.removeCoords();
+       // this.removeCoords();
     }
 }
 
