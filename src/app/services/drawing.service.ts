@@ -190,10 +190,11 @@ export class DrawingService {
     }
 
     onRectSelect(rect: Transition) {
+        this._diagram!.selectedRect = rect;
+
         if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
             return;
         }
-        this._diagram!.selectedRect = rect;
 
         if (this._diagram!.selectedCircle) {
             let circleIsTarget: boolean = false;

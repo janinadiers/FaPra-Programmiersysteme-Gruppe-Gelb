@@ -315,30 +315,29 @@ export class DisplayComponent implements OnInit, OnDestroy {
             const clickedPlace = this._diagram!.places.find(place => place.isClicked(mouseX, mouseY));
             const clickedTransition = this._diagram!.transitions.find(transition => transition.isClicked(mouseX, mouseY));
 
+            const selectedCircle = this._diagram!.selectedCircle;
+            const selectedTransition = this._diagram!.selectedRect;
+
             if (clickedPlace) {
-                if(!this.lineAlreadyExists(clickedPlace, this._diagram!.selectedRect!, false)) {
-                    this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
+                if(clickedPlace === selectedCircle) {
+                    if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
+                        console.log("Yes1");
+                        this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                    }
+                } else {
+                    this._diagram!.selectedCircle = this._diagram!.places.find(place => clickedPlace === place);
                 }
-                if (!this._diagram!.selectedCircle) {
-                    this._diagram!.selectedCircle = clickedPlace;
-                    this._diagram!.selectedRect = undefined;
-                    this._diagram!.lightningCount = 1;
-                } else if (this._diagram!.selectedRect) {
-                    this._diagram!.selectedRect = undefined;
-                    this._diagram!.lightningCount = 1;
-                }
+                this._diagram!.lightningCount = 1;
             } else if (clickedTransition) {
-                if(!this.lineAlreadyExists(this._diagram!.selectedCircle!, clickedTransition, true)) {
-                    this._drawingService.connectElements(this._diagram!.selectedCircle!, clickedTransition, false);
+                if(clickedTransition === selectedTransition) {
+                    if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
+                        console.log("Yes");
+                        this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
+                    }
+                } else {
+                    this._diagram!.selectedRect = this._diagram!.transitions.find(transition => clickedTransition === transition);
                 }
-                if (!this._diagram!.selectedRect) {
-                    this._diagram!.selectedRect = clickedTransition;
-                    this._diagram!.selectedCircle = undefined;
-                    this._diagram!.lightningCount = 0;
-                } else if (this._diagram!.selectedCircle) {
-                    this._diagram!.selectedCircle = undefined;
-                    this._diagram!.lightningCount = 0;
-                }
+                this._diagram!.lightningCount = 0;
             } else {
                 if (this._diagram!.lightningCount === 0) {
                     let targetIsCircle: boolean = true;
