@@ -28,7 +28,11 @@ export class Line {
         this._sourcePosition = {x: source.x, y: source.y};
         this._targetPosition = {x: target.x, y: target.y};
         this._tokens = tokens ?? 1;
-        this._intermediatePoints$ = new BehaviorSubject<IntermediatePoint[]>(coords?.map(c => { return new IntermediatePoint(c.x, c.y, false)}) || []);
+        this._intermediatePoints$ = new BehaviorSubject<IntermediatePoint[]>(coords?.map(c => { 
+            const intermediatePoint = new IntermediatePoint(c.x, c.y, false);
+            intermediatePoint.createCircle();
+            return intermediatePoint;
+        }) || []);
         this.addVirtualPoints()
         
         this._svgElement = this.createSVG();
@@ -110,9 +114,22 @@ export class Line {
     set coords(coords: Coords[]) {
       
         const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
-        this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
-        if (!sugiyamaButton.classList.contains('selected')) this.addVirtualPoints();
         
+        if (!sugiyamaButton.classList.contains('selected')) {
+            
+            this.updateIntermediatePoints(coords.map(c => {
+                const intermediatePoint = new IntermediatePoint(c.x, c.y, false);
+                intermediatePoint.createCircle();
+                return intermediatePoint;
+            }));
+            this.addVirtualPoints();
+        }
+
+        else{
+            this.updateIntermediatePoints(coords.map(c => {
+                return new IntermediatePoint(c.x, c.y, false);
+            }));
+        } 
 
     }
 
@@ -406,8 +423,9 @@ export class Line {
                 this.updateIntermediatePoints(this.intermediatePoints.filter(i => !i.isVirtual));
                 
                 this.intermediatePoints.forEach((intermediatePoint) => {
-                    
-                    let midPoint = new IntermediatePoint((last_coord.x + intermediatePoint.x) / 2, (last_coord.y + intermediatePoint.y) / 2, true);
+                    const newIntermediatePoint = new IntermediatePoint((last_coord.x + intermediatePoint.x) / 2, (last_coord.y + intermediatePoint.y) / 2, true);
+                    newIntermediatePoint.createCircle();
+                    let midPoint = newIntermediatePoint
                     this.updateIntermediatePoints(this.intermediatePoints.reduce((acc, curr, i) => {  
                         
                         if (i === this.intermediatePoints.indexOf(intermediatePoint)) {
@@ -421,16 +439,18 @@ export class Line {
                     last_coord = {x: intermediatePoint.x, y: intermediatePoint.y};
                     
                 });
-              
                 
-                this.updateIntermediatePoints([...this.intermediatePoints, new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)]) 
+                const newIntermediatePoint = new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)
+                newIntermediatePoint.createCircle();
+                this.updateIntermediatePoints([...this.intermediatePoints, newIntermediatePoint]) 
                 
             }
                 
             
         else{
-            
-            this.updateIntermediatePoints([new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)])
+            const newIntermediatePoint = new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)
+            newIntermediatePoint.createCircle();
+            this.updateIntermediatePoints([newIntermediatePoint])
          }
          
          // add intermediatePoints to svgElement

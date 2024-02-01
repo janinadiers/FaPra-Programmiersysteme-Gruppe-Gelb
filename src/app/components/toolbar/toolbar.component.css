@@ -151,6 +151,15 @@
 
 }
 
+.drawing-inactive{
+  
+  color: rgb(200, 200, 200);
+}
+
+.drawing-inactive:hover{
+  background-color: rgb(240, 240, 240);
+}
+
 mat-icon{
   text-align: center;
 }

@@ -10,7 +10,7 @@ export class IntermediatePoint {
         this._x = x;
         this._y = y;
         this._isVirtual = isVirtual;
-        this.createCircle();
+        // this.createCircle();
     }
 
     get x(): number {
@@ -34,7 +34,7 @@ export class IntermediatePoint {
     }
 
 
-    private createCircle(){
+    createCircle(){
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', this.x.toString());
         circle.setAttribute('cy', this.y.toString());

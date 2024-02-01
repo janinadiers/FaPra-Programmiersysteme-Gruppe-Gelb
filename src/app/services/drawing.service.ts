@@ -79,9 +79,7 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place) {
-        console.log("Circle selected", Diagram.algorithmIsActive);
         
-
         if(!this.drawingActive || this.activeButtonService.isBoltButtonActive || Diagram.algorithmIsActive){
             return;
         }
@@ -325,6 +323,8 @@ export class DrawingService {
 
     // Farbänderungen in der Toolbar
     changeTokenButtonColor(color: string) {
+        console.log('changeTokenButtonColor');
+        
         if(!this.drawingActive){
             return;
         }
