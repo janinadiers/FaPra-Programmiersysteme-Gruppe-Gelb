@@ -316,25 +316,30 @@ export class DisplayComponent implements OnInit, OnDestroy {
             const clickedTransition = this._diagram!.transitions.find(transition => transition.isClicked(mouseX, mouseY));
 
             if (clickedPlace) {
-                // Aktualisieren Sie den ausgewählten Kreis
-                this._diagram!.selectedCircle = clickedPlace;
-
-                if(!this.lineAlreadyExists(clickedPlace, this._diagram!.selectedRect!, false)) {
-                    this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
+                if (!this._diagram!.selectedCircle) {
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this._diagram!.selectedRect = undefined;
+                    this._diagram!.lightningCount = 1;
+                } else if (this._diagram!.selectedRect) {
+                    if(!this.lineAlreadyExists(clickedPlace, this._diagram!.selectedRect!, false)) {
+                        this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
+                    }
+                    this._diagram!.selectedRect = undefined;
+                    this._diagram!.lightningCount = 1;
                 }
-
-                this._diagram!.selectedRect = undefined;
-                this._diagram!.lightningCount = 1;
             } else if (clickedTransition) {
-                // Aktualisieren Sie die ausgewählte Transition
-                this._diagram!.selectedRect = clickedTransition;
+                if (!this._diagram!.selectedRect) {
 
-                if(!this.lineAlreadyExists(this._diagram!.selectedCircle!, clickedTransition, true)) {
-                    this._drawingService.connectElements(this._diagram!.selectedCircle!, clickedTransition, false);
+                    this._diagram!.selectedRect = clickedTransition;
+                    this._diagram!.selectedCircle = undefined;
+                    this._diagram!.lightningCount = 0;
+                } else if (this._diagram!.selectedCircle) {
+                    if(!this.lineAlreadyExists(this._diagram!.selectedCircle!, clickedTransition, true)) {
+                        this._drawingService.connectElements(this._diagram!.selectedCircle!, clickedTransition, false);
+                    }
+                    this._diagram!.selectedCircle = undefined;
+                    this._diagram!.lightningCount = 0;
                 }
-
-                this._diagram!.selectedCircle = undefined;
-                this._diagram!.lightningCount = 0;
             } else {
                 if (this._diagram!.lightningCount === 0) {
                     let targetIsCircle: boolean = true;
