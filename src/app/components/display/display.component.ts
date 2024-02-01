@@ -317,6 +317,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             if (clickedPlace) {
                 if (!this._diagram!.selectedCircle) {
+                    if(!this.lineAlreadyExists(clickedPlace, this._diagram!.selectedRect!, false)) {
+                        this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
+                    }
                     this._diagram!.selectedCircle = clickedPlace;
                     this._diagram!.selectedRect = undefined;
                     this._diagram!.lightningCount = 1;
@@ -329,7 +332,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }
             } else if (clickedTransition) {
                 if (!this._diagram!.selectedRect) {
-
+                    if(!this.lineAlreadyExists(this._diagram!.selectedCircle!, clickedTransition, true)) {
+                        this._drawingService.connectElements(this._diagram!.selectedCircle!, clickedTransition, false);
+                    }
                     this._diagram!.selectedRect = clickedTransition;
                     this._diagram!.selectedCircle = undefined;
                     this._diagram!.lightningCount = 0;
