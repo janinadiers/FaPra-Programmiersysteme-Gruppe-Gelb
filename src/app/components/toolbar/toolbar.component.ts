@@ -255,6 +255,7 @@ export class ToolbarComponent {
 
     onButtonClick(buttonId: string) {
         if (buttonId === "reachabilityGraph"){
+            if(Diagram.algorithmIsActive) return
             if(this.checkValidity()){
             this.toggleReachabilityButton();
             this._activeButtonService.reachabilityButtonActive();

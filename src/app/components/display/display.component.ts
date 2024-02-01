@@ -382,7 +382,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     generateReachabilityGraph() {
-
+        if(Diagram.algorithmIsActive) return
         const svgElement = document.getElementById('canvas');
 
         if (this.activeButtonService.isReachButtonActive) {
