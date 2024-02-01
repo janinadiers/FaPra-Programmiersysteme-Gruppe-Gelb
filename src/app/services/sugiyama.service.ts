@@ -20,9 +20,6 @@ export class SugiyamaService {
     public begin(diagram: Diagram) {
         this.diagram = diagram;
         this.removedLines = [];
-        this.diagram.lines.forEach((line) => {
-            line.removeCoords();
-        });
 
         this.removeLoops();
         this.addLayers();
@@ -141,7 +138,7 @@ export class SugiyamaService {
     removeAllIntermediateCoords() {
         this.diagram.lines.forEach((line) => {
             if (line.coords)
-                line.coords = [];
+                line.removeCoords();
         });
     }
 

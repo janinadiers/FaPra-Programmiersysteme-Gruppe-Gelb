@@ -108,8 +108,11 @@ export class Line {
     }
 
     set coords(coords: Coords[]) {
+      
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
         this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
-        this.addVirtualPoints();
+        if (!sugiyamaButton.classList.contains('selected')) this.addVirtualPoints();
+        
 
     }
 
@@ -453,8 +456,9 @@ export class Line {
     }
 
     removeCoord(intermediatePoint: IntermediatePoint){
-        this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint)); 
         intermediatePoint.remove();
+        this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint)); 
+        
     }
 
     handleMouseMove(event: MouseEvent) {
