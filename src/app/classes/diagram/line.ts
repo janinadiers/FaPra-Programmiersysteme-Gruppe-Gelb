@@ -532,10 +532,8 @@ export class Line {
     public isAlreadyConnected(circle: Place, rect: Transition, circleClicked: boolean): boolean {
         // Überprüfen, ob die Kante die angegebenen Elemente schon verbindet
         if(circleClicked) {
-            console.log("Yes");
             return this._source === rect && this._target === circle;
         }
-        console.log("yes1")
         return this._source === circle && this._target === rect;
     }
 }

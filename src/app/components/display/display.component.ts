@@ -12,6 +12,7 @@ import {MarkenspielService} from "../../services/markenspiel.service";
 import { SpringEmbedderService } from 'src/app/services/spring-embedder-for-reachability-graph.service';
 import {Transition} from "../../classes/diagram/transition";
 import {Place} from "../../classes/diagram/place";
+import {indexOf} from "lodash";
 
 
 @Component({
@@ -319,23 +320,51 @@ export class DisplayComponent implements OnInit, OnDestroy {
             const selectedTransition = this._diagram!.selectedRect;
 
             if (clickedPlace) {
-                if(clickedPlace === selectedCircle) {
+                // Sortieren Sie die Elemente so, dass das zuletzt hinzugefügte Element am Ende steht
+                this._diagram!.places.sort((a, b) => a.timestamp - b.timestamp);
+                this._diagram!.transitions.sort((a, b) => a.timestamp - b.timestamp);
+
+                // Extrahiere das letzte Element aus places und transitions
+                const lastPlace = this._diagram!.places[this._diagram!.places.length - 1];
+                const lastTransition = this._diagram!.transitions[this._diagram!.transitions.length - 1];
+                const lastElement = lastPlace.timestamp > lastTransition.timestamp ? lastPlace : lastTransition;
+
+                console.log(lastElement);
+
+                if(clickedPlace === selectedCircle && !(lastElement instanceof Place)) {
                     if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
-                        console.log("Yes1");
                         this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
                     }
                 } else {
                     this._diagram!.selectedCircle = this._diagram!.places.find(place => clickedPlace === place);
+                    if (!this.lineAlreadyExists(clickedPlace, this._diagram!.selectedRect!, true)) {
+                        this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
+                    }
                 }
                 this._diagram!.lightningCount = 1;
             } else if (clickedTransition) {
-                if(clickedTransition === selectedTransition) {
+
+                // Sortieren Sie die Elemente so, dass das zuletzt hinzugefügte Element am Ende steht
+                this._diagram!.places.sort((a, b) => a.timestamp - b.timestamp);
+                this._diagram!.transitions.sort((a, b) => a.timestamp - b.timestamp);
+
+                // Extrahiere das letzte Element aus places und transitions
+                const lastPlace = this._diagram!.places[this._diagram!.places.length - 1];
+                const lastTransition = this._diagram!.transitions[this._diagram!.transitions.length - 1];
+                const lastElement = lastPlace.timestamp > lastTransition.timestamp ? lastPlace : lastTransition;
+
+                console.log("Last: " + lastElement.id);
+
+                if(clickedTransition === selectedTransition && !(lastElement instanceof Transition)) {
                     if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
-                        console.log("Yes");
                         this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
                     }
                 } else {
                     this._diagram!.selectedRect = this._diagram!.transitions.find(transition => clickedTransition === transition);
+                    if (!this.lineAlreadyExists(this._diagram!.selectedCircle!, clickedTransition, false)) {
+                        this._drawingService.connectElements(this._diagram!.selectedCircle!, clickedTransition, false);
+                    }
+                    console.log(this._diagram!.selectedRect?.id)
                 }
                 this._diagram!.lightningCount = 0;
             } else {
@@ -354,8 +383,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
                         this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
-
-                    return;
                 } else if (this._diagram!.lightningCount === 1) {
                     let targetIsCircle: boolean = false;
                     let svgRect = this._drawingService.drawRect(mouseX, mouseY);
@@ -371,8 +398,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
                         this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
-
-                    return;
                 }
             }
         }

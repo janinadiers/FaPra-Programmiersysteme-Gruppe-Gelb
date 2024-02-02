@@ -79,11 +79,11 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place) {
-        this._diagram!.selectedCircle = circle;
 
         if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
             return;
         }
+        this._diagram!.selectedCircle = circle;
 
         if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
             return;
@@ -190,11 +190,11 @@ export class DrawingService {
     }
 
     onRectSelect(rect: Transition) {
-        this._diagram!.selectedRect = rect;
 
         if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
             return;
         }
+        this._diagram!.selectedRect = rect;
 
         if (this._diagram!.selectedCircle) {
             let circleIsTarget: boolean = false;
