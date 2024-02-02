@@ -163,7 +163,7 @@ export class ToolbarComponent {
             this._drawingService.deselectPlacesAndLines();
             this.deselectAddAndRemoveTokenButtons();
         }
-        
+
     }
 
 
@@ -409,10 +409,11 @@ export class ToolbarComponent {
         playButton.style.color = 'black';
         mergeButton.style.color = 'black';
         fireButton.style.color = 'black';
-        multiButton.style.color = 'black';
+        if(multiButton) {
+            multiButton.style.color = 'black';
+        }
 
         this._markenspielService.editStep();
-
     }
 
 
@@ -450,7 +451,7 @@ export class ToolbarComponent {
     }
 
     openPdf() {
-        
+
         window.open(this.pdfSrc, '_blank');
       }
 

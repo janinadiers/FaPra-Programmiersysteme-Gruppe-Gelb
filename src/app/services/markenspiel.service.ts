@@ -4,6 +4,8 @@ import {DisplayService} from "./display.service";
 import {Transition} from "../classes/diagram/transition";
 import {Place} from "../classes/diagram/place";
 import {Line} from "../classes/diagram/line";
+import {coerceStringArray} from "@angular/cdk/coercion";
+import {transition} from "@angular/animations";
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +17,7 @@ export class MarkenspielService {
     private currentActiveTransitions = new Map;
     private alreadUsedParents = new Map;
     private multitasking: boolean = false;
+    private roundTripMap = new Map;
 
     constructor(
         private diplayService: DisplayService) {
@@ -57,7 +60,7 @@ export class MarkenspielService {
     }
 
     public addLineToken() {
-        
+
         if (!this._diagram?.selectedLine) {
             return;
         }
@@ -217,6 +220,8 @@ export class MarkenspielService {
                 this.currentChosenTransitions.push(transition);
                 sourcePlaceIds.push(currentSourceID);
             }
+
+            // else: Marken noch aufteilen
         });
 
         // 4. Zeigen des Schrittes
@@ -229,90 +234,327 @@ export class MarkenspielService {
         return;
     }
 
+    // Aufruf zum Erstellen eines Schrittes
     public editStep() {
+        // Aufräumen
         this.cleanUp();
+        this.alreadUsedParents.clear();
+        this.currentChosenTransitions = [];
 
-        let currentTransitions = this.getPossibleActiveTransitions();
+        // parents nach Anzahl der Marken sortieren
+        this._diagram?.transitions.forEach((element) => {
+            let parents = element.parents;
 
-        currentTransitions.forEach((element) => {
-           this.currentActiveTransitions.set(element.id,element);
+            parents.sort(function(a,b) {
+                return a.amountToken - b.amountToken;
+            });
         });
 
-        this.currentActiveTransitions.forEach((element) => {
-           this.setTransitionColor(element,'green');
-           element.svgElement?.addEventListener(('dblclick'),  () => {
+        // console.log("edit step");
+        // console.log("current chosen transitions");
+        // console.log(this.currentChosenTransitions);
+        // console.log("already used parents");
+        // console.log(this.alreadUsedParents);
+
+        let currentTransitions = this.showAll();
+        currentTransitions.forEach((element) => {
+           element.svgElement?.addEventListener(('dblclick'),  (choseElement) => {
                this.choseElement(element);
            });
+
+           this.smallCleanUp(element,element.parents);
         });
 
         return;
     }
 
+    // Aufruf zum Aktivieren von Auto-Cuncurrency
     public multitaskingTransitions(multitasking: boolean) {
         this.multitasking = multitasking;
-        this.editStep();
         // Wenn in der Stelle vor der Transition genug Marken sind, kann die Transition so oft schalten, wie ihr
         // kleinstes Parent Marken hat
-
-        // nochmal choseElement und checkConsequneces, aber Transition wird erst zu alreadyused parent hinzugefügt,
-        // wenn keine Marken mehr da sind
-        // vorher: Transitionen nach Anzahl der Marken sortieren
     }
 
+    // Auswahl einer Transition für den Schritt
     public choseElement(element: Transition) {
         let parents = element.parents;
+
+        // console.log(this.alreadUsedParents);
+        // console.log(this.alreadUsedParents.get(element.parents[0].id));
 
         parents.sort(function(a,b) {
             return a.amountToken - b.amountToken;
         });
 
+        // Einfacher Schritt ohne Auto-Cuncurrency
         if(!this.multitasking){
-            if(this.checkConsequences(element) && this.processChosing){
-                if(!this.currentChosenTransitions.includes(element)){
-                    this.currentChosenTransitions.push(element);
-                }
-                this.setTransitionColor(element,'violet');
-            }
-        } else {
+            this.simpleStep(element);
+            console.log("simple step");
+        }
 
-            let deleteCount = parents[0].amountToken;
-            let isChosen: boolean = element.svgElement!.querySelector('rect')!.getAttribute('fill') == 'violet';
+        // Schritt mit Autocuncurrency ("multitasking")
+        else {
+            this.multiStep(element);
 
-            if(this.currentChosenTransitions.includes(element) && !isChosen){
-                while(deleteCount >= 0){
-                    let deleteElement = this.currentChosenTransitions.indexOf(element);
-                    this.currentChosenTransitions.splice(deleteElement);
+            console.log("multitasking");
 
-                    let possibleTransitions = this.getPossibleActiveTransitions();
-                    if(possibleTransitions.includes(element)){
-                        this.setTransitionColor(element, 'green');
-                    } else {
-                        this.setTransitionColor(element,'black');
-                    }
-
-                    deleteCount--;
-                }
-            }
-
-            // console.log(this.currentChosenTransitions);
-
-            let count = parents[0].amountToken;
-            let lines = this._diagram!.lines;
-            let result = lines?.find(line => line.target.id === element.id && line.source.id === parents[0].id);
-
+            /*
             while(count > 0){
 
                 if(this.checkConsequences(element) && this.processChosing){
-                    this.currentChosenTransitions.push(element);
-                    this.setTransitionColor(element,'violet');
-                }
+                    // this.currentChosenTransitions.push(element);
+                    // this.setTransitionColor(element,'violet');
 
+                }
                 count = count - result!.tokens;
+            }*/
+        }
+    }
+
+    // Auto-Concurrency
+    private multiStep(element: Transition) {
+        let lines = this._diagram?.lines;
+        let transitions = this.getPossibleActiveTransitions();
+        let sourcePlaceIds: String[] = []; // Array für die schon verwendeten Stellen zur Prüfung im Wettbewerbskonflikt
+
+        let parents = element.parents;
+        let number = this.setmultitaskingNumber(element);
+
+        // console.log(number);
+
+        parents.forEach((parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let lineTokens = result!.tokens;
+            let newTokenAmount;
+
+            if(this.alreadUsedParents.has(parent.id)){
+                let oldTokenAmount = this.alreadUsedParents.get(parent.id);
+                newTokenAmount = oldTokenAmount - lineTokens
+                console.log("new Token Amount: "+newTokenAmount)
+            } else {
+                newTokenAmount = parent.amountToken - lineTokens;
+                console.log("new Token Amount/else: "+newTokenAmount)
             }
+
+            this.alreadUsedParents.set(parent.id, newTokenAmount);
+
+            console.log(this.alreadUsedParents);
+        });
+
+
+        while(number > 0){
+            this.currentChosenTransitions.push(element);
+            number = number - 1;
         }
 
-        // console.log(this.currentChosenTransitions);
+        this.currentChosenTransitions.forEach((transition) => {
+           this.setTransitionColor(transition,'violet');
+        });
+
+
+        /*
+        transitions.forEach((transition) => {
+            const line = lines?.find(line => line.target.id === transition.id);
+            let currentSourceID = line!.source.id;
+
+            // Prüfen, ob die Stelle im Vorbereich schon von einer anderen Transition benutzt wurde
+            if(!sourcePlaceIds.includes(currentSourceID)){
+                sourcePlaceIds.push(currentSourceID);
+            }
+        });*/
+
+        // alle anderen Transitionen, die gleiche parents haben, dürfen jetzt nicht mehr aktiv sein
+
+        console.log(this.currentChosenTransitions);
     }
+
+    private setmultitaskingNumber(element: Transition) {
+        let multitaskingNumber = 1000;
+        let localMap = new Map;
+        let localLineMap = new Map;
+        let parents = element.parents;
+        let lines = this._diagram?.lines;
+
+        parents.forEach((parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let lineTokens = result!.tokens;
+
+            if(this.alreadUsedParents.has(parent.id)){
+                localMap.set(parent.id, this.alreadUsedParents.get(parent.id));
+            } else {
+                localMap.set(parent.id, parent.amountToken);
+            }
+
+            localLineMap.set(parent.id,lineTokens);
+        });
+
+        // console.log(localMap);
+        console.log(localLineMap);
+
+        localLineMap.forEach((lineToken) => {
+
+            localMap.forEach((parentToken) => {
+                if( parentToken/lineToken < multitaskingNumber){
+                    multitaskingNumber = parentToken/lineToken;
+                }
+            });
+        });
+
+        console.log("Number: "+multitaskingNumber);
+
+        return multitaskingNumber;
+    }
+
+
+    // Überprüfung der Vorbedingungen und ggf. Hinzufügen der Transition zum Schritt
+    private simpleStep(element: Transition) {
+        if(this.checkParents(element) && this.processChosing){
+
+            if(!this.currentChosenTransitions.includes(element)){
+                let parents = element.parents;
+                let lines = this._diagram!.lines;
+                let localTokenArray: number[] = [];
+                let transitionIsStillActive: boolean = false;
+
+                parents.sort(function(a,b) {
+                    return a.amountToken - b.amountToken;
+                });
+
+                parents.forEach((parent) => {
+                    let parentToken = this.alreadUsedParents.get(parent.id);
+                    localTokenArray.push(parentToken);
+
+                    // console.log(parent.id+" mit insgesamt "+parent.amountToken);
+                    // console.log(parent.id+" hat gerade "+parentToken);
+                });
+
+                // console.log(localTokenArray);
+                if(!localTokenArray.includes(0)) {
+                    // a) Berechnen der neuen Markenanzahl für alle Stellen
+                    parents.forEach((parent) => {
+                        // let roundTrip = this.roundTrip(element, parent);
+                        let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+                        let idString = result!.id.split(',')![0];
+                        // result: eingehende Kante, idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
+
+                        if (this.alreadUsedParents.has(idString) && this.alreadUsedParents.get(idString) - result!.tokens >= 0) {
+
+                            let oldTokenAmount = this.alreadUsedParents.get(idString);
+                            let newTokenAmount = oldTokenAmount - result!.tokens;
+
+                            this.alreadUsedParents.set(idString, newTokenAmount);
+                            transitionIsStillActive = true;
+
+                            // console.log(parent.id+" hatte vorher: "+oldTokenAmount+" und hat jetzt "+newTokenAmount);
+
+                        } else {
+                            if(!this.alreadUsedParents.has(idString) && parent.amountToken - result!.tokens >= 0){
+
+                                let newTokenAmount = parent.amountToken - result!.tokens;
+
+                                this.alreadUsedParents.set(idString, newTokenAmount);
+                                transitionIsStillActive = true;
+
+                                // console.log("neu in already useed parents: "+idString+" mit "+newTokenAmount+" Marken");
+                            }
+                        }
+                    });
+
+                    // Hinzufügen der Transition zum Schritt
+                    if(transitionIsStillActive){
+                        this.currentChosenTransitions.push(element);
+                        this.setTransitionColor(element,'violet');
+                    } else {
+                        this.setTransitionColor(element,'black');
+                    }
+                }
+            }
+        }
+    }
+
+    // Hilfsmethoden
+    private getOccurence(array: Transition[], value: any) {
+        return array.filter((v) => (v === value)).length;
+    }
+
+    private checkOnRoundTrips() {
+        // sich im Kreis bewegende Marken erkennen
+        // eingehende und ausgehende Kante holen
+        // wenn gleich, dann ist maximales Count bei choseElement die Anzahl der Token in der dazugehörigen Stelle
+
+        let allTransitions = this._diagram?.transitions;
+        let lines = this._diagram!.lines;
+
+        allTransitions?.forEach((transition) => {
+            let parents = transition.parents;
+
+            parents.forEach((parent) => {
+                let inComingLine = lines!.find(line => line.target.id === transition.id && line.source.id === parent.id);
+                let outGoingLine = lines!.find(line => line.source.id === transition.id && line.target.id === parent.id);
+
+                if(inComingLine?.tokens == outGoingLine?.tokens){
+                    this.roundTripMap.set(parent.id,parent.amountToken);
+                }
+            });
+        });
+
+        console.log(this.roundTripMap);
+    }
+
+
+    private smallCleanUp(element: Transition, parents: Place[]) {
+        let deleteCount = parents[0].amountToken;
+        let isChosen: boolean = false;
+
+        if(element == this._diagram?.selectedRect){
+            isChosen = true;
+        } else {
+            isChosen = false;
+        }
+
+        if(this.currentChosenTransitions.includes(element) && !isChosen){
+            while(deleteCount > 0){
+
+                let deleteElement = this.currentChosenTransitions.indexOf(element);
+                this.currentChosenTransitions.splice(deleteElement);
+
+                let possibleTransitions = this.getPossibleActiveTransitions();
+                if(possibleTransitions.includes(element)){
+                    this.setTransitionColor(element, 'green');
+                } else {
+                    this.setTransitionColor(element,'black');
+                }
+
+                deleteCount--;
+            }
+        }
+    }
+
+    private checkParents(element: Transition): boolean {
+        let parentsHaveEnoughTokens: boolean = false;
+
+        let parents = element.parents;
+        let lines = this._diagram!.lines;
+
+        parents.forEach((parent) => {
+            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+            let idString = result!.id.split(',')![0];
+            // result: eingehende Kante
+            // idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
+
+            if (this.alreadUsedParents.has(idString) && this.alreadUsedParents.get(idString) - result!.tokens >= 0){
+                parentsHaveEnoughTokens = true;
+            } else if (!this.alreadUsedParents.has(idString) && parent.amountToken - result!.tokens >= 0) {
+                parentsHaveEnoughTokens = true;
+            } else {
+                parentsHaveEnoughTokens = false;
+            }
+        });
+
+        return parentsHaveEnoughTokens;
+    }
+
+
 
     checkConsequences(element: Transition) {
         let noConflicts = false;
@@ -327,13 +569,38 @@ export class MarkenspielService {
             // idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
 
             if(!this.alreadUsedParents.has(idString)){
+
+                console.log("neues Element hinzugefügt");
+
                 noConflicts = true;
-                this.alreadUsedParents.set(idString, parent.amountToken);
-            } else if (parent.amountToken - result!.tokens >= 0) {
+
+                // this.alreadUsedParents.set(idString, parent.amountToken - result!.tokens);
+
+                console.log("Marken im Parent: ")
+                console.log(this.alreadUsedParents.get(idString));
+
+            }
+
+            else if (this.alreadUsedParents.get(idString) - result!.tokens >= 0) {
+                // Zuordnung?
+                console.log("Element ist schon da, hat aber noch genug Marken");
+
+                // this.alreadUsedParents.set(idString, this.alreadUsedParents.get(idString) - result!.tokens);
+
+                console.log("Marken im Parent: ")
+                console.log(this.alreadUsedParents.get(idString));
+
                 noConflicts = true;
             }
             else {
                 noConflicts = false;
+
+                this.setTransitionColor(element, 'black');
+
+                console.log("Element ist schon da und es gibt nicht mehr genug Marken");
+
+                console.log(this.alreadUsedParents.get(idString));
+                console.log(this.alreadUsedParents);
             }
         });
 
