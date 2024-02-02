@@ -28,11 +28,7 @@ export class Line {
         this._sourcePosition = {x: source.x, y: source.y};
         this._targetPosition = {x: target.x, y: target.y};
         this._tokens = tokens ?? 1;
-        this._intermediatePoints$ = new BehaviorSubject<IntermediatePoint[]>(coords?.map(c => { 
-            const intermediatePoint = new IntermediatePoint(c.x, c.y, false);
-            intermediatePoint.createCircle();
-            return intermediatePoint;
-        }) || []);
+        this._intermediatePoints$ = new BehaviorSubject<IntermediatePoint[]>(coords?.map(c => { return new IntermediatePoint(c.x, c.y, false)}) || []);
         this.addVirtualPoints()
         
         this._svgElement = this.createSVG();
@@ -53,7 +49,6 @@ export class Line {
         
 
         source.getPositionChangeObservable().subscribe((source) => {
-            
             this.updateSource({x: source.x, y: source.y});
             // Update des Schnittpunkts von Linie und Transition
             let refX: number = this.updateMarker();
@@ -61,7 +56,6 @@ export class Line {
 
         });
         target.getPositionChangeObservable().subscribe((target) => {
-            
             this.updateTarget({x: target.x, y: target.y});
             // Update des Schnittpunkts von Linie und Transition
             let refX: number = this.updateMarker();
@@ -114,25 +108,8 @@ export class Line {
     }
 
     set coords(coords: Coords[]) {
-      
-        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
-        
-        if (!sugiyamaButton.classList.contains('selected')) {
-            
-            this.updateIntermediatePoints(coords.map(c => {
-                const intermediatePoint = new IntermediatePoint(c.x, c.y, false);
-                intermediatePoint.createCircle();
-                return intermediatePoint;
-            }));
-            this.addVirtualPoints();
-        }
-
-        else{
-            this.updateIntermediatePoints(coords.map(c => {
-                return new IntermediatePoint(c.x, c.y, false);
-            }));
-        } 
-
+        this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
+       
     }
 
     
@@ -195,7 +172,7 @@ export class Line {
     }
 
     createSVG(): SVGElement {
-        
+
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
    
@@ -281,7 +258,7 @@ export class Line {
 
 
     private addEventListenerForIntermediatePoints(intermediatePoint: IntermediatePoint) {
-        
+
         const handleMouseDown = () => {
             this._draggingCircle = intermediatePoint;
             this._draggingCircle.isVirtual = false;
@@ -293,8 +270,8 @@ export class Line {
         const handleMouseUp = () => {
             Diagram.drawingIsActive = false;
             this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => { 
-                intermediatePoint.remove()
-            });
+                
+                intermediatePoint.remove()});
             this._draggingCircle = null;
             this.updateIntermediatePoints(this.intermediatePoints.filter(c => !c.isVirtual));
             this.addVirtualPoints();
@@ -422,12 +399,14 @@ export class Line {
         let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y}; 
 
             if(this.intermediatePoints.length > 0){
+                this.intermediatePoints.forEach((intermediatePoint) => {
+                    if(intermediatePoint.isVirtual) intermediatePoint.remove();
+                });
                 this.updateIntermediatePoints(this.intermediatePoints.filter(i => !i.isVirtual));
                 
                 this.intermediatePoints.forEach((intermediatePoint) => {
-                    const newIntermediatePoint = new IntermediatePoint((last_coord.x + intermediatePoint.x) / 2, (last_coord.y + intermediatePoint.y) / 2, true);
-                    newIntermediatePoint.createCircle();
-                    let midPoint = newIntermediatePoint
+                    
+                    let midPoint = new IntermediatePoint((last_coord.x + intermediatePoint.x) / 2, (last_coord.y + intermediatePoint.y) / 2, true);
                     this.updateIntermediatePoints(this.intermediatePoints.reduce((acc, curr, i) => {  
                         
                         if (i === this.intermediatePoints.indexOf(intermediatePoint)) {
@@ -441,18 +420,16 @@ export class Line {
                     last_coord = {x: intermediatePoint.x, y: intermediatePoint.y};
                     
                 });
+              
                 
-                const newIntermediatePoint = new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)
-                newIntermediatePoint.createCircle();
-                this.updateIntermediatePoints([...this.intermediatePoints, newIntermediatePoint]) 
+                this.updateIntermediatePoints([...this.intermediatePoints, new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)]) 
                 
             }
                 
             
         else{
-            const newIntermediatePoint = new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)
-            newIntermediatePoint.createCircle();
-            this.updateIntermediatePoints([newIntermediatePoint])
+            
+            this.updateIntermediatePoints([new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)])
          }
          
          // add intermediatePoints to svgElement
@@ -467,25 +444,19 @@ export class Line {
            
 
     }
+
    
     removeCoords(): void {
-        this.intermediatePoints.forEach((intermediatePoint) => {
-            this.removeCoord(intermediatePoint);
-        });
-        
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
-        
     }
 
     removeCoord(intermediatePoint: IntermediatePoint){
-        intermediatePoint.remove();
         this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint)); 
-        
+        intermediatePoint.remove();
     }
 
     handleMouseMove(event: MouseEvent) {
-        
         const svgElement = document.getElementById('canvas');
         const svgContainer = svgElement?.getBoundingClientRect();
 
@@ -511,7 +482,9 @@ export class Line {
     }
 
     private updateSource(updatedPosition: Coords): void {
-        
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
+        const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
+
         if (this._svgElement) {
             
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
@@ -533,10 +506,14 @@ export class Line {
             this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
             this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
 
-            this.intermediatePoints?.forEach((intermediatePoint) => {
+             // Alle svg circle elemente löschen
+            this.intermediatePoints.forEach((intermediatePoint) => {
+                
                 intermediatePoint.remove();
             });
-        
+
+            if(!sugiyamaButton.classList.contains('selected') && !springEmbedderButton.classList.contains('selected')) this.addVirtualPoints();
+
         }
 
 
@@ -544,13 +521,16 @@ export class Line {
 
 
     private updateTarget(updatedPosition: Coords): void {
-        
+
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
+        const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
+
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
-        
+        }
 
         // Markierungen für die Gewichte an die Kante hängen
         let tokenCircleCx = this.calcMidCoords().x.toString();
@@ -564,11 +544,14 @@ export class Line {
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
 
-        this.intermediatePoints?.forEach((intermediatePoint) => {
+        // Alle svg circle elemente löschen
+        this.intermediatePoints.forEach((intermediatePoint) => {
+            
             intermediatePoint.remove();
         });
 
-    }
+        if(!sugiyamaButton.classList.contains('selected') && !springEmbedderButton.classList.contains('selected')) this.addVirtualPoints();
+
+      
     }
 }
-

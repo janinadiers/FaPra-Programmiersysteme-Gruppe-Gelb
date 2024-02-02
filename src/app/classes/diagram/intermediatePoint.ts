@@ -10,7 +10,7 @@ export class IntermediatePoint {
         this._x = x;
         this._y = y;
         this._isVirtual = isVirtual;
-        // this.createCircle();
+        this.createCircle();
     }
 
     get x(): number {
