@@ -317,10 +317,44 @@ export class DisplayComponent implements OnInit, OnDestroy {
             const clickedTransition = this._diagram!.transitions.find(transition => transition.isClicked(mouseX, mouseY));
 
             const selectedCircle = this._diagram!.selectedCircle;
-            const selectedTransition = this._diagram!.selectedRect;
+            let selectedTransition = this._diagram!.selectedRect;
 
             if (clickedPlace) {
-                // Sortieren Sie die Elemente so, dass das zuletzt hinzugefügte Element am Ende steht
+                if(clickedPlace === selectedCircle) {
+                    //this.lastClickedElement = clickedPlace;
+                    console.log("Geklickter Place ist gleich der selected im Diagram!");
+                    if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
+                        console.log("Line existiert nicht!");
+                        this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                    }
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this.lastClickedElement = clickedPlace;
+                    this._diagram!.lightningCount = 1;
+                    return;
+                }
+
+                console.log("Geklickter Place ist NICHT gleich der selected im Diagram!");
+
+                if(this.lastClickedElement instanceof Place) {
+                    console.log("Ist ein Place!");
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this.lastClickedElement = clickedPlace;
+                    this._diagram!.lightningCount = 1;
+                    return;
+                }
+
+                if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
+                    console.log("Line existiert nicht!");
+                    this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                }
+                this._diagram!.selectedCircle = clickedPlace;
+                this.lastClickedElement = clickedPlace;
+                this._diagram!.lightningCount = 1;
+                return;
+
+
+
+                /*// Sortieren Sie die Elemente so, dass das zuletzt hinzugefügte Element am Ende steht
                 this._diagram!.places.sort((a, b) => a.timestamp - b.timestamp);
                 this._diagram!.transitions.sort((a, b) => a.timestamp - b.timestamp);
 
@@ -341,10 +375,40 @@ export class DisplayComponent implements OnInit, OnDestroy {
                         this._drawingService.connectElements(clickedPlace, this._diagram!.selectedRect!, true);
                     }
                 }
-                this._diagram!.lightningCount = 1;
+                this._diagram!.lightningCount = 1;*/
             } else if (clickedTransition) {
+                if(clickedTransition === selectedTransition) {
 
-                // Sortieren Sie die Elemente so, dass das zuletzt hinzugefügte Element am Ende steht
+                    //this.lastClickedElement = clickedTransition;
+                    console.log("Geklickter Trans ist gleich der selected im Diagram!");
+                    if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
+                        console.log("Line existiert nicht!");
+                        this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
+                    }
+                    this._diagram!.selectedRect = clickedTransition;
+                    this.lastClickedElement = clickedTransition;
+                    this._diagram!.lightningCount = 0;
+                    return;
+                }
+                console.log("Geklickter Trans ist NICHT gleich der selected im Diagram!");
+
+                if(this.lastClickedElement instanceof Transition) {
+                    console.log("Ist ein Trans!");
+                    this._diagram!.selectedRect = clickedTransition;
+                    this.lastClickedElement = clickedTransition;
+                    this._diagram!.lightningCount = 0;
+                    return;
+                }
+
+                if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
+                    console.log("Line existiert nicht!");
+                    this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
+                }
+                this._diagram!.selectedRect = clickedTransition;
+                this.lastClickedElement = clickedTransition;
+                this._diagram!.lightningCount = 0;
+                return;
+               /* // Sortieren Sie die Elemente so, dass das zuletzt hinzugefügte Element am Ende steht
                 this._diagram!.places.sort((a, b) => a.timestamp - b.timestamp);
                 this._diagram!.transitions.sort((a, b) => a.timestamp - b.timestamp);
 
@@ -366,7 +430,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     }
                     console.log(this._diagram!.selectedRect?.id)
                 }
-                this._diagram!.lightningCount = 0;
+                this._diagram!.lightningCount = 0;*/
             } else {
                 if (this._diagram!.lightningCount === 0) {
                     let targetIsCircle: boolean = true;
@@ -383,6 +447,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
                         this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
+                    this.lastClickedElement = lastCircleObject;
                 } else if (this._diagram!.lightningCount === 1) {
                     let targetIsCircle: boolean = false;
                     let svgRect = this._drawingService.drawRect(mouseX, mouseY);
@@ -398,10 +463,13 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
                         this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
+                    this.lastClickedElement = lastRectObject;
                 }
             }
         }
     }
+
+    lastClickedElement: Place | Transition | undefined;
 
     lineAlreadyExists(selectedCircle: Place, selectedRect: Transition, circleClicked: boolean): boolean {
         // Durchlaufen aller Kanten im Diagramm
