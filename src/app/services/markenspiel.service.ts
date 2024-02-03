@@ -409,7 +409,7 @@ export class MarkenspielService {
                 if(this.alreadUsedParents.get(parent.id) == 0){
                     this.disableOtherTransitions(parent, element);
                 }
-                
+
                 // console.log(this.alreadUsedParents);
             });
 
@@ -457,7 +457,7 @@ export class MarkenspielService {
                 }
             });
         });
-        console.log("Number: "+multitaskingNumber);
+        // console.log("Number: "+multitaskingNumber);
 
         return multitaskingNumber;
     }
