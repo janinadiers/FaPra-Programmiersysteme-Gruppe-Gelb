@@ -347,6 +347,8 @@ export class MarkenspielService {
                         this.currentChosenTransitions.push(element);
                         this.setTransitionColor(element,'violet');
                     }
+                } else {
+                    this.setTransitionColor(element, 'black');
                 }
             }
         } else {
@@ -361,7 +363,6 @@ export class MarkenspielService {
             }
         }
     }
-
 
     // #################### Auto- Concurrency ##################################
     public multitaskingTransitions(multitasking: boolean) {
@@ -444,7 +445,9 @@ export class MarkenspielService {
 
         return multitaskingNumber;
     }
-    
+
+
+    // ##################### Hilfsmethoden ##########################################
     private disableOtherTransitions(parent: Place, element: Transition) {
         let lines = this._diagram?.lines;
         let transitions: Transition[] = this._diagram!.transitions;
@@ -465,7 +468,7 @@ export class MarkenspielService {
         });
     }
 
-    // Hilfsmethoden
+
     private smallCleanUp(element: Transition, parents: Place[]) {
         let deleteCount = parents[0].amountToken;
         let isChosen: boolean = false;
