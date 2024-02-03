@@ -97,7 +97,7 @@ export class State {
         circle.setAttribute('fill', 'black');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', '2');  
-        if(this._parents.length === 0){
+        if(this._iteration === 0){
             circle.setAttribute('fill', 'red');
         }
         svgElement?.appendChild(circle);
