@@ -95,11 +95,13 @@ export class FreiAlgorithmusService {
 
         if (this._isDragging) {
             
+            
+            const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
             Diagram.algorithmIsActive = true;
             const svgElement = document.getElementById('canvas');
             const svgContainer = svgElement?.getBoundingClientRect();
             // Berechnung der Maus Koordinanten relativ zum SVG Element
-            if ((document.getElementById('algorithm-select') as HTMLSelectElement).value !== 'sugiyama')
+            if (!sugiyamaButton.classList.contains('selected'))
                 node.x = ((event.clientX - svgContainer!.left) * Diagram.zoomFactor) + Diagram.viewBox!.x;
             node.y = ((event.clientY - svgContainer!.top) * Diagram.zoomFactor) + Diagram.viewBox!.y;
             

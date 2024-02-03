@@ -7,7 +7,7 @@ import {FileReaderService} from "../../services/file-reader.service";
 import {HttpClient} from "@angular/common/http";
 import {ActivebuttonService} from 'src/app/services/activebutton.service';
 import {DrawingService} from "../../services/drawing.service";
-import { ReachabilityGraph } from 'src/app/classes/diagram/reachability-graph';
+import {ReachabilityGraph} from 'src/app/classes/diagram/reachability-graph';
 import {MarkenspielService} from "../../services/markenspiel.service";
 import { SpringEmbedderService } from 'src/app/services/spring-embedder-for-reachability-graph.service';
 
@@ -57,19 +57,16 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this._diagram!.canvasElement = document.getElementById('canvas') as unknown as SVGElement;
-        this.subscriptionOfToolbar = this.activeButtonService.
-            getButtonClickObservable().subscribe((buttonId: string) => {
-                if (buttonId === "clear" && this.activeButtonService.isReachButtonActive == false) {
-                    let clearElements: boolean = true;
-                    this.clearDrawingArea(clearElements);
-                }
-                else if (buttonId === "deleteLast" && this.activeButtonService.isReachButtonActive == false) {
-                    this.deleteLastElement();
-                }
-                else if (buttonId === "reachabilityGraph"){
+        this.subscriptionOfToolbar = this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
+            if (buttonId === "clear" && this.activeButtonService.isReachButtonActive == false) {
+                let clearElements: boolean = true;
+                this.clearDrawingArea(clearElements);
+            } else if (buttonId === "deleteLast" && this.activeButtonService.isReachButtonActive == false) {
+                this.deleteLastElement();
+            } else if (buttonId === "reachabilityGraph") {
 
-                    this.generateReachabilityGraph();
-                }
+                this.generateReachabilityGraph();
+            }
         });
 
         this._diagram?.places.forEach((element) => {
@@ -84,7 +81,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram?.lines.forEach((element) => {
             element.svgElement?.addEventListener(('click'), () => {
 
-                if(!element.svgElement) {return}
+                if (!element.svgElement) {
+                    return
+                }
                 this._drawingService.onLineSelect(element);
             });
         });
@@ -206,7 +205,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     private clearDrawingArea(clearElements?: boolean) {
 
-        
+
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -227,10 +226,10 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     private deleteLastElement() {
 
-        if(this.activeButtonService.isReachButtonActive){
+        if (this.activeButtonService.isReachButtonActive) {
             return;
         }
-        
+
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -310,51 +309,64 @@ export class DisplayComponent implements OnInit, OnDestroy {
         else if (event.button === 0 && this.activeButtonService.isBoltButtonActive) {
             this._drawingService.changeTokenButtonColor('black');
 
-            if (this._diagram?.lightningCount === 0) {
+            // Überprüfen, ob ein Place oder eine Transition angeklickt wurde
+            const clickedPlace = this._diagram!.places.find(place => place.isClicked(mouseX, mouseY));
+            const clickedTransition = this._diagram!.transitions.find(transition => transition.isClicked(mouseX, mouseY));
 
-                let targetIsCircle: boolean = true;
-                let svgCircle = this._drawingService.drawCircle(mouseX, mouseY);
-                svgElement.appendChild(svgCircle.svgElement!);
+            if (clickedPlace) {
+                // Aktualisieren Sie den ausgewählten Kreis
+                this._diagram!.selectedCircle = clickedPlace;
 
-                //Gerade erzeugtes Kreisobjekt als selected Circle setzen
-                const lastCircleObject = this._diagram!.places[this._diagram!.places.length - 1];
+                this._diagram!.selectedRect = undefined;
+                this._diagram!.lightningCount = 1;
+            } else if (clickedTransition) {
+                // Aktualisieren Sie die ausgewählte Transition
+                this._diagram!.selectedRect = clickedTransition;
 
-                if (lastCircleObject.svgElement) {
-                    this._diagram.selectedCircle = lastCircleObject;
-                    if (this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
-                        this._drawingService.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                this._diagram!.selectedCircle = undefined;
+                this._diagram!.lightningCount = 0;
+            } else {
+                if (this._diagram!.lightningCount === 0) {
+                    let targetIsCircle: boolean = true;
+                    let svgCircle = this._drawingService.drawCircle(mouseX, mouseY);
+                    svgElement.appendChild(svgCircle.svgElement!);
+                    // Gerade erzeugtes Kreisobjekt als selected Circle setzen
+                    const lastCircleObject = this._diagram!.places[this._diagram!.places.length - 1];
+                    if (lastCircleObject.svgElement) {
+                        this._diagram!.selectedCircle = lastCircleObject;
                     }
-                }
+                    this._diagram!.lightningCount++;
 
-                this._diagram.lightningCount++;
-            }
-
-
-            // Kante von Stelle zu Transition zeichnen
-            else if (this._diagram?.lightningCount === 1) {
-
-                let targetIsCircle: boolean = false;
-                let svgRect = this._drawingService.drawRect(mouseX, mouseY);
-                svgElement.appendChild(svgRect.svgElement!);
-
-                //Gerade erzeugtes Rechteckobjekt als selected Rect setzen
-                const lastRectObject = this._diagram?.transitions[this._diagram?.transitions.length - 1];
-                if (lastRectObject?.svgElement) {
-                    this._diagram.selectedRect = lastRectObject;
-                    if (this._diagram.selectedRect !== undefined && this._diagram.selectedCircle !== undefined) {
-                        this._drawingService.connectElements(this._diagram.selectedCircle, this._diagram.selectedRect, targetIsCircle);
+                    // Verbinden der Elemente
+                    if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
+                        this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
-                }
 
-                this._diagram.lightningCount--;
+                    return;
+                } else if (this._diagram!.lightningCount === 1) {
+                    let targetIsCircle: boolean = false;
+                    let svgRect = this._drawingService.drawRect(mouseX, mouseY);
+                    svgElement.appendChild(svgRect.svgElement!);
+                    // Gerade erzeugtes Rechteckobjekt als selected Rect setzen
+                    const lastRectObject = this._diagram?.transitions[this._diagram?.transitions.length - 1];
+                    if (lastRectObject?.svgElement) {
+                        this._diagram!.selectedRect = lastRectObject;
+                    }
+                    this._diagram!.lightningCount--;
+
+                    // Verbinden der Elemente
+                    if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
+                        this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
+                    }
+
+                    return;
+                }
             }
         }
-
     }
 
     handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
-        
         if (this.activeButtonService.isBoltButtonActive) {
 
             this._diagram?.resetSelectedElements();
@@ -366,7 +378,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         const svgElement = document.getElementById('canvas');
 
-        if (this.activeButtonService.isReachButtonActive){
+        if (this.activeButtonService.isReachButtonActive) {
 
             this.clearDrawingArea();
 
@@ -374,21 +386,19 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             graph.createReachabilityGraph();
 
-        }
-
-      else{
+        } else {
 
             this.clearDrawingArea();
 
             this._diagram!.places.forEach(place => {
                 let svgPlace = place.createSVG();
                 svgElement?.appendChild(svgPlace);
-              });
+            });
 
-              this._diagram!.transitions.forEach(transition => {
+            this._diagram!.transitions.forEach(transition => {
                 let svgTransition = transition.createSVG();
                 svgElement?.appendChild(svgTransition);
-              });
+            });
 
               this._diagram!.lines.forEach(line => {
                 let svgLine = line.svgElement;

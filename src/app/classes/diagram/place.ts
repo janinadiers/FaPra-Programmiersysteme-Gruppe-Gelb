@@ -62,6 +62,12 @@ export class Place extends Element {
         this._parents.push(transition);
     }
 
+    // Methode, um zu überprüfen, ob ein Klick innerhalb der Begrenzungen des Places liegt
+    isClicked(x: number, y: number): boolean {
+        const distance = Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
+        return distance <= this._radius;
+    }
+
     updateGroup(newPosition: Coords) {
         super.x = newPosition.x;
         super.y = newPosition.y;
@@ -93,7 +99,7 @@ export class Place extends Element {
         marker.setAttribute('dy', '.3em');
         if (this._amountToken > 0){
             marker.textContent = this._amountToken.toString();
-            
+
         }
 
 

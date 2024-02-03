@@ -69,6 +69,16 @@ export class Transition extends Element {
         this._parents.push(place);
     }
 
+    // Methode, um zu überprüfen, ob ein Klick innerhalb der Begrenzungen der Transition liegt
+    isClicked(x: number, y: number): boolean {
+        return (
+            x >= this.x - this.width / 2 &&
+            x <= this.x + this.width / 2 &&
+            y >= this.y - this.height / 2 &&
+            y <= this.y + this.height / 2
+        );
+    }
+
     updateGroup(newPosition: Coords) {
         super.x = newPosition.x;
         super.y = newPosition.y;
