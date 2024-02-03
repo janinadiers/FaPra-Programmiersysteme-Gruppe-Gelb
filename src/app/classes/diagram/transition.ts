@@ -105,6 +105,7 @@ export class Transition extends Element {
         } else {
             const labelText = this.svgElement!.querySelector('text:last-child');
             labelText!.textContent = label;
+            this.label = label;
 
             // Überprüfe die Länge des Labels und passe die Farbe an
             if (label.trim().length === 0) {
