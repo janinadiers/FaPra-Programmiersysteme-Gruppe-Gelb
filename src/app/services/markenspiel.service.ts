@@ -57,7 +57,7 @@ export class MarkenspielService {
     }
 
     public addLineToken() {
-        
+
         if (!this._diagram?.selectedLine) {
             return;
         }
@@ -123,7 +123,11 @@ export class MarkenspielService {
         let notActiveTransitions = transitions?.filter(transition => !transition.isActive);
 
         notActiveTransitions?.forEach((transition) => {
-            this.setTransitionColor(transition, 'black');
+            if(transition.isSilent()) {
+                this.setTransitionColor(transition, 'black');
+            } else {
+                this.setTransitionColor(transition, 'white');
+            }
         });
 
         return startTransitions;
@@ -174,7 +178,11 @@ export class MarkenspielService {
 
         this._diagram?.transitions.forEach((transition) => {
             transition.isActive = false;
-            this.setTransitionColor(transition, 'black');
+            if(transition.isSilent()) {
+                this.setTransitionColor(transition, 'black');
+            } else {
+                this.setTransitionColor(transition, 'white');
+            }
         });
     }
 
@@ -287,7 +295,11 @@ export class MarkenspielService {
                     if(possibleTransitions.includes(element)){
                         this.setTransitionColor(element, 'green');
                     } else {
-                        this.setTransitionColor(element,'black');
+                        if(element.isSilent()) {
+                            this.setTransitionColor(element, 'black');
+                        } else {
+                            this.setTransitionColor(element, 'white');
+                        }
                     }
 
                     deleteCount--;
@@ -357,7 +369,11 @@ export class MarkenspielService {
             this.addTokensToPlace(place, line!.tokens);
         });
 
-        this.setTransitionColor(element,'black');
+        if(element.isSilent()) {
+            this.setTransitionColor(element, 'black');
+        } else {
+            this.setTransitionColor(element, 'white');
+        }
 
         return;
     }

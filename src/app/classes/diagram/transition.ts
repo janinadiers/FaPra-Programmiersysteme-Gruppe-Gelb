@@ -107,7 +107,7 @@ export class Transition extends Element {
             labelText!.textContent = label;
 
             // Überprüfe die Länge des Labels und passe die Farbe an
-            if (label.length === 0) {
+            if (label.trim().length === 0) {
                 this.label = "";
                 this.svgElement?.children[0].setAttribute('fill', 'black');
             }
@@ -124,6 +124,41 @@ export class Transition extends Element {
         document.body.appendChild(div);
         return div;
     }
+
+    deactivateContextMenu() {
+        this.svgElement!.removeEventListener('contextmenu', this._contextMenuHandler);
+    }
+
+    activateContextMenu() {
+        this.svgElement!.addEventListener('contextmenu', this._contextMenuHandler);
+    }
+
+    private _contextMenuHandler = (event: MouseEvent) => {
+        if (this._contextMenuOpen) {
+            return;
+        }
+
+        this._contextMenuOpen = true;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const div = this.createContextmenu(event.clientX, event.clientY);
+
+        window.addEventListener('click', (event) => {
+            event.stopPropagation();
+            div.remove();
+            this._contextMenuOpen = false;
+        });
+
+        div.addEventListener('click', () => {
+            div.remove();
+            const newLabel = prompt("Change the label: ", this.label);
+            if (newLabel !== null) {
+                this.changeLabelAndSilentStatus(newLabel);
+            }
+            this._contextMenuOpen = false;
+        });
+    };
 
     override createSVG(){
         if (this.svgElement) {
@@ -168,33 +203,7 @@ export class Transition extends Element {
             group.appendChild(labelText);
         }
 
-        group.addEventListener('contextmenu', (event) => {
-            if(this._contextMenuOpen) {
-                return;
-            }
-
-            this._contextMenuOpen = true;
-            event.preventDefault();
-            event.stopPropagation();
-
-            const div = this.createContextmenu(event.clientX, event.clientY);
-
-            window.addEventListener('click', (event) => {
-                event.stopPropagation();
-                div.remove();
-                this._contextMenuOpen = false;
-            });
-
-            div.addEventListener('click', () => {
-
-                div.remove();
-
-                const newLabel = prompt("Change the label: ", this.label);
-                this.changeLabelAndSilentStatus(newLabel ?? "");
-                this._contextMenuOpen = false;
-            });
-
-        });
+        group.addEventListener('contextmenu', this._contextMenuHandler);
 
         super.registerSvg(group);
         return group;

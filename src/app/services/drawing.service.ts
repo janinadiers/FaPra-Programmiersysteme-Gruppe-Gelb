@@ -7,6 +7,7 @@ import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
 import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
+import {transition} from "@angular/animations";
 
 @Injectable({
     providedIn: 'root'
@@ -149,7 +150,11 @@ export class DrawingService {
 
         if(this.simulationStatus == 0) {
             this._diagram?.transitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'black');
+                if(transition.isSilent()) {
+                    this._markenspielService.setTransitionColor(transition, 'black');
+                } else {
+                    this._markenspielService.setTransitionColor(transition, 'white');
+                }
                 transition.isActive = false;
             });
         }
@@ -158,7 +163,11 @@ export class DrawingService {
             const transitions = this._markenspielService.fireTransition(rectObject!);
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
-                this._markenspielService.setTransitionColor(rectObject!, 'black');
+                if(rectObject.isSilent()) {
+                    this._markenspielService.setTransitionColor(rectObject, 'black');
+                } else {
+                    this._markenspielService.setTransitionColor(rectObject, 'white');
+                }
             }
 
             transitions.forEach((transition => {
@@ -171,7 +180,11 @@ export class DrawingService {
             const transitions = this._markenspielService.showAll();
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
-                this._markenspielService.setTransitionColor(rectObject!, 'black');
+                if(rectObject.isSilent()) {
+                    this._markenspielService.setTransitionColor(rectObject, 'black');
+                } else {
+                    this._markenspielService.setTransitionColor(rectObject, 'white');
+                }
             }
 
             transitions.forEach((transition => {

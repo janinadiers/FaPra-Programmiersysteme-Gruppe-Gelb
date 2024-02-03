@@ -87,7 +87,11 @@ export class ToolbarComponent {
         this._drawingService.setSimulationStatus(this.simulationStatus);
 
         this._diagram?.transitions.forEach((transition) => {
-            this._markenspielService.setTransitionColor(transition, 'black');
+            if(transition.isSilent()) {
+                this._markenspielService.setTransitionColor(transition, 'black');
+            } else {
+                this._markenspielService.setTransitionColor(transition, 'white');
+            }
             transition.isActive = false;
         });
 
@@ -163,7 +167,7 @@ export class ToolbarComponent {
             this._drawingService.deselectPlacesAndLines();
             this.deselectAddAndRemoveTokenButtons();
         }
-        
+
     }
 
 
@@ -386,6 +390,10 @@ export class ToolbarComponent {
         this._drawingService.deselectPlacesAndLines();
         this._drawingService.setSimulationStatus(1);
 
+        this._diagram!.transitions.forEach((transition) => {
+            transition.deactivateContextMenu();
+        });
+
         const startTransitions = this._markenspielService.getPossibleActiveTransitions();
         startTransitions.forEach((transition) => {
             this._markenspielService.setTransitionColor(transition, 'green');
@@ -450,7 +458,7 @@ export class ToolbarComponent {
     }
 
     openPdf() {
-        
+
         window.open(this.pdfSrc, '_blank');
       }
 
@@ -483,7 +491,12 @@ export class ToolbarComponent {
         playButton.style.color = 'black';
 
         this._diagram?.transitions.forEach((transition) => {
-            this._markenspielService.setTransitionColor(transition, 'black');
+            transition.activateContextMenu();
+            if(transition.isSilent()) {
+                this._markenspielService.setTransitionColor(transition, 'black');
+            } else {
+                this._markenspielService.setTransitionColor(transition, 'white');
+            }
             transition.isActive = false;
         });
     }
