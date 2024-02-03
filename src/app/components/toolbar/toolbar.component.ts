@@ -201,8 +201,6 @@ export class ToolbarComponent {
 
         }
         else{
-            console.log("free");
-
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 freeButton.classList.add('selected');
                 springEmbedderButton.classList?.remove('selected');

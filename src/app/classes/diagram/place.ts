@@ -81,11 +81,11 @@ export class Place extends Element {
         }
 
         const group = super.createSVG('g');
-        group.setAttribute('id', this._label);
+        group.setAttribute('id', this.id);
         group.setAttribute('transform', `translate(${this.x}, ${this.y})`);
         //Circle
         const circle = super.createSVG('circle');
-        circle.setAttribute('id', this._label.toString());
+        circle.setAttribute('id', this.id.toString());
         circle.setAttribute('r', this._radius.toString());
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');

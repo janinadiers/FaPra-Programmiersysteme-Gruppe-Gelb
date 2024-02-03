@@ -31,7 +31,7 @@ export class ParserService {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
 
-            const places = this.createPlaces(rawData['places'], rawData['layout'], rawData['marking'] as JsonPetriNet['marking']);
+            const places = this.createPlaces(rawData['places'], rawData['layout'], rawData['marking'] as JsonPetriNet['marking'], rawData['labels'] as JsonPetriNet['labels']);
             const transitions = this.createTransitions(rawData['transitions'], rawData['layout'], rawData['labels'] as JsonPetriNet['labels']);
             const arcs = rawData['arcs'] as JsonPetriNet['arcs'];
 
@@ -50,15 +50,15 @@ export class ParserService {
         }
     }
 
-    private createPlaces(placeIds: Array<string> | undefined, layout: JsonPetriNet['layout'], marking: JsonPetriNet['marking'] | undefined): Place[] | undefined {
-        if (layout === undefined || placeIds === undefined || marking === undefined) {
+    private createPlaces(placeIds: Array<string> | undefined, layout: JsonPetriNet['layout'], marking: JsonPetriNet['marking'] | undefined, labels:JsonPetriNet['labels'] | undefined): Place[] | undefined {
+        if (layout === undefined || placeIds === undefined || marking === undefined || labels === undefined) {
             return;
         }
         let places = []
         for (const id of placeIds) {
             const pos = layout[id] as Coords | undefined;
             if (pos !== undefined) {
-                const place = new Place(id, pos.x, pos.y, marking[id])
+                const place = new Place(id, pos.x, pos.y, marking[id], labels[id])
                 place.createSVG()
                 place.svgElement?.addEventListener(('click'), () => {
                     this._drawingService.onCircleSelect(place);

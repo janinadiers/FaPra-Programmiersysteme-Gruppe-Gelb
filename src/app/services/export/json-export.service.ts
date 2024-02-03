@@ -43,6 +43,9 @@ export class JsonExportService {
             if (place.amountToken > 0)
                 petriNet.marking![place.id] = place.amountToken;
 
+            if (place.label.length > 0)
+                petriNet.labels![place.id] = place.label;
+
             petriNet.layout![place.id] = { x: place.x, y: place.y }
         });
 
