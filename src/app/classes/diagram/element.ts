@@ -10,7 +10,6 @@ export class Element  {
     private _isSelected = false;
     private _lastMouseMove = 0;
     private _position: number;
-    private _timestamp: number;
 
     constructor(id: string, x: number , y: number) {
         this._id = id;
@@ -18,8 +17,6 @@ export class Element  {
         this._y = y;
         this._positionChange$ = new BehaviorSubject<Coords>({x: this._x, y: this._y});
         this._position = 0;
-        this._timestamp = Date.now();
-        console.log(this._timestamp)
     }
 
     updatePosition(newPosition: Coords) {
@@ -87,10 +84,6 @@ export class Element  {
 
     set lastMouseMove(value: number) {
         this._lastMouseMove = value;
-    }
-
-    get timestamp(): number {
-        return this._timestamp;
     }
 
     public registerSvg(svg: SVGElement) {
