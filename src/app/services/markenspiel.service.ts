@@ -359,6 +359,7 @@ export class MarkenspielService {
             }
         } else {
             if(!this.currentChosenTransitions.includes(element) && this.processChosing){
+
                 let parents = element.parents;
 
                 parents.forEach((parent) => {
@@ -404,7 +405,11 @@ export class MarkenspielService {
                 }
 
                 this.alreadUsedParents.set(parent.id, newTokenAmount);
-                this.disableOtherTransitions(parent, element);
+
+                if(this.alreadUsedParents.get(parent.id) == 0){
+                    this.disableOtherTransitions(parent, element);
+                }
+                
                 // console.log(this.alreadUsedParents);
             });
 
@@ -448,11 +453,11 @@ export class MarkenspielService {
         localLineMap.forEach((lineToken) => {
             localMap.forEach((parentToken) => {
                 if( parentToken/lineToken < multitaskingNumber){
-                    multitaskingNumber = parentToken/lineToken;
+                    multitaskingNumber = Math.floor(parentToken/lineToken);
                 }
             });
         });
-        // console.log("Number: "+multitaskingNumber);
+        console.log("Number: "+multitaskingNumber);
 
         return multitaskingNumber;
     }
