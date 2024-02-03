@@ -28,6 +28,7 @@ export class MarkenspielService {
 
     currentChosenTransitions: Array<Transition> = [];
     processChosing: boolean = false;
+    randomStep: boolean = false;
 
     // Marken und Gewichte setzen
     public addCircleToken() {
@@ -181,6 +182,7 @@ export class MarkenspielService {
         });
     }
 
+    // ############### Random Maximum Step #####################################
     public showAll(){
         // 1. Aufräumen und Hilfsvariablen erstellen
         this.cleanUp();
@@ -234,9 +236,9 @@ export class MarkenspielService {
         return;
     }
 
-    // Aufruf zum Erstellen eines Schrittes
+    // ####################### Schritte editieren ######################################
     public editStep() {
-        // Aufräumen
+        // Aufruf zum Erstellen eines Schrittes
         this.cleanUp();
         this.alreadUsedParents.clear();
         this.currentChosenTransitions = [];
@@ -293,6 +295,10 @@ export class MarkenspielService {
         this.currentChosenTransitions.forEach((transition) => {
             this.fireSingleTransition(transition);
         });
+
+        if(this.randomStep == true){
+            this.showStep();
+        }
     }
 
     // #################### Einfache Schritte ##################################
@@ -352,7 +358,7 @@ export class MarkenspielService {
                 }
             }
         } else {
-            if(!this.currentChosenTransitions.includes(element)){
+            if(!this.currentChosenTransitions.includes(element) && this.processChosing){
                 let parents = element.parents;
 
                 parents.forEach((parent) => {
@@ -368,6 +374,9 @@ export class MarkenspielService {
     public multitaskingTransitions(multitasking: boolean) {
         // Aufruf zum Aktivieren von Auto-Cun-Currency
         this.multitasking = multitasking;
+        // console.log(multitasking);
+
+        this.editStep();
         // Wenn in der Stelle vor der Transition genug Marken sind, kann die Transition so oft schalten, wie ihr
         // kleinstes Parent Marken hat
     }
@@ -377,38 +386,40 @@ export class MarkenspielService {
         let lines = this._diagram?.lines;
         let parents = element.parents;
         let number = this.setmultitaskingNumber(element);
-        let alreadyUsedParents: String[] = [];
 
-        parents.forEach((parent) => {
-            let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
-            let lineTokens = result!.tokens;
-            let newTokenAmount;
+        if(this.processChosing){
 
-            if(this.alreadUsedParents.has(parent.id)){
-                let oldTokenAmount = this.alreadUsedParents.get(parent.id);
-                newTokenAmount = oldTokenAmount - lineTokens*number
-                // console.log("new Token Amount: "+newTokenAmount)
-            } else {
-                newTokenAmount = parent.amountToken - lineTokens*number;
-                // console.log("new Token Amount/else: "+newTokenAmount)
+            parents.forEach((parent) => {
+                let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
+                let lineTokens = result!.tokens;
+                let newTokenAmount;
+
+                if(this.alreadUsedParents.has(parent.id)){
+                    let oldTokenAmount = this.alreadUsedParents.get(parent.id);
+                    newTokenAmount = oldTokenAmount - lineTokens*number
+                    // console.log("new Token Amount: "+newTokenAmount)
+                } else {
+                    newTokenAmount = parent.amountToken - lineTokens*number;
+                    // console.log("new Token Amount/else: "+newTokenAmount)
+                }
+
+                this.alreadUsedParents.set(parent.id, newTokenAmount);
+                this.disableOtherTransitions(parent, element);
+                // console.log(this.alreadUsedParents);
+            });
+
+            while(number > 0){
+                this.currentChosenTransitions.push(element);
+                number = number - 1;
             }
 
-            this.alreadUsedParents.set(parent.id, newTokenAmount);
-            this.disableOtherTransitions(parent, element);
-            // console.log(this.alreadUsedParents);
-        });
-
-        while(number > 0){
-            this.currentChosenTransitions.push(element);
-            number = number - 1;
+            this.currentChosenTransitions.forEach((transition) => {
+                this.setTransitionColor(transition,'orange');
+            });
+            // console.log(this.currentChosenTransitions);
         }
 
-        this.currentChosenTransitions.forEach((transition) => {
-            this.setTransitionColor(transition,'violet');
-        });
-        // console.log(this.currentChosenTransitions);
-
-        return alreadyUsedParents;
+        return;
     }
 
     private setmultitaskingNumber(element: Transition) {
@@ -579,6 +590,10 @@ export class MarkenspielService {
         }
 
         return startTransitions;
+    }
+
+    public random(random: boolean){
+        this.randomStep = random;
     }
 
     // Zusatzmethoden, aktuell nicht genutzt
