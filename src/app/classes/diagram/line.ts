@@ -395,6 +395,7 @@ export class Line {
     }
 
     addVirtualPoints() {
+        console.log('addVirtualPoints');
         
         let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y}; 
 
@@ -447,6 +448,9 @@ export class Line {
 
    
     removeCoords(): void {
+        this.intermediatePoints.forEach((intermediatePoint) => {
+            intermediatePoint.remove();
+        });
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
     }
@@ -508,6 +512,7 @@ export class Line {
 
              // Alle svg circle elemente löschen
             this.intermediatePoints.forEach((intermediatePoint) => {
+                console.log('remove', intermediatePoint.svg);
                 
                 intermediatePoint.remove();
             });
@@ -546,6 +551,7 @@ export class Line {
 
         // Alle svg circle elemente löschen
         this.intermediatePoints.forEach((intermediatePoint) => {
+            console.log('remove', intermediatePoint.svg);
             
             intermediatePoint.remove();
         });
