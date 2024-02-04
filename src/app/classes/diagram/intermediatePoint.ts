@@ -36,6 +36,7 @@ export class IntermediatePoint {
 
     createCircle(){
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'intermediatePoint');
         circle.setAttribute('cx', this.x.toString());
         circle.setAttribute('cy', this.y.toString());
         circle.setAttribute('r', '8');
