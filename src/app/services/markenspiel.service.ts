@@ -15,7 +15,7 @@ export class MarkenspielService {
 
     private _diagram: Diagram | undefined;
     private currentActiveTransitions = new Map;
-    private alreadUsedParents = new Map;
+    private alreadyUsedParents = new Map;
     private multitasking: boolean = false;
     private roundTripMap = new Map;
 
@@ -174,7 +174,7 @@ export class MarkenspielService {
     private cleanUp() {
         this.currentChosenTransitions.splice(0,this.currentChosenTransitions.length);
         this.currentActiveTransitions.clear();
-        this.alreadUsedParents.clear();
+        this.alreadyUsedParents.clear();
 
         this._diagram?.transitions.forEach((transition) => {
             transition.isActive = false;
@@ -240,7 +240,7 @@ export class MarkenspielService {
     public editStep() {
         // Aufruf zum Erstellen eines Schrittes
         this.cleanUp();
-        this.alreadUsedParents.clear();
+        this.alreadyUsedParents.clear();
         this.currentChosenTransitions = [];
 
         // parents nach Anzahl der Marken sortieren
@@ -312,8 +312,14 @@ export class MarkenspielService {
            if(!this.currentChosenTransitions.includes(transition)){
                parents.forEach((parent) => {
 
-                   if(this.alreadUsedParents.has(parent.id) && this.alreadUsedParents.get(parent.id) == 0){
+                   if(this.alreadyUsedParents.has(parent.id) && this.alreadyUsedParents.get(parent.id) == 0){
                        this.disableOtherTransitions(parent,transition);
+                   }
+
+                   if(this.multitasking){
+                       if(this.alreadyUsedParents.has(parent.id) && this.alreadyUsedParents.get(parent.id) == 1){
+                           this.disableMultitasking(parent,transition);
+                       }
                    }
                });
            }
@@ -335,7 +341,7 @@ export class MarkenspielService {
                 });
 
                 parents.forEach((parent) => {
-                    let parentToken = this.alreadUsedParents.get(parent.id);
+                    let parentToken = this.alreadyUsedParents.get(parent.id);
                     localTokenArray.push(parentToken);
                     // console.log(parent.id+" mit insgesamt "+parent.amountToken);
                     // console.log(parent.id+" hat gerade "+parentToken);
@@ -349,19 +355,19 @@ export class MarkenspielService {
                         let idString = result!.id.split(',')![0];
                         // result: eingehende Kante, idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
 
-                        if (this.alreadUsedParents.has(idString) && this.alreadUsedParents.get(idString) - result!.tokens >= 0) {
-                            let oldTokenAmount = this.alreadUsedParents.get(idString);
+                        if (this.alreadyUsedParents.has(idString) && this.alreadyUsedParents.get(idString) - result!.tokens >= 0) {
+                            let oldTokenAmount = this.alreadyUsedParents.get(idString);
                             let newTokenAmount = oldTokenAmount - result!.tokens;
 
-                            this.alreadUsedParents.set(idString, newTokenAmount);
+                            this.alreadyUsedParents.set(idString, newTokenAmount);
                             transitionIsStillActive = true;
                             // console.log(parent.id+" hatte vorher: "+oldTokenAmount+" und hat jetzt "+newTokenAmount);
 
                         } else {
-                            if(!this.alreadUsedParents.has(idString) && parent.amountToken - result!.tokens >= 0){
+                            if(!this.alreadyUsedParents.has(idString) && parent.amountToken - result!.tokens >= 0){
                                 let newTokenAmount = parent.amountToken - result!.tokens;
 
-                                this.alreadUsedParents.set(idString, newTokenAmount);
+                                this.alreadyUsedParents.set(idString, newTokenAmount);
                                 transitionIsStillActive = true;
                             }
                         }
@@ -376,20 +382,7 @@ export class MarkenspielService {
                     this.setTransitionColor(element, 'black');
                 }
             }
-        } else {
-            if(!this.currentChosenTransitions.includes(element) && this.processChosing){
-
-                let parents = element.parents;
-
-                parents.forEach((parent) => {
-                    this.disableOtherTransitions(parent, element);
-                });
-
-                this.setTransitionColor(element, 'black');
-            }
         }
-
-        this.resetColor();
 
         return;
     }
@@ -418,8 +411,8 @@ export class MarkenspielService {
                 let lineTokens = result!.tokens;
                 let newTokenAmount;
 
-                if(this.alreadUsedParents.has(parent.id)){
-                    let oldTokenAmount = this.alreadUsedParents.get(parent.id);
+                if(this.alreadyUsedParents.has(parent.id)){
+                    let oldTokenAmount = this.alreadyUsedParents.get(parent.id);
                     newTokenAmount = oldTokenAmount - lineTokens*number
                     // console.log("new Token Amount: "+newTokenAmount)
                 } else {
@@ -427,13 +420,8 @@ export class MarkenspielService {
                     // console.log("new Token Amount/else: "+newTokenAmount)
                 }
 
-                this.alreadUsedParents.set(parent.id, newTokenAmount);
+                this.alreadyUsedParents.set(parent.id, newTokenAmount);
 
-                if(this.alreadUsedParents.get(parent.id) == 0){
-                    this.disableOtherTransitions(parent, element);
-                }
-
-                // console.log(this.alreadUsedParents);
             });
 
             while(number > 0){
@@ -447,7 +435,7 @@ export class MarkenspielService {
             // console.log(this.currentChosenTransitions);
         }
 
-        this.resetColor();
+        // this.resetColor();
 
         return;
     }
@@ -463,8 +451,8 @@ export class MarkenspielService {
             let result = lines?.find(line => line.target.id === element.id && line.source.id === parent.id);
             let lineTokens = result!.tokens;
 
-            if(this.alreadUsedParents.has(parent.id)){
-                localMap.set(parent.id, this.alreadUsedParents.get(parent.id));
+            if(this.alreadyUsedParents.has(parent.id)){
+                localMap.set(parent.id, this.alreadyUsedParents.get(parent.id));
             } else {
                 localMap.set(parent.id, parent.amountToken);
             }
@@ -482,7 +470,11 @@ export class MarkenspielService {
                 }
             });
         });
+
         // console.log("Number: "+multitaskingNumber);
+        if(multitaskingNumber != 0){
+            console.log("Transition "+element.id+" schaltet "+multitaskingNumber+" mal.");
+        }
 
         return multitaskingNumber;
     }
@@ -507,6 +499,31 @@ export class MarkenspielService {
                 // console.log(rect);
             }
         });
+    }
+
+    disableMultitasking(parent: Place, element: Transition){
+
+        let lines = this._diagram?.lines;
+        let transitions: Transition[] = this._diagram!.transitions;
+        let outGoingLines = lines?.filter(line => line.source.id === parent.id );
+
+        outGoingLines!.forEach((outGoingLine) => {
+            let elem = outGoingLine.target;
+
+            if(element.id != elem.id){
+                let rect: Transition = transitions!.find(rect => elem.id == rect.id)!;
+
+                if(!this.currentChosenTransitions.includes(rect)){
+                    //this.setTransitionColor(rect, 'black');
+
+                    if(outGoingLine.tokens > 1){
+                        this.setTransitionColor(rect, 'black');
+                    }
+                }
+                // console.log(rect);
+            }
+        });
+
     }
 
 
@@ -549,9 +566,9 @@ export class MarkenspielService {
             let idString = result!.id.split(',')![0];
             // result: eingehende Kante, idString: Stelle, die vor der Kante steht (dazugehörige parent.id)
 
-            if (this.alreadUsedParents.has(idString) && this.alreadUsedParents.get(idString) - result!.tokens >= 0){
+            if (this.alreadyUsedParents.has(idString) && this.alreadyUsedParents.get(idString) - result!.tokens >= 0){
                 parentsHaveEnoughTokens = true;
-            } else if (!this.alreadUsedParents.has(idString) && parent.amountToken - result!.tokens >= 0) {
+            } else if (!this.alreadyUsedParents.has(idString) && parent.amountToken - result!.tokens >= 0) {
                 parentsHaveEnoughTokens = true;
             } else {
                 parentsHaveEnoughTokens = false;
