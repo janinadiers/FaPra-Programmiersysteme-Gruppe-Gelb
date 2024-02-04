@@ -293,6 +293,7 @@ export class MarkenspielService {
         return;
     }
 
+    // ####################### Schritte auslösen ############################################################
     public fireStep() {
         this.currentChosenTransitions.forEach((transition) => {
             this.fireSingleTransition(transition);
@@ -303,27 +304,26 @@ export class MarkenspielService {
         }
     }
 
-    private resetColor() {
-        let transitions = this.getPossibleActiveTransitions();
+    private fireSingleTransition(element: Transition) {
+        const targetLine = this._diagram!.lines?.filter(line => line.target.id === element.id);
+        // eingehende Linie holen und prüfen, ob die parents (der Vorbereich) genug Marken haben
+        if(!this.parentsHaveEnoughTokens(element.parents, targetLine!)) {
+            return;
+        }
 
-        transitions.forEach((transition) => {
-           let parents = transition.parents;
-
-           if(!this.currentChosenTransitions.includes(transition)){
-               parents.forEach((parent) => {
-
-                   if(this.alreadyUsedParents.has(parent.id) && this.alreadyUsedParents.get(parent.id) == 0){
-                       this.disableOtherTransitions(parent,transition);
-                   }
-
-                   if(this.multitasking){
-                       if(this.alreadyUsedParents.has(parent.id) && this.alreadyUsedParents.get(parent.id) == 1){
-                           this.disableMultitasking(parent,transition);
-                       }
-                   }
-               });
-           }
+        element.parents.forEach((place) => {
+            const line = this._diagram!.lines?.find(line => line.source.id === place.id && line.target.id === element.id);
+            this.subtractTokensFromPlace(place, line!.tokens);
         });
+
+        element.children.forEach((place) => {
+            const line = this._diagram!.lines?.find(line => line.source.id === element.id && line.target.id === place.id);
+            this.addTokensToPlace(place, line!.tokens);
+        });
+
+        this.setTransitionColor(element,'black');
+
+        return;
     }
 
     // #################### Einfache Schritte ##################################
@@ -479,8 +479,30 @@ export class MarkenspielService {
         return multitaskingNumber;
     }
 
+    // ########################### Setzen der Farben ################################################################
+    private resetColor() {
+        let transitions = this.getPossibleActiveTransitions();
 
-    // ##################### Hilfsmethoden ##########################################
+        transitions.forEach((transition) => {
+            let parents = transition.parents;
+
+            if(!this.currentChosenTransitions.includes(transition)){
+                parents.forEach((parent) => {
+
+                    if(this.alreadyUsedParents.has(parent.id)){
+                        this.disableOtherTransitions(parent,transition);
+                    }
+
+                    if(this.multitasking){
+                        if(this.alreadyUsedParents.has(parent.id) && this.alreadyUsedParents.get(parent.id) == 1){
+                            this.disableMultitasking(parent,transition);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     private disableOtherTransitions(parent: Place, element: Transition) {
         let lines = this._diagram?.lines;
         let transitions: Transition[] = this._diagram!.transitions;
@@ -488,15 +510,10 @@ export class MarkenspielService {
 
         outGoingLines!.forEach((outGoingLine) => {
             let elem = outGoingLine.target;
+            let rect: Transition = transitions!.find(rect => elem.id == rect.id)!;
 
-            if(element.id != elem.id){
-                let rect: Transition = transitions!.find(rect => elem.id == rect.id)!;
-
-                if(!this.currentChosenTransitions.includes(rect)){
-                    this.setTransitionColor(rect, 'black');
-                }
-
-                // console.log(rect);
+            if(outGoingLine.tokens > this.alreadyUsedParents.get(parent.id) && !this.currentChosenTransitions.includes(rect)){
+                this.setTransitionColor(rect, 'black');
             }
         });
     }
@@ -513,20 +530,14 @@ export class MarkenspielService {
             if(element.id != elem.id){
                 let rect: Transition = transitions!.find(rect => elem.id == rect.id)!;
 
-                if(!this.currentChosenTransitions.includes(rect)){
-                    //this.setTransitionColor(rect, 'black');
-
-                    if(outGoingLine.tokens > 1){
-                        this.setTransitionColor(rect, 'black');
-                    }
+                if(!this.currentChosenTransitions.includes(rect) && outGoingLine.tokens > 1){
+                    this.setTransitionColor(rect, 'black');
                 }
-                // console.log(rect);
             }
         });
-
     }
 
-
+    // ##################### Hilfsmethoden ##########################################
     private smallCleanUp(element: Transition, parents: Place[]) {
         let deleteCount = parents[0].amountToken;
         let isChosen: boolean = false;
@@ -578,27 +589,7 @@ export class MarkenspielService {
         return parentsHaveEnoughTokens;
     }
 
-    private fireSingleTransition(element: Transition) {
-        const targetLine = this._diagram!.lines?.filter(line => line.target.id === element.id);
-        // eingehende Linie holen und prüfen, ob die parents (der Vorbereich) genug Marken haben
-        if(!this.parentsHaveEnoughTokens(element.parents, targetLine!)) {
-            return;
-        }
 
-        element.parents.forEach((place) => {
-            const line = this._diagram!.lines?.find(line => line.source.id === place.id && line.target.id === element.id);
-            this.subtractTokensFromPlace(place, line!.tokens);
-        });
-
-        element.children.forEach((place) => {
-            const line = this._diagram!.lines?.find(line => line.source.id === element.id && line.target.id === place.id);
-            this.addTokensToPlace(place, line!.tokens);
-        });
-
-        this.setTransitionColor(element,'black');
-
-        return;
-    }
 
     private subtractTokensFromPlace(place: Place, amountTokenLine: number): void {
 
