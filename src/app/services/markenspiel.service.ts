@@ -281,10 +281,12 @@ export class MarkenspielService {
 
         if(!this.multitasking){
             this.simpleStep(element);
+            this.resetColor();
             // console.log("simple step");
         }
         else {
             this.multiStep(element);
+            this.resetColor();
             // console.log("multitasking");
         }
 
@@ -299,6 +301,23 @@ export class MarkenspielService {
         if(this.randomStep == true){
             this.showStep();
         }
+    }
+
+    private resetColor() {
+        let transitions = this.getPossibleActiveTransitions();
+
+        transitions.forEach((transition) => {
+           let parents = transition.parents;
+
+           if(!this.currentChosenTransitions.includes(transition)){
+               parents.forEach((parent) => {
+
+                   if(this.alreadUsedParents.has(parent.id) && this.alreadUsedParents.get(parent.id) == 0){
+                       this.disableOtherTransitions(parent,transition);
+                   }
+               });
+           }
+        });
     }
 
     // #################### Einfache Schritte ##################################
@@ -369,6 +388,10 @@ export class MarkenspielService {
                 this.setTransitionColor(element, 'black');
             }
         }
+
+        this.resetColor();
+
+        return;
     }
 
     // #################### Auto- Concurrency ##################################
@@ -423,6 +446,8 @@ export class MarkenspielService {
             });
             // console.log(this.currentChosenTransitions);
         }
+
+        this.resetColor();
 
         return;
     }
