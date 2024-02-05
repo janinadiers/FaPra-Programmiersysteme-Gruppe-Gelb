@@ -29,7 +29,7 @@ export class ParserService {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
 
-            const places = this.createPlaces(rawData['places'], rawData['layout'], rawData['marking'] as JsonPetriNet['marking'], rawData['labels'] as JsonPetriNet['labels']);
+            const places = this.createPlaces(rawData['places'], rawData['layout'], rawData['marking'] as JsonPetriNet['marking']);
             const transitions = this.createTransitions(rawData['transitions'], rawData['layout'], rawData['labels'] as JsonPetriNet['labels']);
             const arcs = rawData['arcs'] as JsonPetriNet['arcs'];
 
