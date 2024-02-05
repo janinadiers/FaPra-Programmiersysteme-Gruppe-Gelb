@@ -211,6 +211,7 @@ export class ToolbarComponent {
 
             this._springEmbedderService.teardown();
             this._sugiyamaService.begin(this._diagram);
+            this._sugiyamaService.begin(this._diagram); //on purpose
 
         }
         else{

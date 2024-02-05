@@ -13,6 +13,7 @@ export class SugiyamaService {
     diagram: Diagram = new Diagram([], []);
     layers: Element[][] = [];
     removedLines: Line[] = [];
+    usedEdges: Coords[] = [];
     
     layerWidth = 100;
     nodeHeight = 100;
@@ -20,7 +21,10 @@ export class SugiyamaService {
     public begin(diagram: Diagram) {
         this.diagram = diagram;
         this.removedLines = [];
-
+        this.layers = [];
+        this.removedLines = [];
+        this.usedEdges = [];
+        
         this.removeLoops();
         this.addLayers();
         this.removeLowerDirectedLines();
@@ -78,6 +82,23 @@ export class SugiyamaService {
                         visited.add(connectedElem);
                         currentLayer.push(connectedElem as Element);
                         nextQueue.push(connectedElem as Element);
+
+                        if (connectedElem instanceof Transition) {
+                            let transition = connectedElem as Transition;
+                            let coord = { 
+                                x: transition.x, 
+                                y: transition.y
+                            };
+                            this.usedEdges.push(coord);
+                        } else if (connectedElem instanceof Place) {
+                            let place = connectedElem as Place;
+                            let coord = { 
+                                x: place.x, 
+                                y: place.y
+                            };
+                            this.usedEdges.push(coord);
+                        }
+                        this.usedEdges.push();
                     }
                 }
             }
@@ -106,7 +127,7 @@ export class SugiyamaService {
                     if (i > 0) {
                         // if target is on lower layer -> set target on layer above (+1) 
                         let target = this.layers[i-1].find((target) => target.id == currentLine?.target.id) as Element;                        
-                        if (target ) {
+                        if (target) {
                             if (this.layers[i+1]) {
                                 //add target to layer[i+1]
                                 this.layers[i+1].push(target);
@@ -145,7 +166,6 @@ export class SugiyamaService {
     // Step 6: Edge Routing
     routeEdges() {
         // Route edges as PolyLine (add line-points on Layer)
-        let usedEdges: Coords[] = [];
 
         for (let i = 0; i < this.layers.length; i++) {
             let layer = this.layers[i];
@@ -169,13 +189,14 @@ export class SugiyamaService {
                                     yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
     
                                 let coord = { x: xCoord, y: yCoord };
-                                if (usedEdges.find(edge => (edge.x == coord.x && edge.y == coord.y) || (edge.x == coord.y && edge.y == coord.x))) {
-                                    coord.y = (currentLine.source.y) + 1 * this.nodeHeight;
+                                while (this.usedEdges.find(edge => (edge.x == coord.x && edge.y == coord.y) || (edge.x == coord.y && edge.y == coord.x))) {
                                     if (layer.length + 1 == nextLayerLength)
-                                        yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
+                                        coord.y = (coord.y) - 1 * this.nodeHeight;
+                                    else 
+                                        coord.y = (coord.y) + 1 * this.nodeHeight;
                                 }
                                 coords.push(coord);
-                                usedEdges.push(coord);
+                                this.usedEdges.push(coord);
                             }
                         } else {
                             intermediateLayers = i - targetLayer;
@@ -186,13 +207,14 @@ export class SugiyamaService {
                                     yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
     
                                 let coord = { x: xCoord, y: yCoord };
-                                if (usedEdges.find(edge => (edge.x == coord.x && edge.y == coord.y) || (edge.x == coord.y && edge.y == coord.x))) {
-                                    coord.y = (currentLine.source.y) + 1 * this.nodeHeight;
+                                while (this.usedEdges.find(edge => (edge.x == coord.x && edge.y == coord.y) || (edge.x == coord.y && edge.y == coord.x))) {
                                     if (layer.length + 1 == nextLayerLength)
-                                        yCoord = (currentLine.source.y) - 1 * this.nodeHeight;
+                                        coord.y = (coord.y) - 1 * this.nodeHeight;
+                                    else
+                                        coord.y = (coord.y) + 1 * this.nodeHeight;
                                 }
                                 coords.push(coord);
-                                usedEdges.push(coord);
+                                this.usedEdges.push(coord);
                             }
                         }
                         currentLine.coords = coords;

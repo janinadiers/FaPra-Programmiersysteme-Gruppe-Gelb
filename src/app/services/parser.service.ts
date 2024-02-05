@@ -29,7 +29,7 @@ export class ParserService {
         try {
             const rawData = JSON.parse(text) as JsonPetriNet;
 
-            const places = this.createPlaces(rawData['places'], rawData['layout'], rawData['marking'] as JsonPetriNet['marking']);
+            const places = this.createPlaces(rawData['places'], rawData['layout'], rawData['marking'] as JsonPetriNet['marking'], rawData['labels'] as JsonPetriNet['labels']);
             const transitions = this.createTransitions(rawData['transitions'], rawData['layout'], rawData['labels'] as JsonPetriNet['labels']);
             const arcs = rawData['arcs'] as JsonPetriNet['arcs'];
 
@@ -48,7 +48,7 @@ export class ParserService {
         }
     }
 
-    private createPlaces(placeIds: Array<string> | undefined, layout: JsonPetriNet['layout'], marking: JsonPetriNet['marking'] | undefined): Place[] | undefined {
+    private createPlaces(placeIds: Array<string> | undefined, layout: JsonPetriNet['layout'], marking: JsonPetriNet['marking']): Place[] | undefined {
         if (layout === undefined || placeIds === undefined || marking === undefined) {
             return;
         }
