@@ -30,7 +30,6 @@ export class FreiAlgorithmusService {
             if(!node.svgElement) return;
             
             node.svgElement.addEventListener('mousedown', (event) => {
-                Diagram.drawingIsActive = false; 
                 this._selectedNode = node;
                 event.stopPropagation();
                 this.processMouseDown(node.svgElement);
@@ -40,7 +39,7 @@ export class FreiAlgorithmusService {
         
         
         window.addEventListener('mouseup', (event) => {
-           
+            Diagram.drawingIsActive = false; 
             event.stopPropagation();
             if(!this._selectedNode) return;
             this.processMouseUp(this._selectedNode.svgElement);
