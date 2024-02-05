@@ -8,7 +8,6 @@ import { Transition } from '../classes/diagram/transition';
 import {Subscription} from "rxjs";
 import {DisplayService} from "./display.service";
 import {DrawingService} from "./drawing.service";
-import {LabelValidatorService} from "./label-validator.service";
 
 @Injectable({
     providedIn: 'root'
@@ -20,8 +19,7 @@ export class ParserService {
 
     constructor(
         private _displayService: DisplayService,
-        private _drawingService: DrawingService,
-        private _labelValidator: LabelValidatorService) {
+        private _drawingService: DrawingService) {
             this._sub  = this._displayService.diagram$.subscribe(diagram => {
                 this._diagram = diagram;
             });
@@ -63,7 +61,6 @@ export class ParserService {
                 place.svgElement?.addEventListener(('click'), () => {
                     this._drawingService.onCircleSelect(place);
                 });
-                this._labelValidator.createLabelEventListener(place);
                 places.push(place)
 
             }
@@ -87,7 +84,6 @@ export class ParserService {
                 transition.svgElement?.addEventListener(('dblclick'), () => {
                     this._drawingService.startSimulation(transition);
                 });
-                this._labelValidator.createLabelEventListener(transition);
                 transitions.push(transition)
             }
         }
