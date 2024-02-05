@@ -360,6 +360,7 @@ export class ToolbarComponent {
         this._markenspielService.processChosing = false;
         this.randomStep = false;
         this._freiAlgorithmusService.disabled = true;
+        this.multitasking = false;
 
         let simulationButton = document.querySelector('.play-button > mat-icon') as HTMLElement;
         let editButton = document.querySelector('.edit-button > mat-icon') as HTMLElement;
