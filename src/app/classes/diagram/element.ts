@@ -20,7 +20,7 @@ export class Element  {
     }
 
     updatePosition(newPosition: Coords) {
-        
+
         this._positionChange$.next(newPosition);
 
     }

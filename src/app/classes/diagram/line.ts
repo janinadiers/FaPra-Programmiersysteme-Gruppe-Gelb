@@ -4,6 +4,7 @@ import {Transition} from './transition';
 import {Diagram} from './diagram';
 import { IntermediatePoint } from './intermediatePoint';
 import { BehaviorSubject, Observable } from 'rxjs';
+import {Place} from "./place";
 
 export class Line {
 
@@ -18,10 +19,10 @@ export class Line {
     private _draggingCircle : null | IntermediatePoint = null;
     private _svgElement: SVGElement;
     private _contextMenuOpen:boolean = false;
-  
+
 
     constructor(id: string, source: Element, target: Element, coords?: Coords[], tokens?: number) {
-        
+
         this._id = id;
         this._source = source;
         this._target = target;
@@ -30,23 +31,23 @@ export class Line {
         this._tokens = tokens ?? 1;
         this._intermediatePoints$ = new BehaviorSubject<IntermediatePoint[]>(coords?.map(c => { return new IntermediatePoint(c.x, c.y, false)}) || []);
         this.addVirtualPoints()
-        
+
         this._svgElement = this.createSVG();
         this._intermediatePoints$.getValue().forEach((intermediatePoint) => {
             if(intermediatePoint.svg) {
                 this._svgElement.appendChild(intermediatePoint.svg)
-                
+
             }
-            
+
         });
 
         this._intermediatePoints$.subscribe(() => {
             this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
-            
-        });
-        
 
-        
+        });
+
+
+
 
         source.getPositionChangeObservable().subscribe((source) => {
             this.updateSource({x: source.x, y: source.y});
@@ -113,12 +114,12 @@ export class Line {
 
     }
 
-    
+
     //Iterate through found coords and return them as string
     private getCoordsString(): string {
         let result = '';
         if (this.intermediatePoints.length > 0) {
-            
+
             this.intermediatePoints.filter(c => !c.isVirtual).forEach(coord => {
                 result += coord.x + ',' + coord.y + ' ';
             });
@@ -134,7 +135,7 @@ export class Line {
             let totalLength = 0;
             let lastX = this._source.x;
             let lastY = this._source.y;
-            
+
             this.coords.forEach(coord => {
                 totalLength += Math.hypot(coord.x - lastX, coord.y - lastY);
                 lastX = coord.x;
@@ -176,7 +177,7 @@ export class Line {
 
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('id', this._id.toString());
-   
+
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('id', this._id.toString());
         line.setAttribute('points', (`${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`))
@@ -184,9 +185,9 @@ export class Line {
         line.setAttribute('stroke-width', '1');
         line.setAttribute('fill', 'transparent');
         line.style.cursor = 'pointer';
-        
-        group.appendChild(line); 
-        
+
+        group.appendChild(line);
+
         let refX: number;
         refX = this.updateMarker();
          // Marker
@@ -198,15 +199,15 @@ export class Line {
          marker.setAttribute('refY', '5');
          marker.setAttribute('orient', 'auto-start-reverse');
          marker.setAttribute('markerUnits', 'strokeWidth');
- 
+
          // Path Element für Pfeilspitze
          const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'path');
          arrowhead.setAttribute('d', 'M0,0 L10,5 L0,10 Z');
          arrowhead.setAttribute('fill', 'black');
- 
+
          marker.appendChild(arrowhead);
          this._marker = marker;
- 
+
          group.appendChild(marker);
 
         const markerId = `url(#arrowhead-${this._id})`;
@@ -214,7 +215,7 @@ export class Line {
 
         //Get mid coord of Polyline
         const midCoords = this.calcMidCoords();
-        
+
         //Create background circle
         const backgroundCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         backgroundCircle.setAttribute('cx', midCoords.x.toString());
@@ -228,33 +229,33 @@ export class Line {
         group.appendChild(backgroundCircle);
 
         const token = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        
+
         token.setAttribute('x', midCoords.x.toString());
         token.setAttribute('y', midCoords.y.toString());
         token.setAttribute('text-anchor', 'middle');
         token.setAttribute('dy', '.3em');
-        
+
         if (this._tokens > 1)
             token.textContent = this._tokens.toString();
         group.appendChild(token);
 
         window.addEventListener('mousemove', (event) => {
-            
+
             event.stopPropagation();
             if(!this._draggingCircle) return;
             this.handleMouseMove(event);
-              
+
         });
-            
+
         this.intermediatePoints?.forEach((intermediatePoint) => {
             this.addEventListenerForIntermediatePoints(intermediatePoint);
         });
 
         this._svgElement = group;
-        
+
         return group;
-        
-       
+
+
     }
 
 
@@ -270,33 +271,33 @@ export class Line {
 
         const handleMouseUp = () => {
             Diagram.drawingIsActive = false;
-            this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => { 
-                
+            this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => {
+
                 intermediatePoint.remove()});
             this._draggingCircle = null;
             this.updateIntermediatePoints(this.intermediatePoints.filter(c => !c.isVirtual));
             this.addVirtualPoints();
-           
-            
+
+
         };
 
         const handleMouseOver = (event: MouseEvent) => {
             const circle = event.target as SVGElement;
             circle.setAttribute('fill', 'gray');
-            
+
         };
 
         const handleMouseOut = (event: MouseEvent) => {
             const circle = event.target as SVGElement;
             circle.setAttribute('fill', 'transparent');
-           
+
         };
 
         intermediatePoint.svg?.addEventListener('mouseover', handleMouseOver);
         intermediatePoint.svg?.addEventListener('mouseout', handleMouseOut);
         intermediatePoint.svg?.addEventListener('mousedown', handleMouseDown);
         intermediatePoint.svg?.addEventListener('mouseup', handleMouseUp);
-    
+
         intermediatePoint.svg?.addEventListener('contextmenu', (event) => {
             if(this._contextMenuOpen) return;
             this._contextMenuOpen = true;
@@ -316,19 +317,19 @@ export class Line {
 
                 this.removeCoord(intermediatePoint);
 
-                this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => { 
+                this.intermediatePoints?.filter(c => c.isVirtual).forEach((intermediatePoint) => {
                     intermediatePoint.remove()
                 });
 
                 this.updateIntermediatePoints(this.intermediatePoints.filter(c => !c.isVirtual));
                 this._draggingCircle = null;
-                
+
                 this.addVirtualPoints();
                 this._contextMenuOpen = false;
                 this.updateLineToken();
-            
+
             });
-  
+
         });
 
     }
@@ -396,61 +397,61 @@ export class Line {
     }
 
     addVirtualPoints() {
-        
-        let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y}; 
+
+        let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y};
 
             if(this.intermediatePoints.length > 0){
                 this.updateIntermediatePoints(this.intermediatePoints.filter(i => !i.isVirtual));
-                
+
                 this.intermediatePoints.forEach((intermediatePoint) => {
-                    
+
                     let midPoint = new IntermediatePoint((last_coord.x + intermediatePoint.x) / 2, (last_coord.y + intermediatePoint.y) / 2, true);
-                    this.updateIntermediatePoints(this.intermediatePoints.reduce((acc, curr, i) => {  
-                        
+                    this.updateIntermediatePoints(this.intermediatePoints.reduce((acc, curr, i) => {
+
                         if (i === this.intermediatePoints.indexOf(intermediatePoint)) {
                             acc.push(midPoint);
                         }
                         acc.push(curr);
-                        
+
                         return acc;
                     }, [] as IntermediatePoint[]));
-                    
+
                     last_coord = {x: intermediatePoint.x, y: intermediatePoint.y};
-                    
+
                 });
-              
-                
-                this.updateIntermediatePoints([...this.intermediatePoints, new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)]) 
-                
+
+
+                this.updateIntermediatePoints([...this.intermediatePoints, new IntermediatePoint((last_coord.x + this.target.x) /2, (last_coord.y + this.target.y) / 2, true)])
+
             }
-                
-            
+
+
         else{
-            
+
             this.updateIntermediatePoints([new IntermediatePoint((this.source.x + this.target.x) /2, (this.source.y + this.target.y) / 2, true)])
          }
-         
+
          // add intermediatePoints to svgElement
         this.intermediatePoints?.forEach((intermediatePoint) => {
-            
+
             if(intermediatePoint.svg && this._svgElement) this._svgElement.appendChild(intermediatePoint.svg);
-        });       
+        });
         // add eventListeners to intermediatePoints
          this.intermediatePoints.forEach((intermediatePoint) => {
             this.addEventListenerForIntermediatePoints(intermediatePoint);
          });
-           
+
 
     }
 
-   
+
     removeCoords(): void {
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
     }
 
     removeCoord(intermediatePoint: IntermediatePoint){
-        this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint)); 
+        this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint));
         intermediatePoint.remove();
     }
 
@@ -463,16 +464,16 @@ export class Line {
 
         this._draggingCircle!.update(x, y);
         this.updateIntermediatePoints(this.intermediatePoints);
-        
+
         this.updateLineToken();
-           
+
     }
 
     private updateLineToken(){
          // Positionen der Kantengewichte werden mit aktualisiert
          const midCoords = this.calcMidCoords();
          const midCircle = this.svgElement?.querySelectorAll('circle')[0]
-         
+
          midCircle?.setAttribute('cx', midCoords.x.toString());
          midCircle?.setAttribute('cy', midCoords.y.toString());
          this.svgElement?.querySelector('text')?.setAttribute('x', midCoords.x.toString());
@@ -480,14 +481,14 @@ export class Line {
     }
 
     private updateSource(updatedPosition: Coords): void {
-        
+
         if (this._svgElement) {
-            
+
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${updatedPosition.x},
                     ${updatedPosition.y} ${this.getCoordsString()}${this._targetPosition?.x},
                         ${this._targetPosition?.y}`);
-            }            
+            }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
 
             // Markierungen für die Gewichte an die Kante hängen
@@ -506,9 +507,8 @@ export class Line {
 
     }
 
-
     private updateTarget(updatedPosition: Coords): void {
-        
+
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
@@ -527,6 +527,14 @@ export class Line {
         this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
         this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
         this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
+    }
+
+    public isAlreadyConnected(circle: Place, rect: Transition, circleClicked: boolean): boolean {
+        // Überprüfen, ob die Kante die angegebenen Elemente schon verbindet
+        if(circleClicked) {
+            return this._source === rect && this._target === circle;
+        }
+        return this._source === circle && this._target === rect;
     }
 }
 
