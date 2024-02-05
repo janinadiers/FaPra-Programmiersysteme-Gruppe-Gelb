@@ -48,8 +48,8 @@ export class ParserService {
         }
     }
 
-    private createPlaces(placeIds: Array<string> | undefined, layout: JsonPetriNet['layout'], marking: JsonPetriNet['marking'] | undefined, labels:JsonPetriNet['labels'] | undefined): Place[] | undefined {
-        if (layout === undefined || placeIds === undefined || marking === undefined || labels === undefined) {
+    private createPlaces(placeIds: Array<string> | undefined, layout: JsonPetriNet['layout'], marking: JsonPetriNet['marking']): Place[] | undefined {
+        if (layout === undefined || placeIds === undefined || marking === undefined) {
             return;
         }
         let places = []
