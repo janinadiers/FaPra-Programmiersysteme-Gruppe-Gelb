@@ -85,7 +85,7 @@ export class Place extends Element {
         group.setAttribute('transform', `translate(${this.x}, ${this.y})`);
         //Circle
         const circle = super.createSVG('circle');
-        circle.setAttribute('id', this.id.toString());
+        circle.setAttribute('id', this.id);
         circle.setAttribute('r', this._radius.toString());
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
