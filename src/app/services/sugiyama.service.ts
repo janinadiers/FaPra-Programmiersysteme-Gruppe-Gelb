@@ -21,7 +21,10 @@ export class SugiyamaService {
     public begin(diagram: Diagram) {
         this.diagram = diagram;
         this.removedLines = [];
-
+        this.layers = [];
+        this.removedLines = [];
+        this.usedEdges = [];
+        
         this.removeLoops();
         this.addLayers();
         this.removeLowerDirectedLines();
@@ -124,7 +127,7 @@ export class SugiyamaService {
                     if (i > 0) {
                         // if target is on lower layer -> set target on layer above (+1) 
                         let target = this.layers[i-1].find((target) => target.id == currentLine?.target.id) as Element;                        
-                        if (target ) {
+                        if (target) {
                             if (this.layers[i+1]) {
                                 //add target to layer[i+1]
                                 this.layers[i+1].push(target);
