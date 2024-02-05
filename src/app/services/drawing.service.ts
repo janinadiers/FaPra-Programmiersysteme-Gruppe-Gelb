@@ -176,7 +176,7 @@ export class DrawingService {
             }));
         }
 
-        if(this.simulationStatus == 2 && !this._markenspielService.processChosing){
+        if(this.simulationStatus == 2 && !this._markenspielService.processChosing && !this._markenspielService.randomStep){
             const transitions = this._markenspielService.showAll();
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
@@ -215,6 +215,11 @@ export class DrawingService {
         }
         this.simulationStatus = status;
         return;
+    }
+
+    public getSimulationStatus(){
+
+        return this.simulationStatus;
     }
 
     // Linien zeichnen bzw. Kanten erstellen
