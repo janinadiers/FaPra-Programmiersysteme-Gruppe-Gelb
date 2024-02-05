@@ -129,7 +129,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
             Diagram.viewBox.width = rect.width * Diagram.zoomFactor;
             Diagram.viewBox.height = rect.height * Diagram.zoomFactor;
 
-
             return `${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}`;
         }
         // Default viewBox if canvas is not available
