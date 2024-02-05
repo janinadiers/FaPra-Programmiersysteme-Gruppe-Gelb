@@ -7,7 +7,6 @@ import { Transition } from '../../classes/diagram/transition';
 import { Line } from '../../classes/diagram/line';
 import { Coords } from '../../classes/json-petri-net';
 import {DrawingService} from "../drawing.service";
-import {LabelValidatorService} from "../label-validator.service";
 
 
 @Injectable({
@@ -15,7 +14,7 @@ import {LabelValidatorService} from "../label-validator.service";
 })
 export class PnmlImportService {
 
-    constructor(private _drawingService: DrawingService, private _labelValidator: LabelValidatorService) {
+    constructor(private _drawingService: DrawingService) {
     }
 
     import(content: string): Diagram | undefined {
@@ -48,11 +47,10 @@ export class PnmlImportService {
             const placeId = place.getAttribute('id');
 
             if(!placeId) throw new Error('Place element misses id: ' + place);
-            const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y, placeTokens, placeLabel);
+            const placeElement = this.createPlace(placeId, placePosition.x, placePosition.y, placeTokens);
             placeElement.svgElement?.addEventListener(('click'), () => {
                 this._drawingService.onCircleSelect(placeElement);
             });
-            this._labelValidator.createLabelEventListener(placeElement);
 
             result.push(placeElement);
         });
@@ -78,7 +76,6 @@ export class PnmlImportService {
             transitionElement.svgElement?.addEventListener(('dblclick'), () => {
                 this._drawingService.startSimulation(transitionElement);
             });
-            this._labelValidator.createLabelEventListener(transitionElement);
             result.push(transitionElement);
         });
 
@@ -175,12 +172,11 @@ export class PnmlImportService {
     }
 
 
-    private createPlace(id:string, x:number, y:number, amountToken:string, label:string): Place {
+    private createPlace(id:string, x:number, y:number, amountToken:string): Place {
         const place = new Place(id, x, y);
         place.x = x;
         place.y = y;
         place.amountToken = parseInt(amountToken);
-        place.label = label;
         place.svgElement = place.createSVG();
         return place;
 

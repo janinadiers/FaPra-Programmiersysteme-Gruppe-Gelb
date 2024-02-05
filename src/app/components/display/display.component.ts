@@ -10,6 +10,9 @@ import {DrawingService} from "../../services/drawing.service";
 import {ReachabilityGraph} from 'src/app/classes/diagram/reachability-graph';
 import {MarkenspielService} from "../../services/markenspiel.service";
 import { SpringEmbedderService } from 'src/app/services/spring-embedder-for-reachability-graph.service';
+import {Transition} from "../../classes/diagram/transition";
+import {Place} from "../../classes/diagram/place";
+import {indexOf} from "lodash";
 
 
 @Component({
@@ -313,18 +316,92 @@ export class DisplayComponent implements OnInit, OnDestroy {
             const clickedPlace = this._diagram!.places.find(place => place.isClicked(mouseX, mouseY));
             const clickedTransition = this._diagram!.transitions.find(transition => transition.isClicked(mouseX, mouseY));
 
+            let selectedCircle = this._diagram!.selectedCircle;
+            let selectedTransition = this._diagram!.selectedRect;
+
             if (clickedPlace) {
-                // Aktualisieren Sie den ausgewählten Kreis
+                if(this.lastClickedElement === clickedPlace) {
+                    return;
+                }
+
+                if(selectedCircle === undefined) {
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this.lastClickedElement = clickedPlace;
+                    this._diagram!.lightningCount = 1;
+                    if(selectedTransition) {
+                        if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
+                            this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                        }
+                    }
+                    return;
+                }
+
+                if(clickedPlace === selectedCircle) {
+                    if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
+                        this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                    }
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this.lastClickedElement = clickedPlace;
+                    this._diagram!.lightningCount = 1;
+                    return;
+                }
+
+                if(this.lastClickedElement instanceof Place) {
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this.lastClickedElement = clickedPlace;
+                    this._diagram!.lightningCount = 1;
+                    return;
+                }
+
+                if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
+                    this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                }
+
                 this._diagram!.selectedCircle = clickedPlace;
-
-                this._diagram!.selectedRect = undefined;
+                this.lastClickedElement = clickedPlace;
                 this._diagram!.lightningCount = 1;
+                return;
             } else if (clickedTransition) {
-                // Aktualisieren Sie die ausgewählte Transition
-                this._diagram!.selectedRect = clickedTransition;
+                if(this.lastClickedElement === clickedTransition) {
+                    return;
+                }
 
-                this._diagram!.selectedCircle = undefined;
+                if(selectedTransition === undefined) {
+                    this._diagram!.selectedRect = clickedTransition;
+                    this.lastClickedElement = clickedTransition;
+                    this._diagram!.lightningCount = 0;
+                    if(selectedCircle) {
+                        if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
+                            this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
+                        }
+                    }
+                    return;
+                }
+
+                if(clickedTransition === selectedTransition) {
+                    if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
+                        this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
+                    }
+                    this._diagram!.selectedRect = clickedTransition;
+                    this.lastClickedElement = clickedTransition;
+                    this._diagram!.lightningCount = 0;
+                    return;
+                }
+
+                if(this.lastClickedElement instanceof Transition) {
+                    this._diagram!.selectedRect = clickedTransition;
+                    this.lastClickedElement = clickedTransition;
+                    this._diagram!.lightningCount = 0;
+                    return;
+                }
+
+                if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
+                    this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
+                }
+                this._diagram!.selectedRect = clickedTransition;
+                this.lastClickedElement = clickedTransition;
                 this._diagram!.lightningCount = 0;
+                return;
             } else {
                 if (this._diagram!.lightningCount === 0) {
                     let targetIsCircle: boolean = true;
@@ -341,8 +418,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
                         this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
-
-                    return;
+                    this.lastClickedElement = lastCircleObject;
                 } else if (this._diagram!.lightningCount === 1) {
                     let targetIsCircle: boolean = false;
                     let svgRect = this._drawingService.drawRect(mouseX, mouseY);
@@ -358,11 +434,25 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (this._diagram!.selectedRect !== undefined && this._diagram!.selectedCircle !== undefined) {
                         this._drawingService.connectElements(this._diagram!.selectedCircle, this._diagram!.selectedRect, targetIsCircle);
                     }
-
-                    return;
+                    this.lastClickedElement = lastRectObject;
                 }
             }
         }
+    }
+
+    lastClickedElement: Place | Transition | undefined;
+
+    lineAlreadyExists(selectedCircle: Place, selectedRect: Transition, circleClicked: boolean): boolean {
+        // Durchlaufen aller Kanten im Diagramm
+        for (const line of this._diagram!.lines) {
+            // Überprüfen, ob die Kante die ausgewählten Elemente bereits verbindet
+            if (line.isAlreadyConnected(selectedCircle, selectedRect, circleClicked)) {
+                // Eine Kante zwischen dem ausgewählten Kreis und der ausgewählten Transition wurde gefunden
+                return true;
+            }
+        }
+        // Keine Kante zwischen dem ausgewählten Kreis und der ausgewählten Transition gefunden
+        return false;
     }
 
     handleRightClick(event: MouseEvent) {

@@ -10,6 +10,7 @@ export class Transition extends Element {
     private _children: Array<Place>;
     private _parents: Array<Place>;
     private _label: string;
+    private _contextMenuOpen:boolean = false;
 
     constructor(id: string, x: number, y: number, label?: string) {
         super(id, x, y);
@@ -18,7 +19,7 @@ export class Transition extends Element {
         this._height = 40;
         this._children = [];
         this._parents = [];
-        this._label = label ?? id;
+        this._label = label ?? "";
     }
 
     get isActive(): boolean {
@@ -86,6 +87,80 @@ export class Transition extends Element {
         super.svgElement?.setAttribute('transform', `translate(${newPosition.x - this.width / 2}, ${newPosition.y - this.height / 2})`);
     }
 
+    isSilent(): boolean {
+        return !this._label || this.label.trim().length === 0;
+    }
+
+    changeLabelAndSilentStatus(label: string): void {
+        if(this.isSilent()) {
+            this.label = label;
+            const labelText = super.createSVG('text');
+            labelText.setAttribute('text-anchor', 'middle');
+            labelText.setAttribute('alignment-baseline', 'central');
+            labelText.setAttribute('dy', `20`);
+            labelText.setAttribute('dx', `${this.width / 2}`);
+            labelText.textContent = label;
+            this.svgElement?.appendChild(labelText);
+            this.svgElement?.children[0].setAttribute('fill', 'white');
+        } else {
+            const labelText = this.svgElement!.querySelector('text:last-child');
+            labelText!.textContent = label;
+            this.label = label;
+
+            // Überprüfe die Länge des Labels und passe die Farbe an
+            if (label.trim().length === 0) {
+                this.label = "";
+                this.svgElement?.children[0].setAttribute('fill', 'black');
+            }
+        }
+    }
+
+    private createContextmenu(x:number, y:number): HTMLElement {
+        const div = document.createElement('div');
+        div.innerHTML =`
+            <div style="position: fixed; z-index: 100; background-color: white; padding: 5px; cursor:pointer; left: ${x + 20}px; top: ${y + 5 }px; box-shadow: 1px 1px 22px -6px black" onMouseOver="this.style.background='gray'" onMouseOut="this.style.background='white'">
+                <div class="context-menu-item" id="delete">Change label</div>
+            </div>
+            `
+        document.body.appendChild(div);
+        return div;
+    }
+
+    deactivateContextMenu() {
+        this.svgElement!.removeEventListener('contextmenu', this._contextMenuHandler);
+    }
+
+    activateContextMenu() {
+        this.svgElement!.addEventListener('contextmenu', this._contextMenuHandler);
+    }
+
+    private _contextMenuHandler = (event: MouseEvent) => {
+        if (this._contextMenuOpen) {
+            return;
+        }
+
+        this._contextMenuOpen = true;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const div = this.createContextmenu(event.clientX, event.clientY);
+
+        window.addEventListener('click', (event) => {
+            event.stopPropagation();
+            div.remove();
+            this._contextMenuOpen = false;
+        });
+
+        div.addEventListener('click', () => {
+            div.remove();
+            const newLabel = prompt("Change the label: ", this.label);
+            if (newLabel !== null) {
+                this.changeLabelAndSilentStatus(newLabel);
+            }
+            this._contextMenuOpen = false;
+        });
+    };
+
     override createSVG(){
         if (this.svgElement) {
             return this.svgElement;
@@ -99,26 +174,37 @@ export class Transition extends Element {
         rect.setAttribute('id', this.id.toString());
         rect.setAttribute('width', this.width.toString());
         rect.setAttribute('height', this.height.toString());
-        rect.setAttribute('fill', 'black');
+        if(this.isSilent()) {
+            rect.setAttribute('fill', 'black');
+        } else {
+            rect.setAttribute('fill', 'white');
+        }
         rect.setAttribute('stroke', 'black');
         rect.setAttribute('stroke-width', '2');
         group.appendChild(rect);
 
+        //ID-Text unten drunter
+        const idText = super.createSVG('text');
+        idText.setAttribute('text-anchor', 'middle');
+        idText.setAttribute('alignment-baseline', 'central');
+        idText.setAttribute('dy', `${this.height + 10}`);
+        idText.setAttribute('dx', `${this.width / 2}`);
+        idText.textContent = this.id;
+        group.appendChild(idText);
 
-        //Text
-        const text = super.createSVG('text');
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('alignment-baseline', 'central');
-        text.setAttribute('dy', `${this.height + 25}`);
-        text.setAttribute('dx', `${this.width / 2}`);
-        if(!this._label || this.label.trim().length === 0) {
-            this.label = this.id;
-            text.textContent = this.id;
-        } else {
-            text.textContent = this._label.toString();
+        // Label, wenn vorhanden in die Mitte
+        if(!this.isSilent()) {
+            const labelText = super.createSVG('text');
+            labelText.setAttribute('text-anchor', 'middle');
+            labelText.setAttribute('alignment-baseline', 'central');
+            labelText.setAttribute('dy', `20`);
+            labelText.setAttribute('dx', `${this.width / 2}`);
+            labelText.setAttribute('id', `${this.label}`);
+            labelText.textContent = this.label;
+            group.appendChild(labelText);
         }
-        group.appendChild(text);
 
+        group.addEventListener('contextmenu', this._contextMenuHandler);
 
         super.registerSvg(group);
         return group;
