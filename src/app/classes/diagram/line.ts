@@ -110,8 +110,7 @@ export class Line {
 
     set coords(coords: Coords[]) {
         this.updateIntermediatePoints(coords.map(c => {return new IntermediatePoint(c.x, c.y, false)}));
-        this.addVirtualPoints();
-
+       
     }
 
 
@@ -128,10 +127,10 @@ export class Line {
     }
 
     public calcMidCoords(): Coords {
-        let midCoords: Coords = {x: -50000, y: -50000}; //Placeholder to define Coords variable
-
-        if (this.coords) {
-            //Calc mid coord of the polyline (Sum the distances between each pair of consecutive points in the polyline)
+        let midCoords: Coords = {x: 0, y: 0}; // Initialize with default values
+    
+        if (this.coords && this.coords.length > 0) {
+            // Calculate the total length of the polyline
             let totalLength = 0;
             let lastX = this._source.x;
             let lastY = this._source.y;
@@ -142,34 +141,40 @@ export class Line {
                 lastY = coord.y;
             });
             totalLength += Math.hypot(this._target.x - lastX, this._target.y - lastY);
-
-            //Find the midpoint (Traverse the polyline until the accumulated length is half of the total length)
+    
+            // Find the midpoint
             let accumulatedLength = 0;
             lastX = this._source.x;
             lastY = this._source.y;
-
+    
             for (let i = 0; i < this.coords.length; i++) {
                 const coord = this.coords[i];
                 const segmentLength = Math.hypot(coord.x - lastX, coord.y - lastY);
                 accumulatedLength += segmentLength;
-                if (accumulatedLength  >= totalLength / 2) {
-                    const ratio = (accumulatedLength - (totalLength / 2)) / segmentLength;
+    
+                if (accumulatedLength >= totalLength / 2) {
+                    const ratio = (accumulatedLength - totalLength / 2) / segmentLength;
                     midCoords.x = coord.x - ratio * (coord.x - lastX);
                     midCoords.y = coord.y - ratio * (coord.y - lastY);
                     return midCoords;
                 }
+    
                 lastX = coord.x;
                 lastY = coord.y;
             }
+    
             // If the midpoint wasn't found in the loop, it's at the last segment
-            const ratio = ((totalLength/2) - accumulatedLength) / Math.hypot(this._target.x - lastX, this._target.y - lastY);
+            // This case might actually be unnecessary because the loop should always find the midpoint.
+            // However, keeping this as a fallback.
+            const ratio = (totalLength / 2 - accumulatedLength) / Math.hypot(this._target.x - lastX, this._target.y - lastY);
             midCoords.x = lastX + ratio * (this._target.x - lastX);
             midCoords.y = lastY + ratio * (this._target.y - lastY);
+        } else {
+            // If there are no intermediate points, just calculate the midpoint between source and target
+            midCoords.x = (this._source.x + this._target.x) / 2;
+            midCoords.y = (this._source.y + this._target.y) / 2;
         }
-
-        midCoords.x = (this._source.x + this._target.x) / 2;
-        midCoords.y = (this._source.y + this._target.y) / 2;
-
+    
         return midCoords;
     }
 
@@ -401,6 +406,9 @@ export class Line {
         let last_coord:{x:number, y:number} = {x: this._source.x, y: this._source.y};
 
             if(this.intermediatePoints.length > 0){
+                this.intermediatePoints.forEach((intermediatePoint) => {
+                    if(intermediatePoint.isVirtual) intermediatePoint.remove();
+                });
                 this.updateIntermediatePoints(this.intermediatePoints.filter(i => !i.isVirtual));
 
                 this.intermediatePoints.forEach((intermediatePoint) => {
@@ -446,13 +454,22 @@ export class Line {
 
 
     removeCoords(): void {
+        this.cleanupAllCircleSvgElements();
         this.updateIntermediatePoints([]) ;
         this._svgElement?.querySelector('polyline')?.setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${this._targetPosition?.x},${this._targetPosition?.y}`);
+        this.updateLineToken();
     }
 
     removeCoord(intermediatePoint: IntermediatePoint){
         this.updateIntermediatePoints(this.intermediatePoints.filter(c => c !== intermediatePoint));
         intermediatePoint.remove();
+    }
+
+    private cleanupAllCircleSvgElements() {
+        this.svgElement?.querySelectorAll('.intermediatePoint').forEach((circle) => {
+            circle.remove();
+        });
+
     }
 
     handleMouseMove(event: MouseEvent) {
@@ -470,6 +487,7 @@ export class Line {
     }
 
     private updateLineToken(){
+        
          // Positionen der Kantengewichte werden mit aktualisiert
          const midCoords = this.calcMidCoords();
          const midCircle = this.svgElement?.querySelectorAll('circle')[0]
@@ -481,6 +499,8 @@ export class Line {
     }
 
     private updateSource(updatedPosition: Coords): void {
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
+        const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
 
         if (this._svgElement) {
 
@@ -491,17 +511,13 @@ export class Line {
             }
             this._sourcePosition = {x: updatedPosition.x, y: updatedPosition.y};
 
-            // Markierungen für die Gewichte an die Kante hängen
-            let tokenCircleCx = this.calcMidCoords().x.toString();
-            let tokenCircleCy = this.calcMidCoords().y.toString();
+            // Alle svg circle elemente löschen
+            this.cleanupAllCircleSvgElements();
 
-            if (!this.svgElement) {
-                return;
-            }
-            this.svgElement!.querySelector('circle')!.setAttribute('cx', tokenCircleCx);
-            this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
-            this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
-            this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
+            this.updateLineToken();
+
+            if(!sugiyamaButton.classList.contains('selected') && !springEmbedderButton.classList.contains('selected')) this.addVirtualPoints();
+
         }
 
 
@@ -509,25 +525,25 @@ export class Line {
 
     private updateTarget(updatedPosition: Coords): void {
 
+        const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
+        const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
+
         if (this._svgElement) {
             if (this._svgElement.childNodes[0] instanceof SVGElement) {
                 this._svgElement.childNodes[0].setAttribute('points', `${this._sourcePosition?.x},${this._sourcePosition?.y} ${this.getCoordsString()}${updatedPosition.x},${updatedPosition.y}`);
             }
             this._targetPosition = {x: updatedPosition.x, y: updatedPosition.y};
-        }
 
-        // Markierungen für die Gewichte an die Kante hängen
-        let tokenCircleCx = this.calcMidCoords().x.toString();
-        let tokenCircleCy = this.calcMidCoords().y.toString();
+        // Alle svg circle elemente löschen
+        this.cleanupAllCircleSvgElements();
 
-        if (!this.svgElement) {
-            return;
-        }
-        this.svgElement!.querySelector('circle')!.setAttribute('cx', tokenCircleCx);
-        this.svgElement!.querySelector('circle')!.setAttribute('cy', tokenCircleCy);
-        this.svgElement!.querySelector('text')!.setAttribute('x', tokenCircleCx);
-        this.svgElement!.querySelector('text')!.setAttribute('y', tokenCircleCy);
+        this.updateLineToken();
+      
+
+        if(!sugiyamaButton.classList.contains('selected') && !springEmbedderButton.classList.contains('selected')) this.addVirtualPoints();
+
     }
+}
 
     public isAlreadyConnected(circle: Place, rect: Transition, circleClicked: boolean): boolean {
         // Überprüfen, ob die Kante die angegebenen Elemente schon verbindet

@@ -137,7 +137,7 @@
 }
 
 .multitasking-button {
-    colot: black;
+    color: black;
     color: violet;
     color: gray;
 }
@@ -149,6 +149,16 @@
   border-radius: 50px;
   padding: 0 1.5rem;
 
+}
+
+.drawing-inactive{
+  
+  color: rgb(200, 200, 200) !important;
+}
+
+.drawing-inactive:hover{
+  background-color: rgb(240, 240, 240) !important;
+  color: rgb(240, 240, 240) !important;
 }
 
 mat-icon{

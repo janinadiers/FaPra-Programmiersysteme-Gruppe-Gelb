@@ -159,7 +159,7 @@ export class SugiyamaService {
     removeAllIntermediateCoords() {
         this.diagram.lines.forEach((line) => {
             if (line.coords)
-                line.coords = [];
+                line.removeCoords();
         });
     }
 

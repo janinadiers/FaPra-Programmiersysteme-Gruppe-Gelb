@@ -34,7 +34,6 @@ export class FreiAlgorithmusService {
             if(!node.svgElement) return;
 
             node.svgElement.addEventListener('mousedown', (event) => {
-                Diagram.algorithmIsActive = false;
                 this._selectedNode = node;
                 event.stopPropagation();
                 this.processMouseDown(node.svgElement);
@@ -43,7 +42,7 @@ export class FreiAlgorithmusService {
         });
 
         window.addEventListener('mouseup', (event) => {
-
+            Diagram.drawingIsActive = false; 
             event.stopPropagation();
             if(!this._selectedNode) return;
             this.processMouseUp(this._selectedNode.svgElement);
@@ -106,7 +105,7 @@ export class FreiAlgorithmusService {
         }
 
         if (this._isDragging) {
-            Diagram.algorithmIsActive = true;
+            Diagram.drawingIsActive = true;
             const svgElement = document.getElementById('canvas');
             const svgContainer = svgElement?.getBoundingClientRect();
             // Berechnung der Maus Koordinanten relativ zum SVG Element

@@ -77,15 +77,15 @@ export class DrawingService {
     }
 
     onCircleSelect(circle: Place) {
-
-        if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
-            return;
-        }
+        
         this._diagram!.selectedCircle = circle;
 
-        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
+        if(!this.drawingActive || this.activeButtonService.isBoltButtonActive || Diagram.algorithmIsActive || Diagram.drawingIsActive){
             return;
         }
+        //this._diagram!.selectedCircle = circle;
+
+       
 
         this.circleActive = !this.circleActive;
 
@@ -246,7 +246,7 @@ export class DrawingService {
                 }
 
                 // Erstellen des SVG
-                lineObject.createSVG();
+                
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
                     if (svgElement.firstChild) {
@@ -261,13 +261,13 @@ export class DrawingService {
             }
             // Linie von Kreis zu Rechteck zeichnen
             else {
+                
                 // Erstellen des Objekts
                 let lineObject = this._diagram?.createLineObject(circleObject!, rectObject!);
                 if (!lineObject) {
                     throw new Error("LineObject is undefined")
                 }
-                lineObject.createSVG();
-
+                
                 // Erstellen des SVG
                 let svgLine = lineObject.svgElement;
                 if (svgElement) {
@@ -289,6 +289,10 @@ export class DrawingService {
     }
 
     onLineSelect(line: Line) {
+
+        if (Diagram.drawingIsActive || Diagram.algorithmIsActive) {
+            return;
+        }
 
         this._diagram!.selectedLine = line;
 
@@ -333,6 +337,7 @@ export class DrawingService {
 
     // Farbänderungen in der Toolbar
     changeTokenButtonColor(color: string) {
+        
         if(!this.drawingActive){
             return;
         }
