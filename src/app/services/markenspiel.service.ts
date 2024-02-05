@@ -527,10 +527,10 @@ export class MarkenspielService {
             let rect: Transition = transitions!.find(rect => elem.id == rect.id)!;
 
             if(outGoingLine.tokens > this.alreadyUsedParents.get(parent.id) && !this.currentChosenTransitions.includes(rect)){
-                if(element.isSilent()) {
-                    this.setTransitionColor(element, 'black');
+                if(rect.isSilent()) {
+                    this.setTransitionColor(rect, 'black');
                 } else {
-                    this.setTransitionColor(element, 'white');
+                    this.setTransitionColor(rect, 'white');
                 }
             }
         });
@@ -549,10 +549,10 @@ export class MarkenspielService {
                 let rect: Transition = transitions!.find(rect => elem.id == rect.id)!;
 
                 if(!this.currentChosenTransitions.includes(rect) && outGoingLine.tokens > 1){
-                    if(element.isSilent()) {
-                        this.setTransitionColor(element, 'black');
+                    if(rect.isSilent()) {
+                        this.setTransitionColor(rect, 'black');
                     } else {
-                        this.setTransitionColor(element, 'white');
+                        this.setTransitionColor(rect, 'white');
                     }
                 }
             }

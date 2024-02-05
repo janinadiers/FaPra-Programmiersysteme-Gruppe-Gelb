@@ -92,6 +92,14 @@ export class Place extends Element {
 
         group.appendChild(marker);
 
+        //ID-Text unten drunter
+        const text = super.createSVG('text');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('alignment-baseline', 'central');
+        text.setAttribute('dy', `${(this._radius ) + 25}`);
+        text.textContent = this.id;
+        group.appendChild(text);
+
         super.registerSvg(group);
         return group;
     }
