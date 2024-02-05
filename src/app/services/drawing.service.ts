@@ -212,6 +212,11 @@ export class DrawingService {
         return;
     }
 
+    public getSimulationStatus(){
+
+        return this.simulationStatus;
+    }
+
     // Linien zeichnen bzw. Kanten erstellen
     connectElements(circle: Place, rect: Transition, targetIsCircle: boolean) {
         // Check, ob Blitz-Tool oder Linie angeklickt ist

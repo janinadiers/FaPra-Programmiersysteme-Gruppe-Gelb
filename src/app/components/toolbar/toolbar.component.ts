@@ -77,6 +77,7 @@ export class ToolbarComponent {
     simulationActive: boolean = false;
     reachabilityActiveColor: boolean = false;
     simulationStatus: number = 0;
+    initialState: Map<string, number> = new Map<string, number>();
     pdfSrc: string = 'assets/manual.pdf';
     stepsActive: boolean = false;
     multitasking: boolean = false;
@@ -354,6 +355,11 @@ export class ToolbarComponent {
     }
 
     toggleSimulation() {
+
+        if(this._drawingService.getSimulationStatus() === 0){
+
+            this.getInitialState(); // Initale Markierung speichern
+        }
         this.stepsActive = false;
         this.simulationActive = true;
         this._drawingService.drawingActive = false;
@@ -422,7 +428,6 @@ export class ToolbarComponent {
         this._markenspielService.multitaskingTransitions(this.multitasking);
         this._markenspielService.editStep();
     }
-
 
     showRandomMaximumStep() {
         this.stepsActive = true;
@@ -507,6 +512,29 @@ export class ToolbarComponent {
         this._diagram?.transitions.forEach((transition) => {
             this._markenspielService.setTransitionColor(transition, 'black');
             transition.isActive = false;
+        });
+        this.setInitialState(); // Initale Markierung setzen
+    }
+
+    getInitialState(){
+    
+        this._diagram?.places.forEach(place => {
+            this.initialState.set(place.id, place.amountToken);
+            });
+    }
+
+    setInitialState(){
+
+        this._diagram?.places.forEach(place => {
+           let token = this.initialState.get(place.id);
+           place.amountToken = token!;
+           if(place.amountToken === 0){
+            place.svgElement!.children[1].textContent = null;
+           }
+           else{
+            place.svgElement!.children[1].textContent = 
+            place.amountToken.toString();
+           }
         });
     }
 }
