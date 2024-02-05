@@ -56,7 +56,7 @@ export class ParserService {
         for (const id of placeIds) {
             const pos = layout[id] as Coords | undefined;
             if (pos !== undefined) {
-                const place = new Place(id, pos.x, pos.y, marking[id], labels[id])
+                const place = new Place(id, pos.x, pos.y, marking[id])
                 place.createSVG()
                 place.svgElement?.addEventListener(('click'), () => {
                     this._drawingService.onCircleSelect(place);
