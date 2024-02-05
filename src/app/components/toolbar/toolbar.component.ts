@@ -107,7 +107,7 @@ export class ToolbarComponent {
         this.circleActiveColor = false;
         this.arrowActiveColor = false;
         this.boltActiveColor = false;
-        this.rectActiveColor = !this.rectActiveColor;
+        if(!Diagram.algorithmIsActive)  this.rectActiveColor = !this.rectActiveColor;
         this._activeButtonService.RectangleButtonActive();
         this._drawingService.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
@@ -121,7 +121,7 @@ export class ToolbarComponent {
         this.rectActiveColor = false;
         this.arrowActiveColor = false;
         this.boltActiveColor = false;
-        this.circleActiveColor = !this.circleActiveColor;
+        if(!Diagram.algorithmIsActive) this.circleActiveColor = !this.circleActiveColor;
         this._activeButtonService.circleButtonActive();
         this._drawingService.deselectPlacesAndLines();
         this.deselectAddAndRemoveTokenButtons();
@@ -134,7 +134,7 @@ export class ToolbarComponent {
         this.circleActiveColor = false;
         this.rectActiveColor = false;
         this.boltActiveColor = false;
-        this.arrowActiveColor = !this.arrowActiveColor;
+        if(!Diagram.algorithmIsActive)  this.arrowActiveColor = !this.arrowActiveColor;
         // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
         this._diagram?.resetSelectedElements();
         this._activeButtonService.arrowButtonActive();
@@ -149,7 +149,7 @@ export class ToolbarComponent {
         this.circleActiveColor = false;
         this.rectActiveColor = false;
         this.arrowActiveColor = false;
-        this.boltActiveColor = !this.boltActiveColor;
+        if(!Diagram.algorithmIsActive)  this.boltActiveColor = !this.boltActiveColor;
         // Bei Betätigung des Buttons werden selektierte SVG Elemente zurückgesetzt
         this._diagram?.resetSelectedElements();
         this._diagram!.lightningCount = 0;
@@ -180,10 +180,14 @@ export class ToolbarComponent {
         const springEmbedderButton = document.querySelector('.spring-embedder') as HTMLElement;
         const sugiyamaButton = document.querySelector('.sugiyama') as HTMLElement;
 
-
-        this._activeButtonService.deactivateAllButtons();
+       this._activeButtonService.deactivateAllButtons();
         this.deselectActiveColors();
+
         if(algorithm === 'spring-embedder'){
+            Diagram.algorithmIsActive = true;
+            
+           this.deactivateDrawingArea();
+
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 springEmbedderButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
@@ -195,6 +199,10 @@ export class ToolbarComponent {
         }
 
         else if(algorithm === 'sugiyama'){
+            Diagram.algorithmIsActive = true;
+            
+            this.deactivateDrawingArea();
+
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 sugiyamaButton.classList.add('selected');
                 freeButton.classList?.remove('selected');
@@ -206,6 +214,10 @@ export class ToolbarComponent {
 
         }
         else{
+            Diagram.algorithmIsActive = false;
+            this.reActivateDrawingArea();
+            this.deselectAddAndRemoveTokenButtons()
+            
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 freeButton.classList.add('selected');
                 springEmbedderButton.classList?.remove('selected');
@@ -213,6 +225,9 @@ export class ToolbarComponent {
             }
             this._springEmbedderService.teardown();
             this._freiAlgorithmusService.start()
+            this._diagram?.lines.forEach((line) => {
+                line.addVirtualPoints();
+            });
         }
 
     }
@@ -222,6 +237,8 @@ export class ToolbarComponent {
         this.circleActiveColor = false;
         this.arrowActiveColor = false;
         this.boltActiveColor = false;
+        this._drawingService.deselectPlacesAndLines();
+
     }
 
     addToken() {
@@ -243,6 +260,7 @@ export class ToolbarComponent {
 
     onButtonClick(buttonId: string) {
         if (buttonId === "reachabilityGraph"){
+            if(Diagram.algorithmIsActive) return
             if(this.checkValidity()){
             this.toggleReachabilityButton();
             this._activeButtonService.reachabilityButtonActive();
@@ -345,9 +363,13 @@ export class ToolbarComponent {
     }
 
     deselectAddAndRemoveTokenButtons(){
+        
+        if(Diagram.algorithmIsActive) return
+        
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
-        removeTokenButton!.style.color = 'black';
+        if(!addTokenButton || !removeTokenButton) return
+        removeTokenButton.style.color = 'black';
         addTokenButton!.style.color = 'black';
     }
 
@@ -549,5 +571,27 @@ export class ToolbarComponent {
             place.amountToken.toString();
            }
         });
+    }
+
+    deactivateDrawingArea() {
+        const drawingArea = document.querySelector('.drawing') as HTMLElement;
+        drawingArea?.classList.add('drawing-inactive');
+        if(drawingArea && drawingArea.children){
+            Array.from(drawingArea.children).forEach((child) => {
+                child.classList.add('drawing-inactive');
+                child.querySelector('mat-icon')?.classList.add('drawing-inactive');
+            });
+        }
+    }
+
+    reActivateDrawingArea() {
+        const drawingArea = document.querySelector('.drawing') as HTMLElement;
+        drawingArea?.classList.remove('drawing-inactive');
+        if(drawingArea && drawingArea.children){
+            Array.from(drawingArea.children).forEach((child) => {
+                child.classList.remove('drawing-inactive');
+                child.querySelector('mat-icon')?.classList.remove('drawing-inactive');
+            });
+        }
     }
 }

@@ -62,9 +62,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
         this._diagram!.canvasElement = document.getElementById('canvas') as unknown as SVGElement;
         this.subscriptionOfToolbar = this.activeButtonService.getButtonClickObservable().subscribe((buttonId: string) => {
             if (buttonId === "clear" && this.activeButtonService.isReachButtonActive == false) {
+                if(Diagram.algorithmIsActive) return
                 let clearElements: boolean = true;
                 this.clearDrawingArea(clearElements);
             } else if (buttonId === "deleteLast" && this.activeButtonService.isReachButtonActive == false) {
+                if(Diagram.algorithmIsActive) return
                 this.deleteLastElement();
             } else if (buttonId === "reachabilityGraph") {
 
@@ -207,7 +209,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     private clearDrawingArea(clearElements?: boolean) {
 
-
+        if(Diagram.algorithmIsActive) return
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -275,10 +277,12 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Check ob linker Mouse Button geklickt und Button aktiviert
         if (event.button === 0 && this.activeButtonService.isCircleButtonActive) {
+            if(Diagram.algorithmIsActive) return
             this._drawingService.changeTokenButtonColor('black');
             let svgCircle = this._drawingService.drawCircle(mouseX, mouseY)
             svgElement.appendChild(svgCircle.svgElement!);
         } else if (event.button === 0 && this.activeButtonService.isRectangleButtonActive) {
+            if(Diagram.algorithmIsActive) return
             this._drawingService.changeTokenButtonColor('black');
             let svgRect = this._drawingService.drawRect(mouseX, mouseY);
             svgElement.appendChild(svgRect.svgElement!);
@@ -287,6 +291,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Kante von Transition zu Stelle zeichnen
         else if (event.button === 0 && this.activeButtonService.isArrowButtonActive) {
+            
             if (this._diagram!.selectedRect) {
                 this._diagram!.lightningCount = 0;
                 if (this._diagram!.selectedCircle) {
@@ -309,6 +314,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Blitz-Tool
         else if (event.button === 0 && this.activeButtonService.isBoltButtonActive) {
+            
+            if(Diagram.algorithmIsActive) return
             this._drawingService.changeTokenButtonColor('black');
 
             // Überprüfen, ob ein Place oder eine Transition angeklickt wurde
@@ -464,7 +471,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     generateReachabilityGraph() {
-
+        if(Diagram.algorithmIsActive) return
         const svgElement = document.getElementById('canvas');
 
         if (this.activeButtonService.isReachButtonActive) {
