@@ -20,7 +20,8 @@
 
         <button mat-icon-button *ngIf="simulationActive"
                 class="create tooltip"
-                (click)="showRandomMaximumStep()">
+                (click)="showRandomMaximumStep()"
+                [disabled] = "multitasking">
             <div class="merge-type-button">
                 <span class="tooltiptext">Show Random Step</span>
                 <mat-icon style="color:black">merge_type</mat-icon>
@@ -40,8 +41,9 @@
         <div *ngIf="!reachabilityActiveColor" class="vertical-line"></div>
         <button mat-icon-button *ngIf="simulationActive && !randomStep"
                 class="multitasking tooltip"
-                (click)="activateMultitaskingTransitions()">
-            <span class="tooltiptext">Multitasking</span>
+                (click)="activateMultitaskingTransitions()"
+                [disabled] = "!stepsActive">
+            <span class="tooltiptext">Auto-Cuncurrency</span>
             <mat-icon>done_all</mat-icon>
         </button>
 
@@ -111,6 +113,7 @@
                 <mat-icon>remove_circle</mat-icon>
             </button>
 
+            <div class="vertical-line" *ngIf="simulationActive"></div>
             <label *ngIf="simulationActive">{{markenspielText()}}</label>
 
             <div class="vertical-line"></div>
@@ -134,21 +137,27 @@
             </div>
 
             <div *ngIf="!reachabilityActiveColor">
-                <button class="hover-class tooltip free" mat-icon-button  (click)="onAlgorithmSelect('free')">
+                <button class="hover-class tooltip free" mat-icon-button
+                        (click)="onAlgorithmSelect('free')"
+                        *ngIf="!simulationActive ">
                     <span class="tooltiptext" (click)="onAlgorithmSelect('free')">Free</span>
                     <mat-icon>pan_tool</mat-icon>
                 </button>
-                <button class="hover-class tooltip spring-embedder" mat-icon-button (click)="onAlgorithmSelect('spring-embedder')" >
+                <button class="hover-class tooltip spring-embedder" mat-icon-button
+                        (click)="onAlgorithmSelect('spring-embedder')"
+                        *ngIf="!simulationActive">
                     <span class="tooltiptext">Spring-Embedder</span>
                     <mat-icon>account_tree</mat-icon>
                 </button>
-                <button class="hover-class tooltip sugiyama" mat-icon-button (click)="onAlgorithmSelect('sugiyama')" >
+                <button class="hover-class tooltip sugiyama" mat-icon-button
+                        (click)="onAlgorithmSelect('sugiyama')"
+                        *ngIf="!simulationActive">
                     <span class="tooltiptext">Sugiyama</span>
                     <mat-icon>schema</mat-icon>
                 </button>
             </div>
 
-        <div *ngIf="!reachabilityActiveColor" class="vertical-line"></div>
+        <div *ngIf="!reachabilityActiveColor || !simulationActive" class="vertical-line"></div>
 
             <button *ngIf="!reachabilityActiveColor" class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
@@ -170,7 +179,7 @@
 
             <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
 
-            <div class="vertical-line"></div>
+            <div class="vertical-line" ></div>
 
             <div class="zoom-button-wrapper">
                 <button mat-icon-button class="hover-class"
@@ -189,7 +198,4 @@
                         <mat-icon>help</mat-icon>
                 </button>
             </div>
-
-        
-
 </mat-toolbar>
