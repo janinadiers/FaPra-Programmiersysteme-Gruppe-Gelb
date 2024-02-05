@@ -7,7 +7,7 @@ import {Line} from "../classes/diagram/line";
 import {ActivebuttonService} from "./activebutton.service";
 import { FreiAlgorithmusService } from './frei-algorithmus.service';
 import {MarkenspielService} from "./markenspiel.service";
-import {LabelValidatorService} from "./label-validator.service";
+import {transition} from "@angular/animations";
 
 @Injectable({
     providedIn: 'root'
@@ -25,8 +25,7 @@ export class DrawingService {
     constructor(private displayService: DisplayService,
                 private activeButtonService: ActivebuttonService,
                 private _freiAlgorithmusService: FreiAlgorithmusService,
-                private _markenspielService: MarkenspielService,
-                private _labelValidator: LabelValidatorService)
+                private _markenspielService: MarkenspielService)
     {
 
         this.displayService.diagram$.subscribe(diagram => {
@@ -65,7 +64,6 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         circleObject.createSVG();
-        this._labelValidator.createLabelEventListener(circleObject);
 
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
@@ -85,6 +83,7 @@ export class DrawingService {
         if(!this.drawingActive || this.activeButtonService.isBoltButtonActive || Diagram.algorithmIsActive || Diagram.drawingIsActive){
             return;
         }
+        //this._diagram!.selectedCircle = circle;
 
        
 
@@ -97,7 +96,6 @@ export class DrawingService {
 
             this.deselectPlacesAndLines();
             circle.svgElement!.children[0].setAttribute('stroke', 'red');
-            circle.svgElement!.children[2].setAttribute('stroke', 'red');
             circle.svgElement!.children[0].setAttribute('stroke-width', '2');
             circle.svgElement!.children[1].setAttribute('stroke', 'red');
         } else {
@@ -107,7 +105,6 @@ export class DrawingService {
 
             this.deselectPlacesAndLines();
             circle.svgElement!.children[0].setAttribute('stroke', 'black');
-            circle.svgElement!.children[2].setAttribute('stroke', 'black');
             circle.svgElement!.children[0].setAttribute('stroke-width', '2');
             circle.svgElement!.children[1].setAttribute('stroke', 'black');
         }
@@ -129,9 +126,6 @@ export class DrawingService {
 
         // Erstellen des SVG-Elements
         rectObject.createSVG();
-
-        // Erstellung eines Label-Validators inklusive Event-Listener
-        this._labelValidator.createLabelEventListener(rectObject);
 
         this._freiAlgorithmusService.start();
         // Objekt mit SVG Element verknüpfen
@@ -156,7 +150,11 @@ export class DrawingService {
 
         if(this.simulationStatus == 0) {
             this._diagram?.transitions.forEach((transition) => {
-                this._markenspielService.setTransitionColor(transition, 'black');
+                if(transition.isSilent()) {
+                    this._markenspielService.setTransitionColor(transition, 'black');
+                } else {
+                    this._markenspielService.setTransitionColor(transition, 'white');
+                }
                 transition.isActive = false;
             });
         }
@@ -165,7 +163,11 @@ export class DrawingService {
             const transitions = this._markenspielService.fireTransition(rectObject!);
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
-                this._markenspielService.setTransitionColor(rectObject!, 'black');
+                if(rectObject.isSilent()) {
+                    this._markenspielService.setTransitionColor(rectObject, 'black');
+                } else {
+                    this._markenspielService.setTransitionColor(rectObject, 'white');
+                }
             }
 
             transitions.forEach((transition => {
@@ -174,11 +176,15 @@ export class DrawingService {
             }));
         }
 
-        if(this.simulationStatus == 2 && !this._markenspielService.processChosing){
+        if(this.simulationStatus == 2 && !this._markenspielService.processChosing && !this._markenspielService.randomStep){
             const transitions = this._markenspielService.showAll();
             if(transitions.find(transition => transition.id === rectObject!.id) === undefined) {
                 rectObject!.isActive = false;
-                this._markenspielService.setTransitionColor(rectObject!, 'black');
+                if(rectObject.isSilent()) {
+                    this._markenspielService.setTransitionColor(rectObject, 'black');
+                } else {
+                    this._markenspielService.setTransitionColor(rectObject, 'white');
+                }
             }
 
             transitions.forEach((transition => {
@@ -189,6 +195,7 @@ export class DrawingService {
     }
 
     onRectSelect(rect: Transition) {
+
         if(!this.drawingActive || this.activeButtonService.isBoltButtonActive){
             return;
         }
@@ -209,6 +216,11 @@ export class DrawingService {
         }
         this.simulationStatus = status;
         return;
+    }
+
+    public getSimulationStatus(){
+
+        return this.simulationStatus;
     }
 
     // Linien zeichnen bzw. Kanten erstellen
@@ -342,7 +354,6 @@ export class DrawingService {
             element.svgElement!.querySelector('text')!.setAttribute('stroke', 'black'); // Farbe des Tokens
             element.svgElement!.querySelector('circle')!.setAttribute('stroke', 'black'); // Farbe des Kreisrandes
             // element.svgElement?.children[0].setAttribute('stroke', 'black'); // Farbe des Kreisrandes
-            element.svgElement?.children[2].setAttribute('stroke', 'black'); // Farbe des Labels
         });
         this._diagram?.lines.forEach((element) => {
             element.svgElement!.querySelector('text')!.setAttribute('stroke', 'black');

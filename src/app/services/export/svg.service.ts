@@ -1,9 +1,10 @@
-import {Injectable} from '@angular/core';
+import { Injectable, ViewChild } from '@angular/core';
 import {Element} from '../../classes/diagram/element';
 import {Place} from "../../classes/diagram/place";
 import {Transition} from "../../classes/diagram/transition";
 import {Line} from "../../classes/diagram/line";
 import {DisplayService} from "../display.service";
+import { Diagram } from 'src/app/classes/diagram/diagram';
 
 @Injectable({
     providedIn: 'root'
@@ -34,8 +35,8 @@ export class SvgService {
         // Breite und Höhe basierend auf den maximalen Koordinaten und den Elementabmessungen festlegen
         const width = Math.max(1200, maxX + circleRadius)
         const height = Math.max(600, maxY + circleRadius);
-
-        let svgElement = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`;
+        
+        let svgElement = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${Diagram.viewBox.x} ${Diagram.viewBox.y} ${Diagram.viewBox.width} ${Diagram.viewBox.height}">`;
 
         this.getLines().forEach((line) => {
             if (line) {
@@ -45,20 +46,20 @@ export class SvgService {
 
         this.getPlaces().forEach((place) => {
             if (place) {
-                svgElement += place.createSVG().outerHTML;
+                svgElement += place.svgElement?.outerHTML;
             }
         });
 
         this.getTransitions().forEach((transition) => {
             if (transition) {
-                svgElement += transition.createSVG().outerHTML;
+                svgElement += transition.svgElement?.outerHTML;
             }
         });
 
 
         svgElement += `</svg>`;
         
-
+        
         return svgElement;
     }
 

@@ -11,7 +11,7 @@ export class Element  {
     private _lastMouseMove = 0;
     private _position: number;
 
-    constructor(id: string, x: number , y: number) {
+    constructor(id: string, x: number , y: number) {   
         this._id = id;
         this._x = x;
         this._y = y;
@@ -20,7 +20,7 @@ export class Element  {
     }
 
     updatePosition(newPosition: Coords) {
-        
+
         this._positionChange$.next(newPosition);
 
     }
