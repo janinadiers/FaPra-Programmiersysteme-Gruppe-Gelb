@@ -291,7 +291,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Kante von Transition zu Stelle zeichnen
         else if (event.button === 0 && this.activeButtonService.isArrowButtonActive) {
-            
+
             if (this._diagram!.selectedRect) {
                 this._diagram!.lightningCount = 0;
                 if (this._diagram!.selectedCircle) {
@@ -314,7 +314,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
         // Blitz-Tool
         else if (event.button === 0 && this.activeButtonService.isBoltButtonActive) {
-            
+
             if(Diagram.algorithmIsActive) return
             this._drawingService.changeTokenButtonColor('black');
 
@@ -327,6 +327,16 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
             if (clickedPlace) {
                 if(this.lastClickedElement === clickedPlace) {
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this._diagram!.lightningCount = 1;
+                    return;
+                }
+
+                if(this.lastClickedElement instanceof Place) {
+
+                    this._diagram!.selectedCircle = clickedPlace;
+                    this.lastClickedElement = clickedPlace;
+                    this._diagram!.lightningCount = 1;
                     return;
                 }
 
@@ -343,16 +353,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 }
 
                 if(clickedPlace === selectedCircle) {
-                    if (!this.lineAlreadyExists(clickedPlace, selectedTransition!, true)) {
-                        this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                    if(selectedTransition) {
+                        if (!this.lineAlreadyExists(clickedPlace, selectedTransition, true)) {
+                            this._drawingService.connectElements(clickedPlace, selectedTransition!, true);
+                        }
                     }
-                    this._diagram!.selectedCircle = clickedPlace;
-                    this.lastClickedElement = clickedPlace;
-                    this._diagram!.lightningCount = 1;
-                    return;
-                }
-
-                if(this.lastClickedElement instanceof Place) {
                     this._diagram!.selectedCircle = clickedPlace;
                     this.lastClickedElement = clickedPlace;
                     this._diagram!.lightningCount = 1;
@@ -369,6 +374,15 @@ export class DisplayComponent implements OnInit, OnDestroy {
                 return;
             } else if (clickedTransition) {
                 if(this.lastClickedElement === clickedTransition) {
+                    this._diagram!.selectedRect = clickedTransition;
+                    this._diagram!.lightningCount = 0;
+                    return;
+                }
+
+                if(this.lastClickedElement instanceof Transition) {
+                    this._diagram!.selectedRect = clickedTransition;
+                    this.lastClickedElement = clickedTransition;
+                    this._diagram!.lightningCount = 0;
                     return;
                 }
 
@@ -388,13 +402,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
                     if (!this.lineAlreadyExists(selectedCircle!, clickedTransition, false)) {
                         this._drawingService.connectElements(selectedCircle!, clickedTransition, false);
                     }
-                    this._diagram!.selectedRect = clickedTransition;
-                    this.lastClickedElement = clickedTransition;
-                    this._diagram!.lightningCount = 0;
-                    return;
-                }
-
-                if(this.lastClickedElement instanceof Transition) {
                     this._diagram!.selectedRect = clickedTransition;
                     this.lastClickedElement = clickedTransition;
                     this._diagram!.lightningCount = 0;
@@ -464,7 +471,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
     handleRightClick(event: MouseEvent) {
         event.preventDefault(); // Kontextmenü mit Rechtsklick verhindern
         if (this.activeButtonService.isBoltButtonActive) {
-
             this._diagram?.resetSelectedElements();
             this._diagram!.lightningCount = 0;
         }
