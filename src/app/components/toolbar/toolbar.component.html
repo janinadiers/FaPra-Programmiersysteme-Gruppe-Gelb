@@ -63,7 +63,7 @@
         </button>
 
 
-        <div class="drawing">
+        <div class="drawing" [class.inactive] ="reachabilityActiveColor">
              <button mat-icon-button *ngIf="!simulationActive"
                     class="hover-class tooltip"
                     [class.active]="circleActiveColor"
