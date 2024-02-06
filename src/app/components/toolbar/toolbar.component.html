@@ -58,41 +58,45 @@
                 class="hover-class tooltip"
                 [class.active]="reachabilityActiveColor"
                 (click)="onButtonClick('reachabilityGraph')">
-                <span class="tooltiptext">reachability graph</span>
+                <span class="tooltiptext">Reachability Graph</span>
             <mat-icon>share</mat-icon>
         </button>
 
 
         <div class="drawing">
              <button mat-icon-button *ngIf="!simulationActive"
-                    class="hover-class"
+                    class="hover-class tooltip"
                     [class.active]="circleActiveColor"
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleCircleButton()">
+                 <span class="tooltiptext">Draw Place</span>
                 <mat-icon>panorama_fish_eye</mat-icon>
             </button>
 
             <button mat-icon-button *ngIf="!simulationActive"
-                    class="hover-class"
+                    class="hover-class tooltip"
                     [class.active]="rectActiveColor"
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleRectangleButton()">
+                <span class="tooltiptext">Draw Transition</span>
                 <mat-icon>crop_portrait</mat-icon>
             </button>
 
             <button mat-icon-button *ngIf="!simulationActive"
-                    class="hover-class"
+                    class="hover-class tooltip"
                     [class.active]="arrowActiveColor"
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleArrowButton()">
+                <span class="tooltiptext">Draw Line</span>
                 <mat-icon>north_east</mat-icon>
             </button>
 
             <button mat-icon-button *ngIf="!simulationActive"
-                    class="hover-class"
+                    class="hover-class tooltip"
                     [class.active]="boltActiveColor"
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="toggleBoltButton()">
+                <span class="tooltiptext">Fast Petri-Net</span>
                 <mat-icon>bolt</mat-icon>
             </button>
 
@@ -100,7 +104,7 @@
                 class="add-token tooltip"
                 [class.inactive] ="reachabilityActiveColor"
                 (click)="addToken()">
-                <span class="tooltiptext">add tokens</span>
+                <span class="tooltiptext">Add Token</span>
                 <mat-icon>add_circle</mat-icon>
              </button>
 
@@ -109,7 +113,7 @@
                     class="remove-token tooltip"
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="removeToken()">
-                <span class="tooltiptext">remove tokens</span>
+                <span class="tooltiptext">Remove Token</span>
                 <mat-icon>remove_circle</mat-icon>
             </button>
 
@@ -122,7 +126,7 @@
                     class="hover-class tooltip"
                     [class.inactive] ="reachabilityActiveColor"
                     (click)="onButtonClick('deleteLast')">
-                    <span class="tooltiptext">delete last</span>
+                    <span class="tooltiptext">Delete Last Element</span>
                 <mat-icon>undo</mat-icon>
                 </button>
 
@@ -130,7 +134,7 @@
                         class="hover-class tooltip"
                         [class.inactive] ="reachabilityActiveColor"
                         (click)="onButtonClick('clear')">
-                    <span class="tooltiptext">clear all</span>
+                    <span class="tooltiptext">Clear All</span>
                     <mat-icon>delete</mat-icon>
                 </button>
 
@@ -182,12 +186,14 @@
             <div class="vertical-line" ></div>
 
             <div class="zoom-button-wrapper">
-                <button mat-icon-button class="hover-class"
+                <button mat-icon-button class="hover-class tooltip"
                         (click)="onZoomButtonClick('zoom-in')">
+                    <span class="tooltiptext">Zoom In</span>
                     <mat-icon>zoom_in</mat-icon>
                 </button>
-                <button mat-icon-button class="hover-class"
+                <button mat-icon-button class="hover-class tooltip"
                         (click)="onZoomButtonClick('zoom-out')">
+                    <span class="tooltiptext">Zoom Out</span>
                     <mat-icon>zoom_out</mat-icon>
                 </button>
             </div>
@@ -195,7 +201,7 @@
             <div>
                 <button mat-icon-button class="hover-class tooltip"
                         (click)="openPdf()">
-                        <span class="tooltiptext">help</span>
+                        <span class="tooltiptext">Help</span>
                         <mat-icon>help</mat-icon>
                 </button>
             </div>
