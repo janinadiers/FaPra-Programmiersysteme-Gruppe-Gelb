@@ -287,14 +287,13 @@ export class MarkenspielService {
 
         if(!this.multitasking){
             this.simpleStep(element);
-            this.resetColor();
             // console.log("simple step");
         }
         else {
             this.multiStep(element);
-            this.resetColor();
             // console.log("multitasking");
         }
+        this.resetColor();
 
         return;
     }
@@ -308,6 +307,8 @@ export class MarkenspielService {
         if(this.randomStep == true){
             this.showStep();
         }
+
+        this.resetColor();
     }
 
     private fireSingleTransition(element: Transition) {
