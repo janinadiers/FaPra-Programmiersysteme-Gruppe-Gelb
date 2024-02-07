@@ -46,12 +46,13 @@
  }
 
  .inactive {
-  background-color: rgb(139, 136, 136); 
-  color: rgb(0, 0, 0); 
+  background-color:rgb(200, 200, 200) !important;
+  color: black !important; 
+  opacity: 0.4;
 }
 
   .inactive:hover{
-  background-color: rgb(139, 136, 136) !important; 
+  background-color: rgb(200, 200, 200) !important;
 
   } 
 
