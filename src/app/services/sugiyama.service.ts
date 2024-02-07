@@ -24,17 +24,68 @@ export class SugiyamaService {
         this.layers = [];
         this.removedLines = [];
         this.usedEdges = [];
+
+        //heuristische nicht deterministische algorithmus versucht die kreuzungen zu minimieren 
+        //Azyklisch <-> Zyklisch
         
+        //Step 1 - Layer assignment mit nach unten gerichteten Kanten - EXAMPLE.json (DL-Folder)
+        // this.addLayers();
+        // this.removeAllIntermediateCoords();
+        // this.assignCoordinates();
+
+        // //Step 2 - Layer assignment ohne nach unten gerichtete Kanten - EXAMPLE.json (DL-Folder)
+        // this.addLayers();
+        // this.removeLowerDirectedLines();
+        // this.removeAllIntermediateCoords();
+        // this.assignCoordinates();
+
+        // //Step 3 - Auflösen von Schleifen vor Layer Assignment
+        // this.removeLoops();
+        // this.addLayers();
+        // this.removeLowerDirectedLines();
+        // this.removeAllIntermediateCoords();
+        // this.assignCoordinates();
+        
+        // //Step 4 - Auflösen von Schleifen vor Layer Assignment und anschließendes hinzufügen
+        // this.removeLoops();
+        // this.addLayers();
+        // this.removeLowerDirectedLines();
+        // this.revertLoops();
+        // this.removeAllIntermediateCoords();
+        // this.assignCoordinates();
+
+        //Step 5 - Reduzierung von Überschneidungen (barycenter heuristic) -- BEISPIEL NOCH FINDEN
         this.removeLoops();
         this.addLayers();
         this.removeLowerDirectedLines();
         this.revertLoops();
         this.removeAllIntermediateCoords();
         this.assignCoordinates();
-        this.routeEdges(); 
-        this.minimizeCrossings();
-        // this.reduceCrossings();
+        // this.minimizeCrossings();
         this.assignCoordinates();
+
+        // //Step 6 - Kantenzeichnung ohne Überlappung - Finale implementierung von Sugiyama
+        // this.removeLoops();
+        // this.addLayers();
+        // this.removeLowerDirectedLines();
+        // this.revertLoops();
+        // this.removeAllIntermediateCoords();
+        // this.assignCoordinates();
+        // this.routeEdges(); 
+        // this.minimizeCrossings();
+        // this.assignCoordinates();
+
+
+        // this.removeLoops();
+        // this.addLayers();
+        // this.removeLowerDirectedLines();
+        // this.revertLoops();
+        // this.removeAllIntermediateCoords();
+        // this.assignCoordinates();
+        // this.routeEdges(); 
+        // this.minimizeCrossings();
+        //                                     //// this.reduceCrossings();
+        // this.assignCoordinates();
     }
     
     //Step 1: Temporarely remove lines which result in a loop and save them for later push within removedLines
