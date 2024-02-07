@@ -168,6 +168,13 @@
                 <mat-icon>import_export</mat-icon>
             </button>
 
+            <button *ngIf="simulationActive"
+                class="hover-class tooltip" mat-icon-button
+                (click) = refresh()>
+                <span class="tooltiptext">Set Initial State</span>
+                <mat-icon>refresh</mat-icon>
+            </button>
+
             <mat-menu class="hover-class" #importExportMenu="matMenu">
                 <button mat-menu-item [matMenuTriggerFor]="importMenu">Import</button>
                 <button mat-menu-item [matMenuTriggerFor]="exportMenu">Export</button>

@@ -185,7 +185,7 @@ export class ToolbarComponent {
 
         if(algorithm === 'spring-embedder'){
             Diagram.algorithmIsActive = true;
-            
+
            this.deactivateDrawingArea();
 
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
@@ -200,7 +200,7 @@ export class ToolbarComponent {
 
         else if(algorithm === 'sugiyama'){
             Diagram.algorithmIsActive = true;
-            
+
             this.deactivateDrawingArea();
 
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
@@ -218,7 +218,7 @@ export class ToolbarComponent {
             Diagram.algorithmIsActive = false;
             this.reActivateDrawingArea();
             this.deselectAddAndRemoveTokenButtons()
-            
+
             if(freeButton && springEmbedderButton && sugiyamaButton && this._diagram?.nodes && this._diagram.nodes.length > 0){
                 freeButton.classList.add('selected');
                 springEmbedderButton.classList?.remove('selected');
@@ -363,9 +363,9 @@ export class ToolbarComponent {
     }
 
     deselectAddAndRemoveTokenButtons(){
-        
+
         if(Diagram.algorithmIsActive) return
-        
+
         let addTokenButton = document.querySelector('.add-token > mat-icon') as HTMLElement;
         let removeTokenButton = document.querySelector('.remove-token > mat-icon') as HTMLElement;
         if(!addTokenButton || !removeTokenButton) return
@@ -552,7 +552,7 @@ export class ToolbarComponent {
     }
 
     getInitialState(){
-    
+
         this._diagram?.places.forEach(place => {
             this.initialState.set(place.id, place.amountToken);
             });
@@ -567,10 +567,15 @@ export class ToolbarComponent {
             place.svgElement!.children[1].textContent = null;
            }
            else{
-            place.svgElement!.children[1].textContent = 
+            place.svgElement!.children[1].textContent =
             place.amountToken.toString();
            }
         });
+    }
+
+    refresh() {
+        this.setInitialState();
+        this.toggleSimulation();
     }
 
     deactivateDrawingArea() {
