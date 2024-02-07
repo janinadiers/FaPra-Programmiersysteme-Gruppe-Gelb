@@ -163,7 +163,7 @@
 
         <div *ngIf="!reachabilityActiveColor || !simulationActive" class="vertical-line"></div>
 
-            <button *ngIf="!reachabilityActiveColor" class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
+            <button *ngIf="!reachabilityActiveColor && !simulationActive" class="hover-class tooltip" mat-icon-button  [matMenuTriggerFor]="importExportMenu">
                 <span class="tooltiptext">Import/Export</span>
                 <mat-icon>import_export</mat-icon>
             </button>
@@ -183,7 +183,7 @@
 
             <input #hiddenInput (change)="importFromFile($event)" type="file" id="fileInput" style="display: none"/>
 
-            <div class="vertical-line" ></div>
+            <div class="vertical-line" *ngIf="!simulationActive && !reachabilityActiveColor"></div>
 
             <div class="zoom-button-wrapper">
                 <button mat-icon-button class="hover-class tooltip"
