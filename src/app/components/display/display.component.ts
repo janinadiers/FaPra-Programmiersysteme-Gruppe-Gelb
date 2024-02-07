@@ -209,7 +209,6 @@ export class DisplayComponent implements OnInit, OnDestroy {
 
     private clearDrawingArea(clearElements?: boolean) {
 
-        if(Diagram.algorithmIsActive) return
         const drawingArea = this.drawingArea?.nativeElement;
         if (drawingArea?.childElementCount === undefined) {
             return;
@@ -477,11 +476,11 @@ export class DisplayComponent implements OnInit, OnDestroy {
     }
 
     generateReachabilityGraph() {
-        if(Diagram.algorithmIsActive) return
+       
         const svgElement = document.getElementById('canvas');
-
+        
         if (this.activeButtonService.isReachButtonActive) {
-
+            
             this.clearDrawingArea();
 
             let graph = new ReachabilityGraph(this._diagram!, this._springEmbedderService);
@@ -489,7 +488,7 @@ export class DisplayComponent implements OnInit, OnDestroy {
             graph.createReachabilityGraph();
 
         } else {
-
+            
             this.clearDrawingArea();
 
             this._diagram!.places.forEach(place => {
