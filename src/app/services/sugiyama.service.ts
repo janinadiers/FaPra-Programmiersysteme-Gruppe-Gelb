@@ -18,7 +18,7 @@ export class SugiyamaService {
     layerWidth = 100;
     nodeHeight = 100;
 
-    public begin(diagram: Diagram) {
+    public begin(diagram: Diagram): boolean {
         this.diagram = diagram;
         this.removedLines = [];
         this.layers = [];
@@ -29,12 +29,26 @@ export class SugiyamaService {
         this.addLayers();
         this.removeLowerDirectedLines();
         this.revertLoops();
+        if (!this.checkGraphFunctionality()) 
+            return false;
+        
         this.removeAllIntermediateCoords();
         this.assignCoordinates();
         this.routeEdges(); 
         this.minimizeCrossings();
         // this.reduceCrossings();
         this.assignCoordinates();
+
+        return true;
+    }
+    checkGraphFunctionality(): boolean {
+        for (let i = 0; i < this.layers.length; i++) {
+            let layer = this.layers[i];
+            if (layer.length === 0)
+                return false;
+        }
+
+        return true;
     }
     
     //Step 1: Temporarely remove lines which result in a loop and save them for later push within removedLines
