@@ -210,8 +210,12 @@ export class ToolbarComponent {
             }
 
             this._springEmbedderService.teardown();
-            this._sugiyamaService.begin(this._diagram);
-            this._sugiyamaService.begin(this._diagram); //on purpose
+            if (this._sugiyamaService.begin(this._diagram))
+                this._sugiyamaService.begin(this._diagram); //on purpose
+            else {
+                alert('Graph could not be handled. Failed to assign atleast one Layer.');
+                this.onAlgorithmSelect();
+            }
 
         }
         else{
