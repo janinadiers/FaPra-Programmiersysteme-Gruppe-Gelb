@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pnml>
+<net id="" type="http://www.pnml.org/version-2009/grammar/ptnet">
+<name>
+<text>ILovePetriNets.pnml</text>
+</name>
+<page id="p1"><place id="p1">
+<name>
+</name>
+<graphics>
+<position x="262" y="172.0625"/>
+</graphics>
+<initialMarking>
+<text>0</text>
+</initialMarking>
+</place><place id="p2">
+<name>
+</name>
+<graphics>
+<position x="596" y="169.0625"/>
+</graphics>
+<initialMarking>
+<text>0</text>
+</initialMarking>
+</place><place id="p3">
+<name>
+</name>
+<graphics>
+<position x="818.8000000000001" y="164.67500000000007"/>
+</graphics>
+<initialMarking>
+<text>0</text>
+</initialMarking>
+</place><place id="p4">
+<name>
+</name>
+<graphics>
+<position x="267" y="340.0625"/>
+</graphics>
+<initialMarking>
+<text>1</text>
+</initialMarking>
+</place><place id="p5">
+<name>
+</name>
+<graphics>
+<position x="400" y="343.0625"/>
+</graphics>
+<initialMarking>
+<text>5</text>
+</initialMarking>
+</place><place id="p6">
+<name>
+</name>
+<graphics>
+<position x="490" y="341.0625"/>
+</graphics>
+<initialMarking>
+<text>0</text>
+</initialMarking>
+</place><place id="p7">
+<name>
+</name>
+<graphics>
+<position x="715.6" y="339.8750000000001"/>
+</graphics>
+<initialMarking>
+<text>5</text>
+</initialMarking>
+</place><place id="p8">
+<name>
+</name>
+<graphics>
+<position x="597" y="266.0625"/>
+</graphics>
+<initialMarking>
+<text>1</text>
+</initialMarking>
+</place><transition id="t1"><name><text>a</text></name><graphics><position x="402" y="169.0625"/></graphics></transition><transition id="t2"><name><text>b</text></name><graphics><position x="725" y="167.0625"/></graphics></transition><transition id="t3"><name><text>ε</text></name><graphics><position x="122" y="170.0625"/></graphics></transition><transition id="t4"><name><text>ε</text></name><graphics><position x="910" y="165.87500000000006"/></graphics></transition><transition id="t5"><name><text></text></name><graphics><position x="129" y="342.0625"/></graphics></transition>
+<arc id="p1,t1" source="p1" target="t1">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t1,p2" source="t1" target="p2">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p2,t2" source="p2" target="t2">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t2,p3" source="t2" target="p3">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t3,p1" source="t3" target="p1">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p3,t4" source="p3" target="t4">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p1,t5" source="p1" target="t5">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t5,p4" source="t5" target="p4">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p4,t3" source="p4" target="t3">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t1,p4" source="t1" target="p4">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p5,t1" source="p5" target="t1">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t1,p6" source="t1" target="p6">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p7,t2" source="p7" target="t2">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="t2,p8" source="t2" target="p8">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+<arc id="p8,t1" source="p8" target="t1">
+<graphics>
+</graphics>
+
+<inscription><text>1</text></inscription>
+</arc>
+</page>
+</net>
+</pnml>
