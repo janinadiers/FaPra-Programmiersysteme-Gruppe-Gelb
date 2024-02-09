@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pnml>
+  <net id="" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name>
+      <text>ILovePetriNets.pnml</text>
+    </name>
+    <page id="p1">
+      <transition id="a">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="385" y="157"/>
+        </graphics>
+      </transition>
+      <transition id="x">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="676" y="350"/>
+        </graphics>
+      </transition>
+      <transition id="b">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="802" y="227"/>
+        </graphics>
+      </transition>
+      <transition id="y">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="961" y="271"/>
+        </graphics>
+      </transition>
+      <transition id="c">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="1163" y="122"/>
+        </graphics>
+      </transition>
+      <transition id="u">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="629" y="187"/>
+        </graphics>
+      </transition>
+      <transition id="v">
+        <name>
+          <text/>
+        </name>
+        <graphics>
+          <position x="910" y="102"/>
+        </graphics>
+      </transition>
+      <place id="p0">
+        <name>
+          <text>p0</text>
+        </name>
+        <graphics>
+          <position x="215" y="355"/>
+        </graphics>
+        <initialMarking>
+          <text>2</text>
+        </initialMarking>
+      </place>
+      <place id="p1">
+        <name>
+          <text>p1</text>
+        </name>
+        <graphics>
+          <position x="535" y="192"/>
+        </graphics>
+        <initialMarking>
+          <text>0</text>
+        </initialMarking>
+      </place>
+      <place id="p2">
+        <name>
+          <text>p2</text>
+        </name>
+        <graphics>
+          <position x="693" y="258"/>
+        </graphics>
+        <initialMarking>
+          <text>0</text>
+        </initialMarking>
+      </place>
+      <place id="p3">
+        <name>
+          <text>p3</text>
+        </name>
+        <graphics>
+          <position x="909" y="195"/>
+        </graphics>
+        <initialMarking>
+          <text>0</text>
+        </initialMarking>
+      </place>
+      <place id="p4">
+        <name>
+          <text>p4</text>
+        </name>
+        <graphics>
+          <position x="1041" y="156"/>
+        </graphics>
+        <initialMarking>
+          <text>0</text>
+        </initialMarking>
+      </place>
+      <place id="p5">
+        <name>
+          <text>p5</text>
+        </name>
+        <graphics>
+          <position x="724" y="65"/>
+        </graphics>
+        <initialMarking>
+          <text>0</text>
+        </initialMarking>
+      </place>
+      <place id="p6">
+        <name>
+          <text>p6</text>
+        </name>
+        <graphics>
+          <position x="833" y="355"/>
+        </graphics>
+        <initialMarking>
+          <text>0</text>
+        </initialMarking>
+      </place>
+      <arc id="arc0" source="p0" target="a">
+        <graphics>
+          <position x="400" y="350"/>
+          <position x="300" y="250"/>
+        </graphics>
+        <inscription>
+          <text>2</text>
+        </inscription>
+      </arc>
+      <arc id="arc1" source="a" target="p1">
+        <graphics/>
+        <inscription>
+          <text>2</text>
+        </inscription>
+      </arc>
+      <arc id="arc2" source="p1" target="x">
+        <graphics/>
+        <inscription>
+          <text>2</text>
+        </inscription>
+      </arc>
+      <arc id="arc3" source="p1" target="u">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc4" source="x" target="p2">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc5" source="p2" target="b">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc6" source="u" target="p2">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc7" source="b" target="p3">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc8" source="p3" target="y">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc9" source="p3" target="v">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc10" source="y" target="p4">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc11" source="p4" target="c">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc12" source="v" target="p4">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc13" source="u" target="p5">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc14" source="p5" target="v">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc15" source="x" target="p6">
+        <graphics/>
+        <inscription/>
+      </arc>
+      <arc id="arc16" source="p6" target="y">
+        <graphics/>
+        <inscription/>
+      </arc>
+    </page>
+  </net>
+</pnml>
